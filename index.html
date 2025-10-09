@@ -39,6 +39,7 @@
 
     .logo-wrap {
       width: 108px; height: 108px; border-radius: 50%; overflow: hidden; box-shadow: var(--shadow-1);
+      background: #0f0f0f;
     }
     .logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -52,6 +53,7 @@
 
     main { margin-top: 34px; }
 
+    /* HOME */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -66,35 +68,59 @@
       position: relative; overflow: hidden; isolation: isolate;
       transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
     }
-    .card::after {
-      content: ""; position: absolute; inset: 0; border-radius: inherit;
-      background: linear-gradient(135deg, rgba(15, 252, 126, .7), rgba(15, 252, 126, .05));
-      opacity: 0; transition: opacity .25s ease;
-    }
     .card:hover { transform: translateY(-2px); border-color: #222527; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
-    .card:hover::after { opacity: 1; }
 
-    .card-inner { aspect-ratio: 16 / 10; display: grid; place-items: center; }
-    .card-empty {
-      width: 88%; height: 64%; border-radius: var(--radius-lg);
-      border: 1px dashed rgba(255,255,255,.08);
-      display: grid; place-items: center; color: rgba(255,255,255,.3); font-size: 12px;
-      user-select: none;
+    .card-inner { aspect-ratio: 16 / 10; position: relative; display: grid; place-items: center; }
+
+    /* Marca de agua con el logo */
+    .card-inner::before {
+      content: ""; position: absolute; inset: 0; opacity: .06; filter: grayscale(1);
+      background: center/58% no-repeat url("https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg");
     }
+
+    .card-title {
+      z-index: 1; padding: 10px 14px; border-radius: 999px;
+      background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.08);
+      font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    }
+
     figure { margin: 0; }
-    figcaption { margin-top: 10px; font-size: 14px; color: var(--fg-muted); letter-spacing: .02em; }
+    figcaption { margin-top: 10px; font-size: 14px; color: var(--fg-muted); letter-spacing: .02em; text-align: center; }
 
-    @media (prefers-reduced-motion: reduce) {
-      .card { transition: none; }
-      .card:hover { transform: none; }
+    /* DETALLE DE CANCIÓN */
+    #song-view[hidden] { display: none; }
+    #home[hidden] { display: none; }
+
+    .back {
+      display: inline-flex; gap: .6ch; align-items: center; margin-bottom: 16px;
+      padding: 8px 12px; border-radius: 999px; border: 1px solid #1f2123; background: #0f1112;
     }
+
+    .song-title { margin: 0 0 6px; font-size: clamp(22px, 2.2vw + 6px, 32px); font-weight: 900; }
+    .song-meta { color: #b8bec4; font-size: 14px; margin-bottom: 18px; }
+
+    .audios-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;
+    }
+
+    .audio-card {
+      background: linear-gradient(180deg, #141516 0%, #0f1011 100%);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 16px; box-shadow: var(--shadow-1);
+    }
+    .audio-card h3 { margin: 0 0 10px; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-muted); }
+    .audio-card audio { width: 100%; outline: none; }
+
+    /* utilidades */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 1px, 1px); white-space: nowrap; border: 0; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="logo-wrap">
-        <img src="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760050493/logo_tenores_negativo_a6ixhd.svg" alt="Logo Tenores" />
+        <img src="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" alt="Logo Tenores" />
       </div>
       <h1 class="site-title">Tenores</h1>
       <div class="accent-bar"></div>
@@ -102,47 +128,99 @@
     </header>
 
     <main>
-      <section aria-labelledby="canciones-titulo">
+      <!-- HOME -->
+      <section id="home" aria-labelledby="canciones-titulo">
         <h2 id="canciones-titulo" class="sr-only">Canciones del coro navideño</h2>
         <div class="grid">
           <figure>
-            <a class="card" href="#" aria-label="Fum Fum Fum">
-              <div class="card-inner">
-                <div class="card-empty">(vacío)</div>
-              </div>
+            <a class="card" href="#fum" aria-label="Fum Fum Fum">
+              <div class="card-inner"><span class="card-title">Fum Fum Fum</span></div>
             </a>
             <figcaption>Fum Fum Fum</figcaption>
           </figure>
 
           <figure>
-            <a class="card" href="#" aria-label="Adeste Fideles">
-              <div class="card-inner">
-                <div class="card-empty">(vacío)</div>
-              </div>
+            <a class="card" href="#adeste" aria-label="Adeste Fideles">
+              <div class="card-inner"><span class="card-title">Adeste Fideles</span></div>
             </a>
             <figcaption>Adeste Fideles</figcaption>
           </figure>
 
           <figure>
-            <a class="card" href="#" aria-label="Dona Nobis Pacem">
-              <div class="card-inner">
-                <div class="card-empty">(vacío)</div>
-              </div>
+            <a class="card" href="#dona" aria-label="Dona Nobis Pacem">
+              <div class="card-inner"><span class="card-title">Dona Nobis Pacem</span></div>
             </a>
             <figcaption>Dona Nobis Pacem</figcaption>
           </figure>
 
           <figure>
-            <a class="card" href="#" aria-label="Kling Glöckchen, klingelingeling">
-              <div class="card-inner">
-                <div class="card-empty">(vacío)</div>
-              </div>
+            <a class="card" href="#kling" aria-label="Kling Glöckchen, klingelingeling">
+              <div class="card-inner"><span class="card-title">Kling Glöckchen</span></div>
             </a>
             <figcaption>Kling Glöckchen, klingelingeling</figcaption>
           </figure>
         </div>
       </section>
+
+      <!-- SONG VIEW -->
+      <section id="song-view" hidden>
+        <a class="back" href="#">← Volver</a>
+        <h2 class="song-title" id="song-title">Título</h2>
+        <p class="song-meta" id="song-meta">Tenores • Curso navideño</p>
+        <div class="audios-grid">
+          <article class="audio-card">
+            <h3>Explicación</h3>
+            <audio id="audio-explain" controls preload="none"></audio>
+          </article>
+          <article class="audio-card">
+            <h3>Canción</h3>
+            <audio id="audio-track" controls preload="none"></audio>
+          </article>
+        </div>
+      </section>
     </main>
   </div>
+
+  <script>
+    // ====== Router mínimo por hash y data de canciones ======
+    const SONGS = {
+      fum: { title: 'Fum Fum Fum', explain: '', track: '' },
+      adeste: { title: 'Adeste Fideles', explain: '', track: '' },
+      dona: { title: 'Dona Nobis Pacem', explain: '', track: '' },
+      kling: { title: 'Kling Glöckchen, klingelingeling', explain: '', track: '' }
+    };
+
+    const $home = document.getElementById('home');
+    const $songView = document.getElementById('song-view');
+    const $title = document.getElementById('song-title');
+    const $meta = document.getElementById('song-meta');
+    const $exp = document.getElementById('audio-explain');
+    const $trk = document.getElementById('audio-track');
+
+    function renderHome() {
+      $home.hidden = false; $songView.hidden = true;
+      // Stop audios si estaban reproduciéndose
+      [$exp, $trk].forEach(a => { try { a.pause(); a.currentTime = 0; } catch(_){} });
+    }
+
+    function renderSong(id) {
+      const song = SONGS[id];
+      if (!song) return renderHome();
+      $title.textContent = song.title;
+      $meta.textContent = 'Tenores • Curso navideño';
+      $exp.src = song.explain || '';
+      $trk.src = song.track || '';
+      $home.hidden = true; $songView.hidden = false;
+    }
+
+    function router() {
+      const h = (location.hash || '').replace('#','').trim();
+      if (!h) return renderHome();
+      renderSong(h);
+    }
+
+    window.addEventListener('hashchange', router);
+    window.addEventListener('DOMContentLoaded', router);
+  </script>
 </body>
 </html>
