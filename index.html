@@ -12,6 +12,7 @@
     html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--fg);font-family:Futura,'Futura PT','Avenir Next',Avenir,'Trebuchet MS',system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;line-height:1.35}
     a,a:visited{color:var(--fg);text-decoration:none}
+    [hidden]{display:none!important}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
     .container{width:100%;max-width:var(--container);margin:0 auto;padding:32px 20px 52px}
     header{display:grid;place-items:center;gap:18px;padding-top:28px}
@@ -51,12 +52,13 @@
     .btn.is-loading .label{opacity:0}
     .btn.is-loading::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin 1s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .mini{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;background:#0f1112;border:1px solid #242628;border-radius:16px;box-shadow:var(--shadow-1);display:flex;align-items:center;gap:12px;padding:10px 12px}
+    .mini{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;background:#0f1112;border:1px solid #242628;border-radius:16px;box-shadow:var(--shadow-1);display:flex;align-items:center;gap:12px;padding:10px 12px;transition:transform .25s ease,opacity .25s ease}
+    .mini--hidden{transform:translateY(150%);opacity:.2;pointer-events:none}
     .mini-btn{width:40px;height:40px;border-radius:999px;border:1px solid #242628;background:#111314;color:#fff;display:grid;place-items:center}
     .mini-meta{min-width:0;cursor:pointer}
     .mini-title{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .mini-sub{font-size:12px;color:#b8bec4}
-    .mini-bar{flex:1;height:8px;background:#1b1d1f;border-radius:999px;overflow:hidden;cursor:pointer}
+    .mini-bar{flex:1;height:8px;background:#1b1d1f;border-radius:999px;overflow:hidden;cursor:pointer;touch-action:none}
     .mini-prog{width:0%;height:100%;background:var(--accent)}
     @media (min-width:840px){.mini{left:24px;right:auto;width:420px}}
   </style>
@@ -116,6 +118,7 @@
   </div>
   <script>
     const SONGS={fum:{title:'Fum Fum Fum',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051384/fum_fum_fum_explicacion_hcsfzy.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051700/fum_fum_fum_cancion_c7zzyg.wav'},adeste:{title:'Adeste Fideles',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051808/adeste_explicacion_cap0yk.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav'},dona:{title:'Dona Nobis Pacem',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054204/dona_nobis_pacem_explicacion_eeqefa.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054240/dona_nobis_pacem___cancion_hsep4p.wav'},kling:{title:'Kling Glöckchen, klingelingeling',explain:'',track:''}};
+
     const $home=document.getElementById('home');
     const $songView=document.getElementById('song-view');
     const $title=document.getElementById('song-title');
@@ -126,6 +129,7 @@
     const $dlTrk=document.getElementById('dl-track');
     const $lblExp=document.getElementById('lbl-explain');
     const $lblTrk=document.getElementById('lbl-track');
+
     const $mini=document.getElementById('mini');
     const $miniToggle=document.getElementById('mini-toggle');
     const $miniClose=document.getElementById('mini-close');
@@ -134,31 +138,68 @@
     const $miniBar=document.getElementById('mini-bar');
     const $miniProg=document.getElementById('mini-prog');
     const $miniMeta=document.getElementById('mini-meta');
+
     let currentSongId=null;let currentAudio=null;let currentLabel='';
+
     function setActiveCard(id){document.querySelectorAll('[data-song]').forEach(a=>{a.classList.toggle('active',a.getAttribute('data-song')===id);if(a.getAttribute('data-song')===id){a.setAttribute('aria-current','page')}else{a.removeAttribute('aria-current')}})}
+
     function setLoading(btn,on,labelEl){if(on){btn.classList.add('is-loading');btn.setAttribute('aria-disabled','true');if(labelEl)labelEl.textContent='Descargando…'}else{btn.classList.remove('is-loading');btn.setAttribute('aria-disabled','false')}}
+
     function renderHome(){$home.hidden=false;$songView.hidden=true;setActiveCard('');[$exp,$trk].forEach(a=>{if(!currentAudio||a!==currentAudio){try{a.pause();a.currentTime=0}catch(_){} }});if(!currentAudio||currentAudio.paused||currentAudio.ended)hideMini();document.title='Tenores'}
+
     function extFromUrl(url){try{const u=new URL(url);const p=u.pathname;const i=p.lastIndexOf('.');return i!==-1?p.slice(i+1).toUpperCase():'MP3'}catch{const m=url.match(/\.([a-z0-9]+)(?:$|\?)/i);return m?m[1].toUpperCase():'MP3'}}
+
     function renderSong(id){const song=SONGS[id];if(!song)return renderHome();currentSongId=id;$title.textContent=song.title;$meta.textContent='Tenores • Curso oficial';$exp.src=song.explain||'';$trk.src=song.track||'';const hasExplain=Boolean(song.explain);const hasTrack=Boolean(song.track);$dlExp.setAttribute('aria-disabled',String(!hasExplain));$dlTrk.setAttribute('aria-disabled',String(!hasTrack));$lblExp.textContent=hasExplain?`Descargar ${extFromUrl(song.explain)}`:'Descargar';$lblTrk.textContent=hasTrack?`Descargar ${extFromUrl(song.track)}`:'Descargar';$home.hidden=true;$songView.hidden=false;setActiveCard(id);document.title=`Tenores – ${song.title}`;window.scrollTo({top:0,behavior:'smooth'})}
+
     function router(){const h=(location.hash||'').replace('#','').trim();if(!h)return renderHome();renderSong(h)}
+
     function fileExt(url){try{const u=new URL(url);const p=u.pathname;const i=p.lastIndexOf('.');return i!==-1?p.slice(i):'.mp3'}catch{const m=url.match(/\.([a-z0-9]+)(?:$|\?)/i);return m?'.'+m[1]:'.mp3'}}
     function cleanName(s){return s.replace(/[^a-z0-9\- _\.]/gi,'_')}
     async function forceDownload(url,filename,btn,labelEl){try{setLoading(btn,true,labelEl);const res=await fetch(url,{mode:'cors'});const blob=await res.blob();const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=filename;document.body.appendChild(link);link.click();URL.revokeObjectURL(link.href);link.remove()}catch(e){window.open(url,'_blank')}finally{setLoading(btn,false,labelEl);if(labelEl)labelEl.textContent=labelEl.dataset.default||'Descargar'}}
+
     $lblExp.dataset.default=$lblExp.textContent;$lblTrk.dataset.default=$lblTrk.textContent;
     $dlExp.addEventListener('click',e=>{e.preventDefault();if(!currentSongId)return;const s=SONGS[currentSongId];if(!s.explain)return;const ext=fileExt(s.explain);forceDownload(s.explain,cleanName(`${s.title} - explicacion${ext}`),$dlExp,$lblExp)});
     $dlTrk.addEventListener('click',e=>{e.preventDefault();if(!currentSongId)return;const s=SONGS[currentSongId];if(!s.track)return;const ext=fileExt(s.track);forceDownload(s.track,cleanName(`${s.title} - cancion${ext}`),$dlTrk,$lblTrk)});
-    function showMini(){$mini.hidden=false}
-    function hideMini(){$mini.hidden=true;$miniProg.style.width='0%';currentAudio=null}
+
+    function showMini(){ $mini.hidden=false; }
+    function hideMini(){ $mini.hidden=true; $mini.classList.remove('mini--hidden'); $miniProg.style.width='0%'; currentAudio=null; }
+
     function bindToMini(audio,label){currentAudio=audio;currentLabel=label;$miniTitle.textContent=SONGS[currentSongId]?.title||'—';$miniSub.textContent=label;showMini();updateMini()}
     function updateMini(){if(!currentAudio||!currentAudio.duration){$miniProg.style.width='0%';return}const pct=currentAudio.currentTime/currentAudio.duration*100;$miniProg.style.width=`${pct}%`;$miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));$miniToggle.textContent=currentAudio.paused?'▶':'⏸'}
+
     [$exp,$trk].forEach((el,idx)=>{const label=idx===0?'Explicación':'Canción';el.addEventListener('play',()=>{bindToMini(el,label)});el.addEventListener('pause',()=>{updateMini();if($exp.paused&&$trk.paused)hideMini()});el.addEventListener('timeupdate',updateMini);el.addEventListener('ended',()=>{updateMini();hideMini()})});
+
     $miniToggle.addEventListener('click',()=>{if(!currentAudio)return;currentAudio.paused?currentAudio.play():currentAudio.pause();updateMini()});
     $miniClose.addEventListener('click',()=>{if(currentAudio){try{currentAudio.pause()}catch(_){}}hideMini()});
+
     $miniBar.addEventListener('click',e=>{if(!currentAudio||!currentAudio.duration)return;const rect=$miniBar.getBoundingClientRect();const pct=Math.min(1,Math.max(0,(e.clientX-rect.left)/rect.width));currentAudio.currentTime=pct*currentAudio.duration});
+
+    let scrubbing=false;
+    function pointX(ev){return ev.touches?ev.touches[0].clientX:ev.clientX}
+    function scrubTo(ev){if(!currentAudio||!currentAudio.duration)return;const rect=$miniBar.getBoundingClientRect();const pct=Math.min(1,Math.max(0,(pointX(ev)-rect.left)/rect.width));currentAudio.currentTime=pct*currentAudio.duration;updateMini()}
+    $miniBar.addEventListener('mousedown',ev=>{scrubbing=true;scrubTo(ev)});
+    window.addEventListener('mousemove',ev=>{if(scrubbing)scrubTo(ev)});
+    window.addEventListener('mouseup',()=>{scrubbing=false});
+    $miniBar.addEventListener('touchstart',ev=>{scrubbing=true;scrubTo(ev)},{passive:true});
+    window.addEventListener('touchmove',ev=>{if(scrubbing)scrubTo(ev)},{passive:true});
+    window.addEventListener('touchend',()=>{scrubbing=false});
+
     $miniMeta.addEventListener('click',()=>{if(currentSongId){location.hash=currentSongId}});
+
+    let lastY=window.scrollY;
+    window.addEventListener('scroll',()=>{
+      if($mini.hidden) return;
+      const y=window.scrollY;
+      if(y>lastY+8){ $mini.classList.add('mini--hidden'); }
+      else if(y<lastY-8){ $mini.classList.remove('mini--hidden'); }
+      lastY=y;
+    },{passive:true});
+
     document.addEventListener('keydown',e=>{const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||e.altKey||e.ctrlKey||e.metaKey)return;if(e.code==='Space'){e.preventDefault();const target=currentAudio||(!$songView.hidden?($trk.src?$trk:$exp):null);if(target){target.paused?target.play():target.pause()}}else if(e.key==='ArrowLeft'){e.preventDefault();if(currentAudio)currentAudio.currentTime=Math.max(0,currentAudio.currentTime-5)}else if(e.key==='ArrowRight'){e.preventDefault();if(currentAudio&&currentAudio.duration)currentAudio.currentTime=Math.min(currentAudio.duration,currentAudio.currentTime+5)}});
+
     window.addEventListener('hashchange',router);
     window.addEventListener('DOMContentLoaded',()=>{hideMini();router()});
   </script>
 </body>
 </html>
+
