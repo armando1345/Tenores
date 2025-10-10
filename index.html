@@ -63,7 +63,13 @@
     .card-inner::before { content: ''; position: absolute; inset: 0; opacity: .06; filter: grayscale(1); background: center/58% no-repeat url('https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg'); }
 
     /* "Botón" visual con efecto de brillo */
-    .card-title { z-index: 1; padding: 10px 14px; border-radius: 999px; background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.08); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #fff; position: relative; overflow: hidden; }
+    .card-title {
+      z-index: 1; padding: 10px 16px; border-radius: 999px; background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.08); font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase; color: #fff; position: relative; overflow: hidden;
+      /* Forzar una sola línea; si no entra, usar elipsis */
+      white-space: nowrap; max-width: 88%; display: inline-block; text-overflow: ellipsis;
+    }
     .card-title::after { content: ''; position: absolute; top: 0; left: -120%; width: 120%; height: 100%; background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,.25), transparent 60%); transform: skewX(-20deg); transition: transform .6s ease; }
     .card:hover .card-title::after { transform: translateX(220%) skewX(-20deg); }
 
@@ -74,11 +80,6 @@
 
     .song-title { margin: 0 0 6px; font-size: clamp(22px, 2.2vw + 6px, 32px); font-weight: 900; }
     .song-meta { color: #b8bec4; font-size: 14px; margin-bottom: 18px; }
-
-    .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
-    .meta-item { background: #0f1112; border: 1px solid #202224; border-radius: var(--radius-lg); padding: 10px 12px; }
-    .meta-item b { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #b8bec4; margin-bottom: 6px; }
-    .meta-item span { font-size: 14px; color: #fff; }
 
     .audios-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 
@@ -136,14 +137,7 @@
       <section id="song-view" hidden>
         <a class="back" href="#">← Volver</a>
         <h2 class="song-title" id="song-title">Título</h2>
-        <p class="song-meta" id="song-meta">Tenores • Curso navideño</p>
-
-        <div class="meta-grid">
-          <div class="meta-item"><b>Tonalidad</b><span id="m-key">—</span></div>
-          <div class="meta-item"><b>Compás</b><span id="m-time">—</span></div>
-          <div class="meta-item"><b>BPM</b><span id="m-bpm">—</span></div>
-          <div class="meta-item"><b>Entrada Tenor</b><span id="m-entry">—</span></div>
-        </div>
+        <p class="song-meta" id="song-meta">Tenores • Curso oficial</p>
 
         <div class="audios-grid">
           <article class="audio-card">
@@ -162,12 +156,12 @@
   </div>
 
   <script>
-    // Enlaces oficiales + metadatos (puedes completar cuando los tengas)
+    // Enlaces oficiales
     const SONGS = {
-      fum:   { title: 'Fum Fum Fum', explain: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051384/fum_fum_fum_explicacion_hcsfzy.mp3', track: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051700/fum_fum_fum_cancion_c7zzyg.wav', meta:{ key:'', time:'', bpm:'', entry:'' } },
-      adeste:{ title: 'Adeste Fideles', explain: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051808/adeste_explicacion_cap0yk.mp3', track: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav', meta:{ key:'', time:'', bpm:'', entry:'' } },
-      dona:  { title: 'Dona Nobis Pacem', explain: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054204/dona_nobis_pacem_explicacion_eeqefa.mp3', track: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054240/dona_nobis_pacem___cancion_hsep4p.wav', meta:{ key:'', time:'', bpm:'', entry:'' } },
-      kling: { title: 'Kling Glöckchen, klingelingeling', explain: '', track: '', meta:{ key:'', time:'', bpm:'', entry:'' } }
+      fum:   { title: 'Fum Fum Fum', explain: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051384/fum_fum_fum_explicacion_hcsfzy.mp3', track: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051700/fum_fum_fum_cancion_c7zzyg.wav' },
+      adeste:{ title: 'Adeste Fideles', explain: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051808/adeste_explicacion_cap0yk.mp3', track: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav' },
+      dona:  { title: 'Dona Nobis Pacem', explain: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054204/dona_nobis_pacem_explicacion_eeqefa.mp3', track: 'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054240/dona_nobis_pacem___cancion_hsep4p.wav' },
+      kling: { title: 'Kling Glöckchen, klingelingeling', explain: '', track: '' }
     };
 
     const $home = document.getElementById('home');
@@ -179,10 +173,7 @@
     const $dlExp = document.getElementById('dl-explain');
     const $dlTrk = document.getElementById('dl-track');
 
-    const $mKey = document.getElementById('m-key');
-    const $mTime = document.getElementById('m-time');
-    const $mBpm = document.getElementById('m-bpm');
-    const $mEntry = document.getElementById('m-entry');
+    let currentSongId = null;
 
     function setActiveCard(id){
       document.querySelectorAll('[data-song]').forEach(a=>{
@@ -195,35 +186,27 @@
       $home.hidden = false; $songView.hidden = true; setActiveCard('');
       [$exp, $trk].forEach(a => { try { a.pause(); a.currentTime = 0; } catch(_){} });
       document.title = 'Tenores';
+      currentSongId = null;
     }
 
     function renderSong(id) {
       const song = SONGS[id];
       if (!song) return renderHome();
+      currentSongId = id;
       $title.textContent = song.title;
-      $meta.textContent = 'Tenores • Curso navideño';
+      $meta.textContent = 'Tenores • Curso oficial';
 
       $exp.src = song.explain || '';
       $trk.src = song.track || '';
 
-      // Descargas
+      // Botones de descarga: se habilitan si hay URL
       const hasExplain = Boolean(song.explain);
       const hasTrack = Boolean(song.track);
-      $dlExp.href = hasExplain ? song.explain : '#';
-      $dlTrk.href = hasTrack ? song.track : '#';
       $dlExp.setAttribute('aria-disabled', String(!hasExplain));
       $dlTrk.setAttribute('aria-disabled', String(!hasTrack));
 
-      // Metadatos
-      const m = song.meta || {}; 
-      $mKey.textContent = m.key || '—';
-      $mTime.textContent = m.time || '—';
-      $mBpm.textContent = m.bpm || '—';
-      $mEntry.textContent = m.entry || '—';
-
       $home.hidden = true; $songView.hidden = false; setActiveCard(id);
       document.title = `Tenores – ${song.title}`;
-      // Autoscroll suave a la parte superior
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -233,10 +216,48 @@
       renderSong(h);
     }
 
+    // ===== Descarga forzada (evita abrir pestaña) =====
+    function extFromUrl(url){
+      try { const u=new URL(url); const p=u.pathname; const i=p.lastIndexOf('.'); return i!==-1 ? p.slice(i) : '.mp3'; }
+      catch { const m=url.match(/\.([a-z0-9]+)(?:$|\?)/i); return m?('.'+m[1]):'.mp3'; }
+    }
+    function cleanName(s){ return s.replace(/[^a-z0-9\- _\.]/gi,'_'); }
+    async function forceDownload(url, filename){
+      try{
+        const res = await fetch(url, {mode:'cors'});
+        const blob = await res.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        link.remove();
+      } catch(e){
+        // Fallback: abre en nueva pestaña si el navegador bloquea la descarga
+        window.open(url, '_blank');
+      }
+    }
+
+    $dlExp.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(!currentSongId) return;
+      const s = SONGS[currentSongId];
+      if(!s.explain) return;
+      const ext = extFromUrl(s.explain);
+      forceDownload(s.explain, cleanName(`${s.title} - explicacion${ext}`));
+    });
+    $dlTrk.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(!currentSongId) return;
+      const s = SONGS[currentSongId];
+      if(!s.track) return;
+      const ext = extFromUrl(s.track);
+      forceDownload(s.track, cleanName(`${s.title} - cancion${ext}`));
+    });
+
     window.addEventListener('hashchange', router);
     window.addEventListener('DOMContentLoaded', router);
   </script>
 </body>
 </html>
-
-
