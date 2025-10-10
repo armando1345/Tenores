@@ -155,7 +155,7 @@
 
     function fileExt(url){try{const u=new URL(url);const p=u.pathname;const i=p.lastIndexOf('.');return i!==-1?p.slice(i):'.mp3'}catch{const m=url.match(/\.([a-z0-9]+)(?:$|\?)/i);return m?'.'+m[1]:'.mp3'}}
     function cleanName(s){return s.replace(/[^a-z0-9\- _\.]/gi,'_')}
-    async function forceDownload(url,filename,btn,labelEl){try{setLoading(btn,true,labelEl);const res=await fetch(url,{mode:'cors'});const blob=await res.blob();const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=filename;document.body.appendChild(link);link.click();URL.revokeObjectURL(link.href);link.remove()}catch(e){window.open(url,'_blank')}finally{setLoading(btn,false,labelEl);if(labelEl)labelEl.textContent=labelEl.dataset.default||'Descargar'}}
+    async function forceDownload(url,filename,btn,labelEl){try{setLoading(btn,true,labelEl);const res=await fetch(url,{mode:'cors'});const blob=await res.blob();const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=filename;document.body.appendChild(link);link.click();URL.revokeObjectURL(link.href);link.remove()}catch(e){window.open(url,'*blank')}finally{setLoading(btn,false,labelEl);if(labelEl)labelEl.textContent=labelEl.dataset.default||'Descargar'}}
 
     $lblExp.dataset.default=$lblExp.textContent;$lblTrk.dataset.default=$lblTrk.textContent;
     $dlExp.addEventListener('click',e=>{e.preventDefault();if(!currentSongId)return;const s=SONGS[currentSongId];if(!s.explain)return;const ext=fileExt(s.explain);forceDownload(s.explain,cleanName(`${s.title} - explicacion${ext}`),$dlExp,$lblExp)});
@@ -168,14 +168,14 @@
     function iconPlay(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="8,5 19,12 8,19 8,5"></polygon></svg>`}
     function iconPause(){return `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><line x1=\"9\" y1=\"5\" x2=\"9\" y2=\"19\"/><line x1=\"15\" y1=\"5\" x2=\"15\" y2=\"19\"/></svg>`}
     function updateMini(){
-      const isPaused = !currentAudio || currentAudio.paused;
-      $miniToggle.innerHTML = isPaused ? iconPlay() : iconPause();
-      $miniToggle.setAttribute('aria-label', isPaused ? 'Reproducir' : 'Pausar');
-      if(!currentAudio || !currentAudio.duration){ $miniProg.style.width='0%'; return; }
-      const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
-      $miniProg.style.width = `${pct}%`;
-      $miniBar.setAttribute('aria-valuenow', String(Math.round(pct)));
-    }const pct=currentAudio.currentTime/currentAudio.duration*100;$miniProg.style.width=`${pct}%`;$miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));$miniToggle.textContent=currentAudio.paused?'▶':'⏸'}
+      const isPaused=!currentAudio||currentAudio.paused;
+      $miniToggle.innerHTML=isPaused?iconPlay():iconPause();
+      $miniToggle.setAttribute('aria-label',isPaused?'Reproducir':'Pausar');
+      if(!currentAudio||!currentAudio.duration){$miniProg.style.width='0%';return}
+      const pct=(currentAudio.currentTime/currentAudio.duration)*100;
+      $miniProg.style.width=`${pct}%`;
+      $miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));
+    }
 
     [$exp,$trk].forEach((el,idx)=>{const label=idx===0?'Explicación':'Canción';el.addEventListener('play',()=>{bindToMini(el,label)});el.addEventListener('pause',()=>{updateMini();if($exp.paused&&$trk.paused)hideMini()});el.addEventListener('timeupdate',updateMini);el.addEventListener('ended',()=>{updateMini();hideMini()})});
 
@@ -198,10 +198,10 @@
 
     let lastY=window.scrollY;
     window.addEventListener('scroll',()=>{
-      if($mini.hidden) return;
+      if($mini.hidden)return;
       const y=window.scrollY;
-      if(y>lastY+8){ $mini.classList.add('mini--hidden'); }
-      else if(y<lastY-8){ $mini.classList.remove('mini--hidden'); }
+      if(y>lastY+8){$mini.classList.add('mini--hidden')}
+      else if(y<lastY-8){$mini.classList.remove('mini--hidden')}
       lastY=y;
     },{passive:true});
 
