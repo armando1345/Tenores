@@ -47,7 +47,7 @@
     .btn:hover{transform:translateY(-1px);box-shadow:0 0 0 3px rgba(15,252,126,.12);border-color:var(--accent)}
     .btn:active{transform:translateY(0)}
     .btn[aria-disabled="true"]{opacity:.45;pointer-events:none}
-    .btn svg{width:1rem;height:1rem;display:block}
+    .btn svg,.mini-btn svg{width:1rem;height:1rem;display:block}
     .btn .label{white-space:nowrap}
     .btn.is-loading .label{opacity:0}
     .btn.is-loading::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin 1s linear infinite}
@@ -111,7 +111,7 @@
     </main>
   </div>
   <div id="mini" class="mini" hidden>
-    <button id="mini-toggle" class="mini-btn" aria-label="Reproducir o pausar">▶</button>
+    <button id="mini-toggle" class="mini-btn" aria-label="Reproducir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="8,5 19,12 8,19 8,5"></polygon></svg></button>
     <div id="mini-meta" class="mini-meta" title="Abrir canción"><div id="mini-title" class="mini-title">—</div><div id="mini-sub" class="mini-sub">—</div></div>
     <div id="mini-bar" class="mini-bar" aria-label="Barra de progreso" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="mini-prog" class="mini-prog"></div></div>
     <button id="mini-close" class="mini-btn" aria-label="Detener y cerrar">✕</button>
@@ -165,7 +165,17 @@
     function hideMini(){ $mini.hidden=true; $mini.classList.remove('mini--hidden'); $miniProg.style.width='0%'; currentAudio=null; }
 
     function bindToMini(audio,label){currentAudio=audio;currentLabel=label;$miniTitle.textContent=SONGS[currentSongId]?.title||'—';$miniSub.textContent=label;showMini();updateMini()}
-    function updateMini(){if(!currentAudio||!currentAudio.duration){$miniProg.style.width='0%';return}const pct=currentAudio.currentTime/currentAudio.duration*100;$miniProg.style.width=`${pct}%`;$miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));$miniToggle.textContent=currentAudio.paused?'▶':'⏸'}
+    function iconPlay(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="8,5 19,12 8,19 8,5"></polygon></svg>`}
+    function iconPause(){return `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><line x1=\"9\" y1=\"5\" x2=\"9\" y2=\"19\"/><line x1=\"15\" y1=\"5\" x2=\"15\" y2=\"19\"/></svg>`}
+    function updateMini(){
+      const isPaused = !currentAudio || currentAudio.paused;
+      $miniToggle.innerHTML = isPaused ? iconPlay() : iconPause();
+      $miniToggle.setAttribute('aria-label', isPaused ? 'Reproducir' : 'Pausar');
+      if(!currentAudio || !currentAudio.duration){ $miniProg.style.width='0%'; return; }
+      const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
+      $miniProg.style.width = `${pct}%`;
+      $miniBar.setAttribute('aria-valuenow', String(Math.round(pct)));
+    }const pct=currentAudio.currentTime/currentAudio.duration*100;$miniProg.style.width=`${pct}%`;$miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));$miniToggle.textContent=currentAudio.paused?'▶':'⏸'}
 
     [$exp,$trk].forEach((el,idx)=>{const label=idx===0?'Explicación':'Canción';el.addEventListener('play',()=>{bindToMini(el,label)});el.addEventListener('pause',()=>{updateMini();if($exp.paused&&$trk.paused)hideMini()});el.addEventListener('timeupdate',updateMini);el.addEventListener('ended',()=>{updateMini();hideMini()})});
 
@@ -202,4 +212,3 @@
   </script>
 </body>
 </html>
-
