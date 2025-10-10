@@ -24,16 +24,25 @@
     .accent-bar{width:112px;height:3px;background:var(--accent);border-radius:999px;margin:6px auto 8px}
     .subtitle{color:#b8bec4;font-size:15px;opacity:.9;text-align:center;max-width:620px}
     main{margin-top:34px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;align-items:start}
-    .card{background:linear-gradient(180deg,#121314 0%,#0f1011 100%);border:1px solid var(--card-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-1);position:relative;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
-    .card:hover{transform:translateY(-2px);border-color:#222527;box-shadow:0 16px 40px rgba(0,0,0,.45)}
-    .card:active{transform:translateY(0)}
-    .card.active{border-color:rgba(15,252,126,.6);box-shadow:0 0 0 2px rgba(15,252,126,.35),var(--shadow-1)}
-    .card-inner{aspect-ratio:16/10;position:relative;display:grid;place-items:center}
-    .card-inner::before{content:"";position:absolute;inset:0;opacity:.06;filter:grayscale(1);background:center/58% no-repeat url('https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg')}
-    .card-title{z-index:1;padding:10px 16px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;position:relative;overflow:hidden;white-space:nowrap;max-width:88%;display:inline-block;text-overflow:ellipsis}
-    .card-title::after{content:"";position:absolute;top:0;left:-120%;width:120%;height:100%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.25),transparent 60%);transform:skewX(-20deg);transition:transform .6s ease}
-    .card:hover .card-title::after{transform:translateX(220%) skewX(-20deg)}
+
+    /* === Canciones: grid de mini-cards (más atractivo y orden sencillo) === */
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;align-items:stretch}
+    .mini-card{
+      background:linear-gradient(180deg,#121314 0%,#0f1011 100%);
+      border:1px solid var(--card-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-1);
+      position:relative;overflow:hidden;min-height:160px;display:grid;place-items:center;text-align:center;
+      transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease
+    }
+    .mini-card::before{content:"";position:absolute;inset:0;opacity:.06;filter:grayscale(1);background:center/60% no-repeat url('https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg')}
+    .mini-card:hover{transform:translateY(-2px);border-color:#222527;box-shadow:0 16px 40px rgba(0,0,0,.45)}
+    .mini-card:active{transform:translateY(0)}
+    .mini-card.active{border-color:rgba(15,252,126,.6);box-shadow:0 0 0 2px rgba(15,252,126,.35),var(--shadow-1)}
+    .mini-title{z-index:1;padding:10px 16px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;position:relative;overflow:hidden;white-space:nowrap;max-width:88%;display:inline-block;text-overflow:ellipsis}
+    .mini-title::after{content:"";position:absolute;top:0;left:-120%;width:120%;height:100%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.25),transparent 60%);transform:skewX(-20deg);transition:transform .6s ease}
+    .mini-card:hover .mini-title::after{transform:translateX(220%) skewX(-20deg)}
+    .mini-badge{position:absolute;top:10px;left:10px;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;background:#0f1112;border:1px solid #242628;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);font-weight:900;font-size:12px;color:var(--fg-muted);letter-spacing:.04em}
+    .mini-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
     #song-view[hidden],#home[hidden]{display:none}
     .back{display:inline-flex;gap:.6ch;align-items:center;margin-bottom:16px;padding:8px 12px;border-radius:999px;border:1px solid #1f2123;background:#0f1112}
     .song-title{margin:0 0 6px;font-size:clamp(22px,2.2vw + 6px,32px);font-weight:900}
@@ -52,6 +61,8 @@
     .btn.is-loading .label{opacity:0}
     .btn.is-loading::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin 1s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Mini player */
     .mini{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;background:#0f1112;border:1px solid #242628;border-radius:16px;box-shadow:var(--shadow-1);display:flex;align-items:center;gap:12px;padding:10px 12px;transition:transform .25s ease,opacity .25s ease}
     .mini--hidden{transform:translateY(150%);opacity:.2;pointer-events:none}
     .mini-btn{width:40px;height:40px;border-radius:999px;border:1px solid #242628;background:#111314;color:#fff;display:grid;place-items:center}
@@ -62,6 +73,32 @@
     .mini-bar{flex:1;height:8px;background:#1b1d1f;border-radius:999px;overflow:hidden;cursor:pointer;touch-action:none}
     .mini-prog{width:0%;height:100%;background:var(--accent)}
     @media (min-width:840px){.mini{left:24px;right:auto;width:420px}}
+
+    /* Botón flotante AU/AU */
+    .fab{
+      position:fixed;top:16px;right:16px;z-index:60;
+      width:64px;height:64px;border-radius:999px;border:1px solid #242628;
+      background:#111314;color:#fff;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:2px;font-weight:900;
+      line-height:1;box-shadow:var(--shadow-1);
+      transition:transform .18s,box-shadow .18s,border-color .18s;
+    }
+    .fab:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,252,126,.12)}
+    .fab-line{font-size:14px;letter-spacing:.06em}
+
+    /* Confeti */
+    .confetti{position:fixed;top:-10px;left:0;width:8px;height:12px;background:var(--accent);
+      opacity:.9;will-change:transform,opacity;pointer-events:none;z-index:59;
+      animation:fall 900ms linear forwards;
+    }
+    @keyframes fall{
+      to{transform:translate(var(--x,0), calc(100vh + 20px)) rotate(var(--r, 180deg)); opacity:0.95;}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{scroll-behavior:auto}
+      .logo-wrap,.song-row,.btn,.mini{transition:none}
+      .confetti{animation:none;display:none}
+    }
   </style>
 </head>
 <body>
@@ -75,11 +112,24 @@
     <main>
       <section id="home" aria-labelledby="canciones-titulo">
         <h2 id="canciones-titulo" class="sr-only">Canciones del coro navideño</h2>
-        <div class="grid">
-          <figure><a class="card" href="#fum" aria-label="Fum Fum Fum" data-song="fum"><div class="card-inner"><span class="card-title">Fum Fum Fum</span></div></a></figure>
-          <figure><a class="card" href="#adeste" aria-label="Adeste Fideles" data-song="adeste"><div class="card-inner"><span class="card-title">Adeste Fideles</span></div></a></figure>
-          <figure><a class="card" href="#dona" aria-label="Dona Nobis Pacem" data-song="dona"><div class="card-inner"><span class="card-title">Dona Nobis Pacem</span></div></a></figure>
-          <figure><a class="card" href="#kling" aria-label="Kling Glöckchen, klingelingeling" data-song="kling"><div class="card-inner"><span class="card-title">Kling Glöckchen</span></div></a></figure>
+        <!-- Lista accesible, más escaneable que cards, mantiene estética -->
+        <div class="grid" aria-labelledby="canciones-titulo">
+          <a class="mini-card" href="#fum" aria-label="Fum Fum Fum" data-song="fum">
+            <span class="mini-badge">01</span>
+            <span class="mini-title">Fum Fum Fum</span>
+          </a>
+          <a class="mini-card" href="#adeste" aria-label="Adeste Fideles" data-song="adeste">
+            <span class="mini-badge">02</span>
+            <span class="mini-title">Adeste Fideles</span>
+          </a>
+          <a class="mini-card" href="#dona" aria-label="Dona Nobis Pacem" data-song="dona">
+            <span class="mini-badge">03</span>
+            <span class="mini-title">Dona Nobis Pacem</span>
+          </a>
+          <a class="mini-card" href="#kling" aria-label="Kling Glöckchen, klingelingeling" data-song="kling">
+            <span class="mini-badge">04</span>
+            <span class="mini-title">Kling Glöckchen</span>
+          </a>
         </div>
       </section>
       <section id="song-view" hidden>
@@ -111,6 +161,13 @@
       </section>
     </main>
   </div>
+
+  <!-- Botón flotante AÚ/AÚ -->
+  <button id="auBtn" class="fab" aria-label="Activar AÚ AÚ">
+    <span class="fab-line">AÚ</span>
+    <span class="fab-line">AÚ</span>
+  </button>
+
   <div id="mini" class="mini" hidden>
     <button id="mini-toggle" class="mini-btn" aria-label="Reproducir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="8,5 19,12 8,19 8,5"></polygon></svg></button>
     <button id="mini-loop" class="mini-btn" aria-label="Activar repetición continua"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
@@ -118,8 +175,14 @@
     <div id="mini-bar" class="mini-bar" aria-label="Barra de progreso" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="mini-prog" class="mini-prog"></div></div>
     <button id="mini-close" class="mini-btn" aria-label="Detener y cerrar">✕</button>
   </div>
+
   <script>
-    const SONGS={fum:{title:'Fum Fum Fum',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051384/fum_fum_fum_explicacion_hcsfzy.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051700/fum_fum_fum_cancion_c7zzyg.wav'},adeste:{title:'Adeste Fideles',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760100617/adeste_explicacion_g74foi.wav',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav'},dona:{title:'Dona Nobis Pacem',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760101534/dona_nobis_pacem___explicacion_3_rmnjay.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054240/dona_nobis_pacem___cancion_hsep4p.wav'},kling:{title:'Kling Glöckchen, klingelingeling',explain:'',track:''}};
+    const SONGS={
+      fum:{title:'Fum Fum Fum',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051384/fum_fum_fum_explicacion_hcsfzy.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051700/fum_fum_fum_cancion_c7zzyg.wav'},
+      adeste:{title:'Adeste Fideles',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760100617/adeste_explicacion_g74foi.wav',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav'},
+      dona:{title:'Dona Nobis Pacem',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760101534/dona_nobis_pacem___explicacion_3_rmnjay.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054240/dona_nobis_pacem___cancion_hsep4p.wav'},
+      kling:{title:'Kling Glöckchen, klingelingeling',explain:'',track:''}
+    };
 
     const $home=document.getElementById('home');
     const $songView=document.getElementById('song-view');
@@ -144,15 +207,37 @@
 
     let currentSongId=null;let currentAudio=null;let currentLabel='';
 
-    function setActiveCard(id){document.querySelectorAll('[data-song]').forEach(a=>{a.classList.toggle('active',a.getAttribute('data-song')===id);if(a.getAttribute('data-song')===id){a.setAttribute('aria-current','page')}else{a.removeAttribute('aria-current')}})}
+    function setActiveCard(id){
+      document.querySelectorAll('[data-song]').forEach(a=>{
+        const is = a.getAttribute('data-song')===id;
+        a.classList.toggle('active',is);
+        if(is){a.setAttribute('aria-current','page')}else{a.removeAttribute('aria-current')}
+      })
+    }
 
     function setLoading(btn,on,labelEl){if(on){btn.classList.add('is-loading');btn.setAttribute('aria-disabled','true');if(labelEl)labelEl.textContent='Descargando…'}else{btn.classList.remove('is-loading');btn.setAttribute('aria-disabled','false')}}
 
-    function renderHome(){$home.hidden=false;$songView.hidden=true;setActiveCard('');[$exp,$trk].forEach(a=>{if(!currentAudio||a!==currentAudio){try{a.pause();a.currentTime=0}catch(_){} }});if(!currentAudio||currentAudio.paused||currentAudio.ended)hideMini();document.title='Tenores'}
+    function renderHome(){
+      $home.hidden=false;$songView.hidden=true;setActiveCard('');
+      [$exp,$trk].forEach(a=>{if(!currentAudio||a!==currentAudio){try{a.pause();a.currentTime=0}catch(_){} }});
+      if(!currentAudio||currentAudio.paused||currentAudio.ended)hideMini();
+      document.title='Tenores'
+    }
 
     function extFromUrl(url){try{const u=new URL(url);const p=u.pathname;const i=p.lastIndexOf('.');return i!==-1?p.slice(i+1).toUpperCase():'MP3'}catch{const m=url.match(/\.([a-z0-9]+)(?:$|\?)/i);return m?m[1].toUpperCase():'MP3'}}
 
-    function renderSong(id){const song=SONGS[id];if(!song)return renderHome();currentSongId=id;$title.textContent=song.title;$meta.textContent='Tenores • Curso oficial';$exp.src=song.explain||'';$trk.src=song.track||'';$exp.loop=false;$trk.loop=false;const hasExplain=Boolean(song.explain);const hasTrack=Boolean(song.track);$dlExp.setAttribute('aria-disabled',String(!hasExplain));$dlTrk.setAttribute('aria-disabled',String(!hasTrack));$lblExp.textContent=hasExplain?`Descargar ${extFromUrl(song.explain)}`:'Descargar';$lblTrk.textContent=hasTrack?`Descargar ${extFromUrl(song.track)}`:'Descargar';$home.hidden=true;$songView.hidden=false;setActiveCard(id);document.title=`Tenores – ${song.title}`;window.scrollTo({top:0,behavior:'smooth'})}
+    function renderSong(id){
+      const song=SONGS[id];if(!song)return renderHome();
+      currentSongId=id;$title.textContent=song.title;$meta.textContent='Tenores • Curso oficial';
+      $exp.src=song.explain||'';$trk.src=song.track||'';$exp.loop=false;$trk.loop=false;
+      const hasExplain=Boolean(song.explain);const hasTrack=Boolean(song.track);
+      $dlExp.setAttribute('aria-disabled',String(!hasExplain));
+      $dlTrk.setAttribute('aria-disabled',String(!hasTrack));
+      $lblExp.textContent=hasExplain?`Descargar ${extFromUrl(song.explain)}`:'Descargar';
+      $lblTrk.textContent=hasTrack?`Descargar ${extFromUrl(song.track)}`:'Descargar';
+      $home.hidden=true;$songView.hidden=false;setActiveCard(id);
+      document.title=`Tenores – ${song.title}`;window.scrollTo({top:0,behavior:'smooth'})
+    }
 
     function router(){const h=(location.hash||'').replace('#','').trim();if(!h)return renderHome();renderSong(h)}
 
@@ -212,8 +297,45 @@
 
     document.addEventListener('keydown',e=>{const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||e.altKey||e.ctrlKey||e.metaKey)return;if(e.code==='Space'){e.preventDefault();const target=currentAudio||(!$songView.hidden?($trk.src?$trk:$exp):null);if(target){target.paused?target.play():target.pause()}}else if(e.key==='ArrowLeft'){e.preventDefault();if(currentAudio)currentAudio.currentTime=Math.max(0,currentAudio.currentTime-5)}else if(e.key==='ArrowRight'){e.preventDefault();if(currentAudio&&currentAudio.duration)currentAudio.currentTime=Math.min(currentAudio.duration,currentAudio.currentTime+5)}});
 
+    function router(){const h=(location.hash||'').replace('#','').trim();if(!h)return renderHome();renderSong(h)}
     window.addEventListener('hashchange',router);
     window.addEventListener('DOMContentLoaded',()=>{hideMini();router()});
+
+    // === Botón AU/AU: confeti por ~3s ===
+    (function(){
+      const btn = document.getElementById('auBtn');
+      function spawnConfettiBurst(){
+        const N = 50;
+        for(let i=0;i<N;i++){
+          const piece = document.createElement('div');
+          piece.className = 'confetti';
+          const startX = Math.random() * window.innerWidth;
+          const drift = (Math.random()*2 - 1) * 120; // -120..120px
+          const rot = (Math.random()*360).toFixed(0)+'deg';
+          piece.style.left = startX + 'px';
+          piece.style.setProperty('--x', drift + 'px');
+          piece.style.setProperty('--r', rot);
+          const w = 6 + Math.random()*6, h = 8 + Math.random()*10;
+          piece.style.width = w+'px';
+          piece.style.height = h+'px';
+          piece.style.background = ['#0FFC7E','#19e58a','#13c971','#12b866'][i%4];
+          piece.style.opacity = (0.75 + Math.random()*0.25).toFixed(2);
+          piece.style.animationDelay = (Math.random()*300)+'ms';
+          document.body.appendChild(piece);
+          setTimeout(()=> piece.remove(), 1200);
+        }
+      }
+      let timer=null;
+      btn.addEventListener('click', ()=>{
+        spawnConfettiBurst();
+        clearInterval(timer);
+        const start=Date.now();
+        timer=setInterval(()=>{
+          spawnConfettiBurst();
+          if(Date.now()-start>3000){ clearInterval(timer); }
+        }, 600);
+      });
+    })();
   </script>
 </body>
 </html>
