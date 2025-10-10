@@ -247,10 +247,12 @@
 
     function renderHome() {
       $home.hidden = false; $songView.hidden = true; setActiveCard('');
-      // Mantener reproducción si hay audio activo (mini-player)
+      // Pausamos todo lo que no sea el audio actual
       [$exp, $trk].forEach(a => {
         if (!currentAudio || a !== currentAudio) { try { a.pause(); a.currentTime = 0; } catch(_){} }
       });
+      // Si no hay nada reproduciéndose, ocultar mini-player
+      if(!currentAudio || currentAudio.paused || currentAudio.ended) hideMini();
       document.title = 'Tenores';
     }
 
@@ -329,7 +331,7 @@
 
     // ===== Mini player logic =====
     function showMini(){ $mini.hidden = false; }
-    function hideMini(){ $mini.hidden = true; $miniProg.style.width = '0%'; }
+    function hideMini(){ $mini.hidden = true; $miniProg.style.width = '0%'; currentAudio = null; }
 
     function bindToMini(audio, label){
       currentAudio = audio; currentLabel = label;
@@ -351,6 +353,10 @@
     [$exp, $trk].forEach((el, idx)=>{
       const label = idx===0 ? 'Explicación' : 'Canción';
       el.addEventListener('play', ()=>{ bindToMini(el, label); });
+      el.addEventListener('pause', ()=>{ updateMini(); /* si ambos están pausados, ocultar */ if($exp.paused && $trk.paused) hideMini(); });
+      el.addEventListener('timeupdate', updateMini);
+      el.addEventListener('ended', ()=>{ updateMini(); hideMini(); });
+    });
       el.addEventListener('pause', updateMini);
       el.addEventListener('timeupdate', updateMini);
       el.addEventListener('ended', ()=>{ updateMini(); });
@@ -358,7 +364,7 @@
 
     // Controles del mini-player
     $miniToggle.addEventListener('click', ()=>{ if(!currentAudio) return; currentAudio.paused ? currentAudio.play() : currentAudio.pause(); updateMini(); });
-    $miniClose.addEventListener('click', ()=>{ if(currentAudio){ try{ currentAudio.pause(); }catch(_){} } hideMini(); });
+    $miniClose.addEventListener('click', ()=>{ if(currentAudio){ try{ currentAudio.pause(); }catch(_){} } hideMini(); }); }catch(_){} } hideMini(); });
     $miniBar.addEventListener('click', (e)=>{
       if(!currentAudio || !currentAudio.duration) return;
       const rect = $miniBar.getBoundingClientRect();
@@ -380,7 +386,7 @@
     });
 
     window.addEventListener('hashchange', router);
-    window.addEventListener('DOMContentLoaded', router);
+    window.addEventListener('DOMContentLoaded', ()=>{ hideMini(); router(); });
   </script>
 </body>
 </html>
