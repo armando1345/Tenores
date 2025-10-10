@@ -177,10 +177,10 @@
       $miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));
     }
 
-    [$exp,$trk].forEach((el,idx)=>{const label=idx===0?'Explicación':'Canción';el.addEventListener('play',()=>{bindToMini(el,label)});el.addEventListener('pause',()=>{updateMini();if($exp.paused&&$trk.paused)hideMini()});el.addEventListener('timeupdate',updateMini);el.addEventListener('ended',()=>{updateMini();hideMini()})});
+    [$exp,$trk].forEach((el,idx)=>{const label=idx===0?'Explicación':'Canción';el.addEventListener('play',()=>{bindToMini(el,label)});el.addEventListener('pause',updateMini);el.addEventListener('timeupdate',updateMini);el.addEventListener('ended',()=>{updateMini();hideMini()})});
 
     $miniToggle.addEventListener('click',()=>{if(!currentAudio)return;currentAudio.paused?currentAudio.play():currentAudio.pause();updateMini()});
-    $miniClose.addEventListener('click',()=>{if(currentAudio){try{currentAudio.pause()}catch(_){}}hideMini()});
+    $miniClose.addEventListener('click',()=>{if(currentAudio){try{currentAudio.pause();currentAudio.currentTime=0}catch(_){}}hideMini()});
 
     $miniBar.addEventListener('click',e=>{if(!currentAudio||!currentAudio.duration)return;const rect=$miniBar.getBoundingClientRect();const pct=Math.min(1,Math.max(0,(e.clientX-rect.left)/rect.width));currentAudio.currentTime=pct*currentAudio.duration});
 
