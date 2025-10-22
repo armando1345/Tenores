@@ -95,6 +95,12 @@
     .confetti{position:fixed;top:-10px;left:0;width:8px;height:12px;background:var(--accent);opacity:.9;will-change:transform,opacity;pointer-events:none;z-index:59;animation:fall 900ms linear forwards}
     @keyframes fall{to{transform:translate(var(--x,0), calc(100vh + 20px)) rotate(var(--r, 180deg)); opacity:0.95;}}
     @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}.logo-wrap,.song-row,.btn,.mini{transition:none}.confetti{animation:none;display:none}}
+    /* Lightweight download buttons */
+    .btn.small.quiet{padding:6px 8px;font-size:12px;border-color:transparent;background:transparent;color:#c6cbd1;opacity:.9}
+    .btn.small.quiet:hover{transform:none;box-shadow:0 0 0 2px rgba(15,252,126,.08);border-color:rgba(15,252,126,.18);color:#fff}
+    .btn.small.quiet:active{transform:translateY(0)}
+    .btn.small.quiet svg{width:.9rem;height:.9rem;opacity:.85}
+    .btn.small.quiet .label{font-weight:600}
   </style>
 </head>
 <body>
@@ -133,7 +139,7 @@
             <h3>Explicación</h3>
             <audio id="audio-explain" controls preload="none"></audio>
             <div class="btn-row">
-              <a id="dl-explain" class="btn small" href="#" download>
+              <a id="dl-explain" class="btn btn-ghost small quiet" href="#" download>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
                 <span class="label" id="lbl-explain">Descargar</span>
               </a>
@@ -143,7 +149,7 @@
             <h3>Canción</h3>
             <audio id="audio-track" controls preload="none"></audio>
             <div class="btn-row">
-              <a id="dl-track" class="btn small" href="#" download>
+              <a id="dl-track" class="btn btn-ghost small quiet" href="#" download>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
                 <span class="label" id="lbl-track">Descargar</span>
               </a>
