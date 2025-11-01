@@ -128,7 +128,8 @@
           <a class="mini-card" href="#estrella" aria-label="Estrella Errante" data-song="estrella"><span class="mini-badge">06</span><span class="mini-title">Estrella Errante</span></a>
           <a class="mini-card" href="#paz" aria-label="Himno a la paz" data-song="paz"><span class="mini-badge">07</span><span class="mini-title">Himno a la paz</span></a>
           <a class="mini-card" href="#merry" aria-label="We wish you a merry christmas" data-song="merry"><span class="mini-badge">08</span><span class="mini-title">We wish you a merry christmas</span></a>
-          <a class="mini-card" href="#kling" aria-label="Kling Glöckchen, klingelingeling" data-song="kling"><span class="mini-badge">09</span><span class="mini-title">Kling Glöckchen, klingelingeling</span></a>
+                    <a class="mini-card" href="#kling" aria-label="Kling Glöckchen, klingelingeling" data-song="kling"><span class="mini-badge">09</span><span class="mini-title">Kling Glöckchen</span></a>
+          <a class="mini-card" href="#tannenbaum" aria-label="O Tannenbaum" data-song="tannenbaum"><span class="mini-badge">10</span><span class="mini-title">O Tannenbaum</span></a>
         </div>
       </section>
       <section id="song-view" hidden>
@@ -270,7 +271,16 @@ Qué es lo que murmuras Eucaristía`},
       estrella:{title:'Estrella Errante',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997189/estrella_errante_cancion_m6bcdm.mp3'},
       paz:{title:'Himno a la paz',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997237/himno_a_la_paz_cancion_avurel.mp3'},
       merry:{title:'We wish you a merry christmas',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997255/we_wish_you_cancion_pgz1i2.mp3'},
-      kling:{title:'Kling Glöckchen, klingelingeling',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1761827592/kling_cancion_xawypb.mp3'}
+      kling:{title:'Kling Glöckchen, klingelingeling',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1761827592/kling_cancion_xawypb.mp3'},
+      tannenbaum:{title:'O Tannenbaum',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1761968289/oh_thanenbaum_kkhmya.mp3',lyrics:`O Tannenbaum, o Tannenbaum, wie treu sind deine Blätter!
+O Tannenbaum, o Tannenbaum, wie treu sind deine Blätter!
+Du grünst nicht nur zur Sommerzeit, nein, auch im Winter, wenn es schneit
+O Tannenbaum, o Tannenbaum, wie treu sind deine Blätter!
+
+O Tannenbaum, o Tannenbaum, du kannst mir sehr gefallen
+O Tannenbaum, o Tannenbaum, du kannst mir sehr gefallen
+Wie oft hat nicht zur Weihnachtszeit ein Baum von dir mich hoch erfreut
+O Tannenbaum, o Tannenbaum, Du kannst mir sehr gefallen`}
     };
 
     const $home=document.getElementById('home');
@@ -423,6 +433,7 @@ Qué es lo que murmuras Eucaristía`},
       console.assert(normalize('ÁÉÍÓÚ Ñ').includes('aeiou n'),'normalize debe quitar tildes');
       console.assert(!!SONGS.fum && SONGS.fum.title==='Fum Fum Fum','SONGS.fum presente');
       console.assert(!!SONGS.kling && SONGS.kling.track.includes('kling_cancion'),'SONGS.kling presente');
+      console.assert(!!SONGS.tannenbaum && SONGS.tannenbaum.track.includes('oh_thanenbaum'),'SONGS.tannenbaum presente');
       console.assert(!!document.getElementById('dl-explain'),'dl-explain presente');
       console.assert(!!document.getElementById('dl-track'),'dl-track presente');
       console.assert(document.getElementById('dl-explain')?.classList.contains('small'),'botón explain tamaño small');
