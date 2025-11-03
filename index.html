@@ -2,115 +2,91 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Tenores</title>
   <meta name="description" content="El curso que te convertirá en un excelente miembro de este equipo" />
   <link rel="icon" type="image/svg+xml" href="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" />
   <style>
-    :root{--bg:#0a0a0a;--fg:#ffffff;--fg-muted:#dfe4ea;--card:#111213;--card-border:#1b1d1f;--accent:#0ffc7e;--accent-ink:#06170f;--radius-xl:28px;--radius-lg:20px;--shadow-1:0 10px 30px rgba(0,0,0,.35);--container:1080px;--lyrics-zoom:1}
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:Futura,'Futura PT','Avenir Next',Avenir,'Trebuchet MS',system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;line-height:1.35}
-    a,a:visited{color:var(--fg);text-decoration:none}
+    :root{--bg:#0a0a0a;--fg:#fff;--muted:#cfd6dc;--card:#111213;--border:#1b1d1f;--accent:#0ffc7e;--r-xl:26px;--r-lg:16px;--container:1080px;--lyrics-zoom:1}
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--fg);font-family:Futura,'Futura PT','Avenir Next',Avenir,'Trebuchet MS',system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;line-height:1.4}
+    a{color:inherit;text-decoration:none}
     [hidden]{display:none!important}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    .container{width:100%;max-width:var(--container);margin:0 auto;padding:32px 20px 52px}
-    header{display:grid;place-items:center;gap:18px;padding-top:28px}
-    .logo-wrap{width:108px;height:108px;border-radius:50%;overflow:hidden;position:relative;box-shadow:0 0 40px rgba(15,252,126,.4),0 0 80px rgba(15,252,126,.2);background:radial-gradient(circle at 50% 50%,rgba(15,252,126,.15),transparent 70%),#0f0f0f;transition:box-shadow .4s ease,transform .4s ease}
-    .logo-wrap:hover{box-shadow:0 0 60px rgba(15,252,126,.6),0 0 120px rgba(15,252,126,.4);transform:scale(1.03)}
-    .logo-wrap::after{content:"";position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle,rgba(15,252,126,.4),transparent 70%);z-index:-1;filter:blur(18px)}
-    .logo-wrap img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-    h1.site-title{margin:0;font-weight:900;letter-spacing:.1em;text-transform:uppercase;font-size:clamp(28px,2.6vw + 8px,46px)}
-    .accent-bar{width:112px;height:3px;background:var(--accent);border-radius:999px;margin:6px auto 8px}
-    .subtitle{color:#b8bec4;font-size:15px;opacity:.9;text-align:center;max-width:620px}
-    main{margin-top:34px}
 
-    .search{position:sticky;top:8px;z-index:20;margin:6px 0 14px}
-    .search input{width:100%;padding:14px 16px 14px 44px;border-radius:14px;border:1px solid #232527;background:#0f1112;color:#fff;font-weight:600;letter-spacing:.02em;outline:none;transition:border-color .18s}
-    .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,252,126,.12)}
-    .search .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#b8bec4}
-    .suggest{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;color:#8f98a3;background:#111314;border:1px solid #242628;padding:6px 8px;border-radius:999px}
+    .container{max-width:var(--container);margin:0 auto;padding:28px 18px 56px}
+    header{display:grid;place-items:center;gap:14px}
+    .logo{width:104px;height:104px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#0f0f0f;box-shadow:0 0 40px rgba(15,252,126,.4)}
+    .logo img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+    h1{margin:0;font-weight:900;letter-spacing:.1em;text-transform:uppercase;font-size:clamp(28px,2.5vw + 8px,46px)}
+    .bar{width:112px;height:3px;background:var(--accent);border-radius:999px}
+    .sub{color:#b8bec4;font-size:15px;text-align:center;max-width:620px}
 
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;align-items:stretch}
-    .mini-card{background:linear-gradient(180deg,#121314 0%,#0f1011 100%);border:1px solid var(--card-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-1);position:relative;overflow:hidden;min-height:160px;display:grid;place-items:center;text-align:center;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
-    .mini-card::before{content:"";position:absolute;inset:0;opacity:.06;filter:grayscale(1);background:center/60% no-repeat url('https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg')}
-    .mini-card:hover{transform:translateY(-2px);border-color:#222527;box-shadow:0 16px 40px rgba(0,0,0,.45)}
-    .mini-card:active{transform:translateY(0)}
-    .mini-card.active{border-color:rgba(15,252,126,.6);box-shadow:0 0 0 2px rgba(15,252,126,.35),var(--shadow-1)}
-    .mini-title{z-index:1;padding:10px 16px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;position:relative;overflow:hidden;white-space:nowrap;max-width:88%;display:inline-block;text-overflow:ellipsis}
-    .mini-title::after{content:"";position:absolute;top:0;left:-120%;width:120%;height:100%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.25),transparent 60%);transform:skewX(-20deg);transition:transform .6s ease}
-    .mini-card:hover .mini-title::after{transform:translateX(220%) skewX(-20deg)}
-    .mini-badge{position:absolute;top:10px;left:10px;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;background:#0f1112;border:1px solid #242628;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);font-weight:900;font-size:12px;color:var(--fg-muted);letter-spacing:.04em}
-    .mini-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .search{position:sticky;top:8px;z-index:10;margin:12px 0}
+    .search input{width:100%;padding:14px 16px 14px 44px;border-radius:14px;border:1px solid var(--border);background:#0f1112;color:#fff;font-weight:600;outline:none}
+    .search .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#9aa3ad}
+    .suggest{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;color:#9aa3ad;background:#111314;border:1px solid var(--border);padding:6px 8px;border-radius:999px}
 
-    #song-view[hidden],#home[hidden]{display:none}
-    .back{display:inline-flex;gap:.6ch;align-items:center;margin-bottom:16px;padding:8px 12px;border-radius:999px;border:1px solid #1f2123;background:#0f1112}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{background:linear-gradient(180deg,#121314,#0f1011);border:1px solid var(--border);border-radius:var(--r-xl);min-height:150px;display:grid;place-items:center;position:relative;overflow:hidden}
+    .card::before{content:"";position:absolute;inset:0;opacity:.06;background:center/60% no-repeat url('https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg')}
+    .badge{position:absolute;top:10px;left:10px;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;background:#0f1112;border:1px solid var(--border);color:#9aa3ad;font-size:12px;font-weight:900}
+    .title{z-index:1;padding:10px 16px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;max-width:88%;overflow:hidden;text-overflow:ellipsis}
+    .active{box-shadow:0 0 0 2px rgba(15,252,126,.35) inset}
+
+    #home[hidden],#song[hidden]{display:none}
+    .back{display:inline-flex;gap:.6ch;align-items:center;margin-bottom:14px;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#0f1112}
     .song-title{margin:0 0 6px;font-size:clamp(22px,2.2vw + 6px,32px);font-weight:900}
-    .song-meta{color:#b8bec4;font-size:14px;margin-bottom:18px}
-    .audios-grid{display:grid;gap:16px;grid-template-columns:1fr}
-    @media(min-width:840px){.audios-grid{grid-template-columns:1fr 1fr}}
-    .audio-card{background:linear-gradient(180deg,#141516 0%,#0f1011 100%);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-1)}
+    .song-meta{color:#b8bec4;font-size:14px;margin-bottom:14px}
+    .cols{display:grid;gap:16px;grid-template-columns:1fr} @media(min-width:840px){.cols{grid-template-columns:1fr 1fr}}
+    .pane{background:linear-gradient(180deg,#141516,#0f1011);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px}
+    .pane h3{margin:0 0 10px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3ad}
 
-    /* ===== Letra UX ===== */
-    .lyrics-card{grid-column:1 / -1}
-    .lyrics-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-    .lyrics-controls{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{border:1px solid #242628;background:#0f1112;color:#fff;border-radius:999px;padding:8px 10px;display:inline-flex;align-items:center;gap:.35ch;line-height:1;font-weight:700}
-    .chip.small{padding:6px 8px;font-size:12px}
-    .chip:active{transform:translateY(1px)}
-    .chip:hover{border-color:var(--accent)}
-    .lyrics-wrap{position:relative;max-width:66ch;margin-inline:auto}
-    .lyrics{white-space:normal;line-height:1.75;letter-spacing:.01em;color:var(--fg-muted);font-size:calc(15px * var(--lyrics-zoom));hyphens:auto}
-    .lyrics p{margin:0 0 14px}
-    .lyrics p + p{margin-top:10px}
-    .lyrics em{color:#9aa3ad}
+    .player{position:relative;display:flex;align-items:center;gap:10px;border:1px solid var(--border);background:#0f1112;border-radius:12px;padding:10px 12px}
+    .p-btn{min-width:40px;height:40px;border-radius:999px;border:1px solid var(--border);background:#111314;color:#fff;display:grid;place-items:center}
+    .p-time{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+    .p-cur,.p-dur{font-variant-numeric:tabular-nums;color:#cfd6dc;font-weight:700;font-size:12px}
+    .pbar{position:relative;flex:1;height:8px;background:#1b1d1f;border-radius:999px;overflow:hidden;cursor:pointer}
+    .fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--accent)}
+    .more{position:relative}
+    .more-btn{min-width:40px;height:40px;border-radius:999px;border:1px solid var(--border);background:#111314;color:#fff;display:grid;place-items:center}
+    .menu{position:absolute;right:0;bottom:48px;background:#0f1112;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.35);padding:8px;width:180px}
+    .menu-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .m-btn{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#111314;color:#fff}
+    .speed-label{font-weight:800;color:#cfd6dc}
+
+    .lyrics-card{grid-column:1/-1}
+    .lyrics-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+    .chip{border:1px solid var(--border);background:#0f1112;color:#fff;border-radius:999px;padding:6px 8px;display:inline-flex;align-items:center;gap:.35ch;line-height:1;font-weight:700;font-size:12px}
+    .lyrics-surface{border:1px solid var(--border);background:#0f1011;border-radius:14px;padding:14px}
+    .lyrics-wrap{max-width:64ch;margin:0 auto;position:relative}
+    .lyrics{font-size:calc(16px * var(--lyrics-zoom));line-height:1.75;color:var(--muted)}
+    .lyrics .stanza{margin:0 0 12px;padding-left:10px;border-left:2px solid rgba(15,252,126,.12)}
     .lyrics-wrap.is-collapsed{max-height:32rem;overflow:hidden}
-    .lyrics-wrap.is-collapsed::after{content:"";position:absolute;left:0;right:0;bottom:0;height:84px;background:linear-gradient(180deg,rgba(10,10,10,0) 0%, rgba(10,10,10,0.9) 60%, rgba(10,10,10,1) 100%);pointer-events:none}
-    .btn-row{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:.6ch;padding:10px 14px;border-radius:999px;border:1px solid #242628;background:#0f1112;color:#fff;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,color .18s ease}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 0 0 3px rgba(15,252,126,.12);border-color:var(--accent)}
-    .btn:active{transform:translateY(0)}
-    .btn[aria-disabled="true"]{opacity:.45;pointer-events:none}
-    .btn-ghost{background:transparent}
-    .btn.small{padding:8px 10px;font-size:12px}
+    .lyrics-wrap.is-collapsed::after{content:"";position:absolute;left:0;right:0;bottom:0;height:84px;background:linear-gradient(180deg,rgba(10,10,10,0),rgba(10,10,10,1))}
 
-    .audio-card h3{margin:0 0 10px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-muted)}
-    .audio-card audio{width:100%;outline:none;margin-bottom:12px}
-
-    .mini{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;background:#0f1112;border:1px solid #242628;border-radius:16px;box-shadow:var(--shadow-1);display:flex;align-items:center;gap:12px;padding:10px 12px;transition:transform .25s ease,opacity .25s ease}
+    .mini{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;background:#0f1112;border:1px solid var(--border);border-radius:16px;display:flex;align-items:center;gap:12px;padding:10px 12px;transition:transform .25s ease,opacity .25s ease}
     .mini--hidden{transform:translateY(150%);opacity:.2;pointer-events:none}
-    .mini-btn{width:40px;height:40px;border-radius:999px;border:1px solid #242628;background:#111314;color:#fff;display:grid;place-items:center}
-    .mini-btn.active { color: var(--accent); }
-    .mini-meta{min-width:0;cursor:pointer}
+    .mini-btn{width:40px;height:40px;border-radius:999px;border:1px solid var(--border);background:#111314;color:#fff;display:grid;place-items:center}
+    .mini-meta{min-width:0}
     .mini-title{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .mini-sub{font-size:12px;color:#b8bec4}
     .mini-bar{flex:1;height:8px;background:#1b1d1f;border-radius:999px;overflow:hidden;cursor:pointer;touch-action:none}
     .mini-prog{width:0%;height:100%;background:var(--accent)}
-    @media (min-width:840px){.mini{left:24px;right:auto;width:420px}}
-
-    .fab{position:fixed;top:16px;right:16px;z-index:60;width:64px;height:64px;border-radius:999px;border:1px solid #242628;background:#111314;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:900;line-height:1;box-shadow:var(--shadow-1);transition:transform .18s,box-shadow .18s,border-color .18s}
-    .fab:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,252,126,.12)}
-    .fab-line{font-size:14px;letter-spacing:.06em}
-
-    .confetti{position:fixed;top:-10px;left:0;width:8px;height:12px;background:var(--accent);opacity:.9;will-change:transform,opacity;pointer-events:none;z-index:59;animation:fall 900ms linear forwards}
-    @keyframes fall{to{transform:translate(var(--x,0), calc(100vh + 20px)) rotate(var(--r, 180deg)); opacity:0.95;}}
-    @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}.logo-wrap,.song-row,.btn,.mini{transition:none}.confetti{animation:none;display:none}}
-    /* Lightweight download buttons */
-    .btn.small.quiet{padding:6px 8px;font-size:12px;border-color:transparent;background:transparent;color:#c6cbd1;opacity:.9}
-    .btn.small.quiet:hover{transform:none;box-shadow:0 0 0 2px rgba(15,252,126,.08);border-color:rgba(15,252,126,.18);color:#fff}
-    .btn.small.quiet:active{transform:translateY(0)}
-    .btn.small.quiet svg{width:.9rem;height:.9rem;opacity:.85}
-    .btn.small.quiet .label{font-weight:600}
+    @media(min-width:840px){.mini{left:24px;right:auto;width:420px}}
+    .btn{display:inline-flex;align-items:center;gap:.5ch;padding:6px 10px;font-size:12px;border-radius:999px;border:1px solid var(--border);background:#0f1112;color:#fff}
+    .btn svg{width:14px;height:14px}
+    .btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="logo-wrap"><img src="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" alt="Logo Tenores" /></div>
-      <h1 class="site-title">Tenores</h1>
-      <div class="accent-bar"></div>
-      <p class="subtitle">El curso que te convertirá en un excelente miembro de este equipo</p>
+      <div class="logo"><img src="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" alt="Logo Tenores"></div>
+      <h1>Tenores</h1>
+      <div class="bar"></div>
+      <p class="sub">El curso que te convertirá en un excelente miembro de este equipo</p>
     </header>
+
     <main>
       <section id="home" aria-labelledby="canciones-titulo">
         <h2 id="canciones-titulo" class="sr-only">Canciones del coro navideño</h2>
@@ -120,327 +96,197 @@
           <span class="suggest" id="suggest" hidden></span>
         </div>
         <div id="grid" class="grid" aria-labelledby="canciones-titulo">
-          <a class="mini-card" href="#fum" aria-label="Fum Fum Fum" data-song="fum"><span class="mini-badge">01</span><span class="mini-title">Fum Fum Fum</span></a>
-          <a class="mini-card" href="#campanas" aria-label="Canto de las campanas" data-song="campanas"><span class="mini-badge">02</span><span class="mini-title">Canto de las campanas</span></a>
-          <a class="mini-card" href="#adeste" aria-label="Adeste Fideles" data-song="adeste"><span class="mini-badge">03</span><span class="mini-title">Adeste Fideles</span></a>
-          <a class="mini-card" href="#dona" aria-label="Dona Nobis Pacem" data-song="dona"><span class="mini-badge">04</span><span class="mini-title">Dona Nobis Pacem</span></a>
-          <a class="mini-card" href="#fuentecilla" aria-label="Fuentecilla que corres" data-song="fuentecilla"><span class="mini-badge">05</span><span class="mini-title">Fuentecilla que corres</span></a>
-          <a class="mini-card" href="#estrella" aria-label="Estrella Errante" data-song="estrella"><span class="mini-badge">06</span><span class="mini-title">Estrella Errante</span></a>
-          <a class="mini-card" href="#paz" aria-label="Himno a la paz" data-song="paz"><span class="mini-badge">07</span><span class="mini-title">Himno a la paz</span></a>
-          <a class="mini-card" href="#merry" aria-label="We wish you a merry christmas" data-song="merry"><span class="mini-badge">08</span><span class="mini-title">We wish you a merry christmas</span></a>
-                    <a class="mini-card" href="#kling" aria-label="Kling Glöckchen, klingelingeling" data-song="kling"><span class="mini-badge">09</span><span class="mini-title">Kling Glöckchen</span></a>
-          <a class="mini-card" href="#tannenbaum" aria-label="O Tannenbaum" data-song="tannenbaum"><span class="mini-badge">10</span><span class="mini-title">O Tannenbaum</span></a>
+          <a class="card" href="#fum" data-song="fum"><span class="badge">01</span><span class="title">Fum Fum Fum</span></a>
+          <a class="card" href="#campanas" data-song="campanas"><span class="badge">02</span><span class="title">Canto de las campanas</span></a>
+          <a class="card" href="#adeste" data-song="adeste"><span class="badge">03</span><span class="title">Adeste Fideles</span></a>
+          <a class="card" href="#dona" data-song="dona"><span class="badge">04</span><span class="title">Dona Nobis Pacem</span></a>
+          <a class="card" href="#fuentecilla" data-song="fuentecilla"><span class="badge">05</span><span class="title">Fuentecilla que corres</span></a>
+          <a class="card" href="#estrella" data-song="estrella"><span class="badge">06</span><span class="title">Estrella Errante</span></a>
+          <a class="card" href="#paz" data-song="paz"><span class="badge">07</span><span class="title">Himno a la paz</span></a>
+          <a class="card" href="#merry" data-song="merry"><span class="badge">08</span><span class="title">We wish you a merry christmas</span></a>
+          <a class="card" href="#kling" data-song="kling"><span class="badge">09</span><span class="title">Kling Glöckchen</span></a>
+          <a class="card" href="#tannenbaum" data-song="tannenbaum"><span class="badge">10</span><span class="title">O Tannenbaum</span></a>
         </div>
       </section>
-      <section id="song-view" hidden>
+
+      <section id="song" hidden>
         <a class="back" href="#">← Volver</a>
         <h2 class="song-title" id="song-title">Título</h2>
         <p class="song-meta" id="song-meta">Tenores • Curso oficial</p>
-        <div class="audios-grid">
-          <article class="audio-card">
+        <div class="cols">
+          <article class="pane">
             <h3>Explicación</h3>
-            <audio id="audio-explain" controls preload="none"></audio>
-            <div class="btn-row">
-              <a id="dl-explain" class="btn btn-ghost small quiet" href="#" download>
+            <audio id="aud-explain" preload="none"></audio>
+            <div id="ui-explain" class="player" role="group" aria-label="Controles de explicación"></div>
+            <div style="margin-top:8px">
+              <a id="dl-explain" class="btn" href="#" download>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
-                <span class="label" id="lbl-explain">Descargar</span>
+                <span id="lbl-explain">Descargar</span>
               </a>
             </div>
           </article>
-          <article class="audio-card">
+          <article class="pane">
             <h3>Canción</h3>
-            <audio id="audio-track" controls preload="none"></audio>
-            <div class="btn-row">
-              <a id="dl-track" class="btn btn-ghost small quiet" href="#" download>
+            <audio id="aud-track" preload="none"></audio>
+            <div id="ui-track" class="player" role="group" aria-label="Controles de canción"></div>
+            <div style="margin-top:8px">
+              <a id="dl-track" class="btn" href="#" download>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
-                <span class="label" id="lbl-track">Descargar</span>
+                <span id="lbl-track">Descargar</span>
               </a>
             </div>
           </article>
-          <article class="audio-card lyrics-card">
-            <div class="lyrics-header">
-              <h3>Letra</h3>
-              <div class="lyrics-controls">
-                <button id="fontDown" class="chip small" aria-label="Reducir tamaño">A−</button>
-                <button id="fontUp" class="chip small" aria-label="Aumentar tamaño">A+</button>
-                <button id="copyLyrics" class="chip small" aria-label="Copiar letra">Copiar</button>
-              </div>
-            </div>
-            <div id="lyrics-wrap" class="lyrics-wrap">
-              <div id="lyrics" class="lyrics"><em>Letra no disponible aún.</em></div>
-            </div>
-            <div class="btn-row" style="justify-content:center;margin-top:6px">
-              <button id="toggle-lyrics" class="btn btn-ghost small" hidden>Ver más</button>
-            </div>
+          <article class="pane lyrics-card">
+            <div class="lyrics-head"><h3>Letra</h3><div><button id="fontDown" class="chip" aria-label="Reducir tamaño">A−</button><button id="fontUp" class="chip" aria-label="Aumentar tamaño">A+</button></div></div>
+            <div class="lyrics-surface"><div id="wrap" class="lyrics-wrap"><div id="lyrics" class="lyrics"><em>Letra no disponible aún.</em></div></div></div>
+            <div style="display:flex;justify-content:center;margin-top:8px"><button id="toggleLyrics" class="chip" hidden>Ver más</button></div>
           </article>
         </div>
       </section>
     </main>
   </div>
 
-  <button id="auBtn" class="fab" aria-label="Activar AÚ AÚ"><span class="fab-line">AÚ</span><span class="fab-line">AÚ</span></button>
-
   <div id="mini" class="mini" hidden>
-    <button id="mini-toggle" class="mini-btn" aria-label="Reproducir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="8,5 19,12 8,19 8,5"></polygon></svg></button>
-    <button id="mini-loop" class="mini-btn" aria-label="Activar repetición continua"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
-    <div id="mini-meta" class="mini-meta" title="Abrir canción"><div id="mini-title" class="mini-title">—</div><div id="mini-sub" class="mini-sub">—</div></div>
-    <div id="mini-bar" class="mini-bar" aria-label="Barra de progreso" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="mini-prog" class="mini-prog"></div></div>
-    <button id="mini-close" class="mini-btn" aria-label="Detener y cerrar">✕</button>
+    <button id="miniPlay" class="mini-btn" aria-label="Reproducir"></button>
+    <div class="mini-meta"><div id="miniTitle" class="mini-title">—</div><div id="miniSub" class="mini-sub">—</div></div>
+    <div id="miniBar" class="mini-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="miniProg" class="mini-prog"></div></div>
+    <button id="miniLoop" class="mini-btn" aria-label="Activar repetición"></button>
+    <button id="miniClose" class="mini-btn" aria-label="Detener y cerrar">✕</button>
   </div>
 
   <script>
     const SONGS={
-      fum:{
-        title:'Fum Fum Fum',
-        explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051384/fum_fum_fum_explicacion_hcsfzy.mp3',
-        track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051700/fum_fum_fum_cancion_c7zzyg.wav',
-        lyrics:`Veinticinco de diciembre
-Fum, fum, fum
-Veinticinco de diciembre
-Fum, fum, fum
-Fum, fum, fum, fum, fum, fum fum
-Carita de rosa
-Parece una flor hermosa
-Fum, fum, fum
-
-Sopla el viento por las calles
-Fum, fum, fum
-Y la virgen tiene frío
-Fum, fum, fum
-Fum, fum, fum, fum, fum, fum fum
-Quieres niño mío
-En mi corazón nacer
-Fum, fum, fum
-
-Cierren todos ya sus puertas
-Fum, fum, fum
-Y hasta el cielo se durmió
-Fum, fum, fum
-Fum, fum, fum, fum, fum, fum fum
-Telas de oro y plata
-Yo te haré un buen colchón
-Fum, fum, fum`
-      },
-      adeste:{title:'Adeste Fideles',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760100617/adeste_explicacion_g74foi.wav',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav',lyrics:`Adeste fideles
-Laeti triumphantes
-Venite, venite in Bethlehem
-Natum videte
-Regem angelorum
-
-Venite adoremus, venite adoremus
-Venite adoremus Dominum
-
-En grége relicto
-Húmiles ad cúnas
-Vocati pastores appróperant
-Et nos ovánti
-Grádu festinémus
-
-Venite adoremus, venite adoremus
-Venite adoremus Dominum
-
-Aetérni Paréntis
-Splendórem aetérnum
-Velátum sub cárne vidébimus
-Déum infántem
-Pánnis involútum
-
-Venite adoremus, venite adoremus
-Venite adoremus Dominum`},
+      fum:{title:'Fum Fum Fum',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051384/fum_fum_fum_explicacion_hcsfzy.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051700/fum_fum_fum_cancion_c7zzyg.wav',lyrics:`Veinticinco de diciembre\nFum, fum, fum\nVeinticinco de diciembre\nFum, fum, fum\nFum, fum, fum, fum, fum, fum fum\nCarita de rosa\nParece una flor hermosa\nFum, fum, fum\n\nSopla el viento por las calles\nFum, fum, fum\nY la virgen tiene frío\nFum, fum, fum\nFum, fum, fum, fum, fum, fum fum\nQuieres niño mío\nEn mi corazón nacer\nFum, fum, fum\n\nCierren todos ya sus puertas\nFum, fum, fum\nY hasta el cielo se durmió\nFum, fum, fum\nFum, fum, fum, fum, fum, fum fum\nTelas de oro y plata\nYo te haré un buen colchón\nFum, fum, fum`},
+      adeste:{title:'Adeste Fideles',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760100617/adeste_explicacion_g74foi.wav',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav'},
       dona:{title:'Dona Nobis Pacem',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760101534/dona_nobis_pacem___explicacion_3_rmnjay.mp3',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760054240/dona_nobis_pacem___cancion_hsep4p.wav'},
-      fuentecilla:{title:'Fuentecilla que corres',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760998122/fuentecilla_que_corres_cancion__qhqna2.mp3',lyrics:`A la nanita nana, nanita nana, nanita ea
-Mi Jesús tiene sueño, bendito sea, bendito sea
-A la nanita nana, nanita nana, nanita ea
-Mi Jesús tiene sueño, bendito sea, bendito sea
-
-Fuentecilla que corres clara y sonora
-Ruiseñor que en en la selva cantando lloras
-Callad mientras la cuna se balancea
-A la nanita nana, nanita ea
-
-A la nanita nana, nanita nana, nanita ea
-Mi Jesús tiene sueño, bendito sea, bendito sea
-A la nanita nana, nanita nana, nanita ea
-Mi Jesús tiene sueño, bendito sea, bendito sea
-
-Manojito de rosas y de alelíes
-Qué es lo que estás soñando que te sonríes
-Cuáles son tus ensueños, dilo alma mía más
-Qué es lo que murmuras Eucaristía`},
+      fuentecilla:{title:'Fuentecilla que corres',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760998122/fuentecilla_que_corres_cancion__qhqna2.mp3'},
       campanas:{title:'Canto de las campanas',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1760142195/canto_de_las_campanas_cancion_tq94nl.mp3'},
       estrella:{title:'Estrella Errante',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997189/estrella_errante_cancion_m6bcdm.mp3'},
       paz:{title:'Himno a la paz',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997237/himno_a_la_paz_cancion_avurel.mp3'},
       merry:{title:'We wish you a merry christmas',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997255/we_wish_you_cancion_pgz1i2.mp3'},
       kling:{title:'Kling Glöckchen, klingelingeling',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1761827592/kling_cancion_xawypb.mp3'},
-      tannenbaum:{title:'O Tannenbaum',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1761968289/oh_thanenbaum_kkhmya.mp3',lyrics:`O Tannenbaum, o Tannenbaum, wie treu sind deine Blätter!
-O Tannenbaum, o Tannenbaum, wie treu sind deine Blätter!
-Du grünst nicht nur zur Sommerzeit, nein, auch im Winter, wenn es schneit
-O Tannenbaum, o Tannenbaum, wie treu sind deine Blätter!
-
-O Tannenbaum, o Tannenbaum, du kannst mir sehr gefallen
-O Tannenbaum, o Tannenbaum, du kannst mir sehr gefallen
-Wie oft hat nicht zur Weihnachtszeit ein Baum von dir mich hoch erfreut
-O Tannenbaum, o Tannenbaum, Du kannst mir sehr gefallen`}
+      tannenbaum:{title:'O Tannenbaum',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1761968289/oh_thanenbaum_kkhmya.mp3'}
     };
 
     const $home=document.getElementById('home');
-    const $songView=document.getElementById('song-view');
+    const $song=document.getElementById('song');
     const $title=document.getElementById('song-title');
     const $meta=document.getElementById('song-meta');
-    const $exp=document.getElementById('audio-explain');
-    const $trk=document.getElementById('audio-track');
+    const $exp=document.getElementById('aud-explain');
+    const $trk=document.getElementById('aud-track');
     const $dlExp=document.getElementById('dl-explain');
     const $dlTrk=document.getElementById('dl-track');
     const $lblExp=document.getElementById('lbl-explain');
     const $lblTrk=document.getElementById('lbl-track');
     const $lyrics=document.getElementById('lyrics');
-    const $wrap=document.getElementById('lyrics-wrap');
-    const $toggle=document.getElementById('toggle-lyrics');
+    const $wrap=document.getElementById('wrap');
+    const $toggle=document.getElementById('toggleLyrics');
     const $fontUp=document.getElementById('fontUp');
     const $fontDown=document.getElementById('fontDown');
-    const $copyBtn=document.getElementById('copyLyrics');
 
     const $grid=document.getElementById('grid');
     const $q=document.getElementById('q');
     const $suggest=document.getElementById('suggest');
 
     const $mini=document.getElementById('mini');
-    const $miniToggle=document.getElementById('mini-toggle');
-    const $miniLoop=document.getElementById('mini-loop');
-    const $miniClose=document.getElementById('mini-close');
-    const $miniTitle=document.getElementById('mini-title');
-    const $miniSub=document.getElementById('mini-sub');
-    const $miniBar=document.getElementById('mini-bar');
-    const $miniProg=document.getElementById('mini-prog');
-    const $miniMeta=document.getElementById('mini-meta');
+    const $miniPlay=document.getElementById('miniPlay');
+    const $miniLoop=document.getElementById('miniLoop');
+    const $miniClose=document.getElementById('miniClose');
+    const $miniTitle=document.getElementById('miniTitle');
+    const $miniSub=document.getElementById('miniSub');
+    const $miniBar=document.getElementById('miniBar');
+    const $miniProg=document.getElementById('miniProg');
 
-    let currentSongId=null;let currentAudio=null;let currentLabel='';
-    let plainLyrics='';
+    let current=null, currentAudio=null, plainLyrics='';
 
-    function setActiveCard(id){document.querySelectorAll('[data-song]').forEach(a=>{const is=a.getAttribute('data-song')===id;a.classList.toggle('active',is);if(is){a.setAttribute('aria-current','page')}else{a.removeAttribute('aria-current')}})}
+    function iconPlay(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="8,5 19,12 8,19 8,5"></polygon></svg>'}
+    function iconPause(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="9" y1="5" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="19"/></svg>'}
+    function iconLoop(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>'}
+    function iconMore(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>'}
 
-    function setLoading(btn,on,labelEl){if(on){btn.classList.add('is-loading');btn.setAttribute('aria-disabled','true');if(labelEl)labelEl.textContent='Descargando…'}else{btn.classList.remove('is-loading');btn.setAttribute('aria-disabled','false')}}
+    function setActive(id){document.querySelectorAll('[data-song]').forEach(a=>a.classList.toggle('active',a.getAttribute('data-song')===id))}
+    function showHome(){ $home.hidden=false; $song.hidden=true; setActive(''); if(!currentAudio || currentAudio.paused || currentAudio.ended){ stopMini(); } document.title='Tenores' }
 
-    function renderHome(){$home.hidden=false;$songView.hidden=true;setActiveCard('');[$exp,$trk].forEach(a=>{if(!currentAudio||a!==currentAudio){try{a.pause();a.currentTime=0}catch(_){} }});if(!currentAudio||currentAudio.paused||currentAudio.ended)hideMini();document.title='Tenores'}
+    function ext(url){try{const u=new URL(url), p=u.pathname, i=p.lastIndexOf('.');return i!==-1?p.slice(i+1).toUpperCase():'MP3'}catch{return 'MP3'}}
+    function fileExt(url){try{const u=new URL(url), p=u.pathname, i=p.lastIndexOf('.');return i!==-1?p.slice(i):'.mp3'}catch{return '.mp3'}}
+    function cleanName(s){return s.replace(/[^a-z0-9\- _.]/gi,'_')}
 
-    function extFromUrl(url){try{const u=new URL(url);const p=u.pathname;const i=p.lastIndexOf('.');return i!==-1?p.slice(i+1).toUpperCase():'MP3'}catch{const m=url.match(/\.([a-z0-9]+)(?:$|\?)/i);return m?m[1].toUpperCase():'MP3'}}
+    async function download(url,name,btn,labelEl){try{btn&&btn.setAttribute('aria-disabled','true');if(labelEl)labelEl.textContent='Descargando…';const res=await fetch(url);const blob=await res.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();URL.revokeObjectURL(a.href);a.remove()}catch{open(url,'_blank')}finally{btn&&btn.setAttribute('aria-disabled','false');if(labelEl)labelEl.textContent='Descargar'}}
 
-    function renderSong(id){
-      const song=SONGS[id];
-      if(!song) return renderHome();
-      currentSongId=id;
-      $title.textContent=song.title;
-      $meta.textContent='Tenores • Curso oficial';
-      $exp.src=song.explain||'';
-      $trk.src=song.track||'';
-      $exp.loop=false; $trk.loop=false;
-      const hasExplain=Boolean(song.explain);
-      const hasTrack=Boolean(song.track);
-      $dlExp.setAttribute('aria-disabled',String(!hasExplain));
-      $dlTrk.setAttribute('aria-disabled',String(!hasTrack));
-      $lblExp.textContent=hasExplain?`Descargar ${extFromUrl(song.explain)}`:'Descargar';
-      $lblTrk.textContent=hasTrack?`Descargar ${extFromUrl(song.track)}`:'Descargar';
-      const L=(song.lyrics||'').trim();
-      setLyrics(L);
-      $home.hidden=true; $songView.hidden=false; setActiveCard(id);
-      document.title=`Tenores – ${song.title}`; window.scrollTo({top:0,behavior:'smooth'});
-    }
-
-    function router(){const h=(location.hash||'').replace('#','').trim();if(!h)return renderHome();renderSong(h)}
-
-    function fileExt(url){try{const u=new URL(url);const p=u.pathname;const i=p.lastIndexOf('.');return i!==-1?p.slice(i):'.mp3'}catch{const m=url.match(/\.([a-z0-9]+)(?:$|\?)/i);return m?'.'+m[1]:'.mp3'}}
-    function cleanName(s){return s.replace(/[^a-z0-9\- _\.]/gi,'_')}
-    async function forceDownload(url,filename,btn,labelEl){try{setLoading(btn,true,labelEl);const res=await fetch(url,{mode:'cors'});const blob=await res.blob();const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=filename;document.body.appendChild(link);link.click();URL.revokeObjectURL(link.href);link.remove()}catch(e){window.open(url,'*blank')}finally{setLoading(btn,false,labelEl);if(labelEl)labelEl.textContent=labelEl.dataset.default||'Descargar'}}
-
-    if($lblExp) $lblExp.dataset.default=$lblExp.textContent; if($lblTrk) $lblTrk.dataset.default=$lblTrk.textContent;
-    if($dlExp) $dlExp.addEventListener('click',e=>{e.preventDefault();if(!currentSongId)return;const s=SONGS[currentSongId];if(!s.explain)return;const ext=fileExt(s.explain);forceDownload(s.explain,cleanName(`${s.title} - explicacion${ext}`),$dlExp,$lblExp)});
-    if($dlTrk) $dlTrk.addEventListener('click',e=>{e.preventDefault();if(!currentSongId)return;const s=SONGS[currentSongId];if(!s.track)return;const ext=fileExt(s.track);forceDownload(s.track,cleanName(`${s.title} - cancion${ext}`),$dlTrk,$lblTrk)});
-
-    function showMini(){ $mini.hidden=false; }
-    function hideMini(){ $mini.hidden=true; $mini.classList.remove('mini--hidden'); $miniProg.style.width='0%'; currentAudio=null; }
-
-    function bindToMini(audio,label){currentAudio=audio;currentLabel=label;currentAudio.loop=false;$miniLoop.classList.remove('active');$miniLoop.setAttribute('aria-label','Activar repetición continua');$miniTitle.textContent=SONGS[currentSongId]?.title||'—';$miniSub.textContent=label;showMini();updateMini()}
-    function iconPlay(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="8,5 19,12 8,19 8,5"></polygon></svg>`}
-    function iconPause(){return `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><line x1=\"9\" y1=\"5\" x2=\"9\" y2=\"19\"/><line x1=\"15\" y1=\"5\" x2=\"15\" y2=\"19\"/></svg>`}
-    function updateMini(){const isPaused=!currentAudio||currentAudio.paused;$miniToggle.innerHTML=isPaused?iconPlay():iconPause();$miniToggle.setAttribute('aria-label',isPaused?'Reproducir':'Pausar');$miniLoop.classList.toggle('active', currentAudio && currentAudio.loop);if(!currentAudio||!currentAudio.duration){$miniProg.style.width='0%';return}const pct=(currentAudio.currentTime/currentAudio.duration)*100;$miniProg.style.width=`${pct}%`;$miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));}
-
-    [$exp,$trk].forEach((el,idx)=>{const label=idx===0?'Explicación':'Canción';el.addEventListener('play',()=>{bindToMini(el,label)});el.addEventListener('pause',updateMini);el.addEventListener('timeupdate',updateMini);el.addEventListener('ended',()=>{updateMini();hideMini()})});
-
-    $miniToggle.addEventListener('click',()=>{if(!currentAudio)return;currentAudio.paused?currentAudio.play():currentAudio.pause();updateMini()});
-    $miniLoop.addEventListener('click',()=>{if(!currentAudio)return;currentAudio.loop=!currentAudio.loop;$miniLoop.classList.toggle('active',currentAudio.loop);$miniLoop.setAttribute('aria-label',currentAudio.loop?'Desactivar repetición continua':'Activar repetición continua');updateMini()});
-    $miniClose.addEventListener('click',()=>{if(currentAudio){try{currentAudio.pause();currentAudio.currentTime=0}catch(_){}}hideMini()});
-
-    $miniBar.addEventListener('click',e=>{if(!currentAudio||!currentAudio.duration)return;const rect=$miniBar.getBoundingClientRect();const pct=Math.min(1,Math.max(0,(e.clientX-rect.left)/rect.width));currentAudio.currentTime=pct*currentAudio.duration});
-
-    let scrubbing=false;function pointX(ev){return ev.touches?ev.touches[0].clientX:ev.clientX}
-    function scrubTo(ev){if(!currentAudio||!currentAudio.duration)return;const rect=$miniBar.getBoundingClientRect();const pct=Math.min(1,Math.max(0,(pointX(ev)-rect.left)/rect.width));currentAudio.currentTime=pct*currentAudio.duration;updateMini()}
-    $miniBar.addEventListener('mousedown',ev=>{scrubbing=true;scrubTo(ev)});window.addEventListener('mousemove',ev=>{if(scrubbing)scrubTo(ev)});window.addEventListener('mouseup',()=>{scrubbing=false});
-    $miniBar.addEventListener('touchstart',ev=>{scrubbing=true;scrubTo(ev)},{passive:true});window.addEventListener('touchmove',ev=>{if(scrubbing)scrubTo(ev)},{passive:true});window.addEventListener('touchend',()=>{scrubbing=false});
-
-    $miniMeta.addEventListener('click',()=>{if(currentSongId){location.hash=currentSongId}});
-
-    let lastY=window.scrollY;window.addEventListener('scroll',()=>{if($mini.hidden)return;const y=window.scrollY;if(y>lastY+8){$mini.classList.add('mini--hidden')}else if(y<lastY-8){$mini.classList.remove('mini--hidden')}lastY=y;},{passive:true});
-
-    document.addEventListener('keydown',e=>{const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||e.altKey||e.ctrlKey||e.metaKey)return;if(e.code==='Space'){e.preventDefault();const target=currentAudio||(!$songView.hidden?($trk.src?$trk:$exp):null);if(target){target.paused?target.play():target.pause()}}else if(e.key==='ArrowLeft'){e.preventDefault();if(currentAudio)currentAudio.currentTime=Math.max(0,currentAudio.currentTime-5)}else if(e.key==='ArrowRight'){e.preventDefault();if(currentAudio&&currentAudio.duration)currentAudio.currentTime=Math.min(currentAudio.duration,currentAudio.currentTime+5)}});
-
-    // ===== Buscador =====
-    function normalize(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
-    const items=[...document.querySelectorAll('#grid [data-song]')].map(a=>({el:a,id:a.getAttribute('data-song'),title:normalize(a.querySelector('.mini-title').textContent)}));
-    function applyFilter(q){const n=normalize(q);let shown=0;items.forEach(({el,title})=>{const match=title.includes(n);el.hidden=!match;if(match) shown++;});$suggest.hidden=!n; $suggest.textContent = n ? (shown? `${shown} resultado${shown>1?'s':''}` : 'Sin resultados') : ''}
-    $q.addEventListener('input',()=>applyFilter($q.value));
-    $q.addEventListener('keydown',e=>{if(e.key==='Escape'){ $q.value=''; applyFilter(''); $q.blur(); }});
-
-    // ===== Letra helpers =====
-    function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
     function formatLyrics(s){
       if(!s) return '<em>Letra no disponible aún.</em>';
-      const safe=escapeHtml(s.trim());
-      const blocks=safe.split(/\n{2,}/).map(b=>`<p>${b.replace(/\n/g,'<br>')}</p>`).join('');
-      return blocks;
+      const safe=s.replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+      return safe.trim().split(/\n{2,}/).map(b=>`<p class="stanza">${b.replace(/\n/g,'<br>')}</p>`).join('');
     }
-    function setLyrics(text){
-      plainLyrics=text||'';
-      $lyrics.innerHTML = formatLyrics(plainLyrics);
-      requestAnimationFrame(()=>{
-        const tooTall=$wrap.scrollHeight>520 || (plainLyrics.length>700 && window.innerWidth<840);
-        $wrap.classList.toggle('is-collapsed', tooTall);
-        $toggle.hidden=!tooTall;
-        $toggle.textContent= tooTall ? 'Ver más' : ' ';
-      });
-    }
-
-    // Zoom persistente
+    function setLyrics(text){plainLyrics=text||'';$lyrics.innerHTML=formatLyrics(plainLyrics);requestAnimationFrame(()=>{const tall=$wrap.scrollHeight>520||(plainLyrics.length>700&&innerWidth<840);$wrap.classList.toggle('is-collapsed',tall);$toggle.hidden=!tall;$toggle.textContent=tall?'Ver más':'Ver menos'})}
     function getZoom(){const z=parseFloat(localStorage.getItem('lyricsZoom')||'1');return isNaN(z)?1:Math.min(1.6,Math.max(0.8,z))}
     function setZoom(z){document.documentElement.style.setProperty('--lyrics-zoom', z);localStorage.setItem('lyricsZoom', z)}
 
-    // Eventos letra
     $fontUp.addEventListener('click',()=>setZoom(Math.min(1.6, getZoom()+0.1)));
     $fontDown.addEventListener('click',()=>setZoom(Math.max(0.8, getZoom()-0.1)));
-    $copyBtn.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(plainLyrics);$copyBtn.textContent='Copiado';setTimeout(()=>{$copyBtn.textContent='Copiar'},1200);}catch{}});
-    $toggle.addEventListener('click',()=>{const isNow=$wrap.classList.toggle('is-collapsed');$toggle.textContent=isNow?'Ver más':'Ver menos'});
+    $toggle.addEventListener('click',()=>{const c=$wrap.classList.toggle('is-collapsed');$toggle.textContent=c?'Ver más':'Ver menos'});
 
-    function routerInit(){hideMini();setZoom(getZoom());router()}
-    window.addEventListener('hashchange',router);
-    window.addEventListener('DOMContentLoaded',routerInit);
+    const SPEEDS=[0.75,1,1.25,1.5,2];
+    let gSpeedIdx=parseInt(localStorage.getItem('audSpeedIdx')||'1',10); if(isNaN(gSpeedIdx)) gSpeedIdx=1; gSpeedIdx=Math.max(0,Math.min(SPEEDS.length-1,gSpeedIdx));
+    const players={ex:null,tr:null};
+    function applySpeedAll(){ [$exp,$trk].forEach(a=>{ try{ a.playbackRate=SPEEDS[gSpeedIdx]; }catch{} }); if(currentAudio){ try{ currentAudio.playbackRate=SPEEDS[gSpeedIdx]; }catch{} } players.ex&&players.ex.setSpeedLabel&&players.ex.setSpeedLabel(SPEEDS[gSpeedIdx]); players.tr&&players.tr.setSpeedLabel&&players.tr.setSpeedLabel(SPEEDS[gSpeedIdx]); localStorage.setItem('audSpeedIdx', String(gSpeedIdx)); }
 
-    (function(){const btn=document.getElementById('auBtn');function burst(){const N=50;for(let i=0;i<N;i++){const d=document.createElement('div');d.className='confetti';const sx=Math.random()*window.innerWidth;const drift=(Math.random()*2-1)*120;const rot=(Math.random()*360).toFixed(0)+'deg';d.style.left=sx+'px';d.style.setProperty('--x',drift+'px');d.style.setProperty('--r',rot);const w=6+Math.random()*6,h=8+Math.random()*10;d.style.width=w+'px';d.style.height=h+'px';d.style.background=['#0FFC7E','#19e58a','#13c971','#12b866'][i%4];d.style.opacity=(0.75+Math.random()*0.25).toFixed(2);d.style.animationDelay=(Math.random()*300)+'ms';document.body.appendChild(d);setTimeout(()=>d.remove(),1200)}}let t=null;btn.addEventListener('click',()=>{burst();clearInterval(t);const start=Date.now();t=setInterval(()=>{burst();if(Date.now()-start>3000){clearInterval(t)}},600)})})();
+    function buildPlayer(audio,root){
+      root.innerHTML=`<button class="p-btn play" aria-label="Reproducir">${iconPlay()}</button><div class="p-time"><span class="p-cur">0:00</span><div class="pbar"><div class="fill"></div></div><span class="p-dur">0:00</span></div><div class="more"><button class="more-btn" aria-label="Más opciones">${iconMore()}</button><div class="menu" hidden><div class="menu-row"><button class="m-btn dec" aria-label="Reducir velocidad">−</button><span class="speed-label">1×</span><button class="m-btn inc" aria-label="Aumentar velocidad">+</button></div></div></div>`;
+      const play=root.querySelector('.play'), cur=root.querySelector('.p-cur'), dur=root.querySelector('.p-dur'), bar=root.querySelector('.pbar'), fill=root.querySelector('.fill');
+      const more=root.querySelector('.more-btn'), menu=root.querySelector('.menu'), dec=menu.querySelector('.dec'), inc=menu.querySelector('.inc'), sLabel=menu.querySelector('.speed-label');
+      audio.playbackRate=SPEEDS[gSpeedIdx]; sLabel.textContent=(SPEEDS[gSpeedIdx]+'×').replace('.00','');
+      function fmt(t){if(!isFinite(t))return'0:00';t=t|0;const m=(t/60)|0,s=(t%60)|0;return m+':'+String(s).padStart(2,'0')}
+      function sync(){cur.textContent=fmt(audio.currentTime);if(isFinite(audio.duration))dur.textContent=fmt(audio.duration);fill.style.width=(audio.duration?(audio.currentTime/audio.duration)*100:0)+'%';play.innerHTML=audio.paused?iconPlay():iconPause()}
+      function seek(x){const r=bar.getBoundingClientRect();const pct=Math.min(1,Math.max(0,(x-r.left)/r.width));if(isFinite(audio.duration))audio.currentTime=pct*audio.duration;sync()}
+      play.addEventListener('click',()=>{audio.paused?audio.play():audio.pause()});
+      bar.addEventListener('mousedown',e=>seek(e.clientX));
+      bar.addEventListener('touchstart',e=>{seek(e.touches[0].clientX)},{passive:true});
+      more.addEventListener('click',()=>{menu.hidden=!menu.hidden});
+      dec.addEventListener('click',()=>{gSpeedIdx=Math.max(0,gSpeedIdx-1);applySpeedAll()});
+      inc.addEventListener('click',()=>{gSpeedIdx=Math.min(SPEEDS.length-1,gSpeedIdx+1);applySpeedAll()});
+      document.addEventListener('click',e=>{if(!root.contains(e.target))menu.hidden=true});
+      audio.addEventListener('timeupdate',sync); audio.addEventListener('play',sync); audio.addEventListener('pause',sync); audio.addEventListener('loadedmetadata',sync);
+      sync();
+      return {reset(){cur.textContent='0:00';dur.textContent='0:00';fill.style.width='0%';play.innerHTML=iconPlay()}, setDisabled(off){[play,bar,more,dec,inc].forEach(el=>el.disabled=off);root.style.opacity=off?.5:1}, setSpeedLabel(val){ sLabel.textContent=(val+'×').replace('.00',''); }};
+    }
 
-    // ====== Mini test cases (debug) ======
-    (function tests(){
-      console.group('%cTests Tenores','color:#0ffc7e');
-      console.assert(formatLyrics('a\n\nb').includes('<p>a'), 'formatLyrics debe crear <p> por dobles saltos');
-      console.assert(formatLyrics('x\ny').includes('<br>'), 'formatLyrics debe convertir \n en <br>');
-      console.assert(normalize('ÁÉÍÓÚ Ñ').includes('aeiou n'),'normalize debe quitar tildes');
-      console.assert(!!SONGS.fum && SONGS.fum.title==='Fum Fum Fum','SONGS.fum presente');
-      console.assert(!!SONGS.kling && SONGS.kling.track.includes('kling_cancion'),'SONGS.kling presente');
-      console.assert(!!SONGS.tannenbaum && SONGS.tannenbaum.track.includes('oh_thanenbaum'),'SONGS.tannenbaum presente');
-      console.assert(!!document.getElementById('dl-explain'),'dl-explain presente');
-      console.assert(!!document.getElementById('dl-track'),'dl-track presente');
-      console.assert(document.getElementById('dl-explain')?.classList.contains('small'),'botón explain tamaño small');
-      console.assert(document.getElementById('dl-track')?.classList.contains('small'),'botón track tamaño small');
-      console.groupEnd();
-    })();
+    function bindMini(audio,label){currentAudio=audio;$miniTitle.textContent=SONGS[current]?.title||'—';$miniSub.textContent=label;$miniPlay.innerHTML=audio.paused?iconPlay():iconPause();$miniLoop.innerHTML=iconLoop();$mini.hidden=false;syncMini()}
+    function syncMini(){if(!currentAudio){$mini.hidden=true;return}const d=currentAudio.duration||0;const pct=d?(currentAudio.currentTime/d)*100:0;$miniProg.style.width=pct+'%';$miniPlay.innerHTML=currentAudio.paused?iconPlay():iconPause();$miniLoop.classList.toggle('active',currentAudio.loop)}
+    function stopMini(){if(currentAudio){try{currentAudio.pause();currentAudio.currentTime=0}catch{}}$mini.hidden=true;currentAudio=null}
+
+    $miniPlay.addEventListener('click',()=>{if(!currentAudio)return;currentAudio.paused?currentAudio.play():currentAudio.pause();syncMini()});
+    $miniLoop.addEventListener('click',()=>{if(!currentAudio)return;currentAudio.loop=!currentAudio.loop;syncMini()});
+    $miniClose.addEventListener('click',stopMini);
+    $miniBar.addEventListener('click',e=>{if(!currentAudio||!currentAudio.duration)return;const r=$miniBar.getBoundingClientRect();currentAudio.currentTime=((e.clientX-r.left)/r.width)*currentAudio.duration});
+
+    function renderSong(id){const s=SONGS[id]; if(!s){showHome();return} current=id; $title.textContent=s.title; $meta.textContent='Tenores • Curso oficial'; $exp.src=s.explain||''; $trk.src=s.track||''; const hasE=!!s.explain, hasT=!!s.track; $lblExp.textContent=hasE?`Descargar ${ext(s.explain)}`:'Descargar'; $lblTrk.textContent=hasT?`Descargar ${ext(s.track)}`:'Descargar'; players.ex.setDisabled(!hasE); players.tr.setDisabled(!hasT); players.ex.reset(); players.tr.reset(); setLyrics(s.lyrics||''); setActive(id); $home.hidden=true; $song.hidden=false; document.title='Tenores – '+s.title; scrollTo({top:0,behavior:'smooth'}) }
+
+    function router(){const h=(location.hash||'').slice(1); if(!h) return showHome(); renderSong(h)}
+
+    function normalize(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
+    const items=[...document.querySelectorAll('#grid [data-song]')].map(a=>({el:a,id:a.getAttribute('data-song'),t:normalize(a.querySelector('.title').textContent)}));
+    function filter(q){const n=normalize(q), vis=[]; items.forEach(({el,t})=>{const m=t.includes(n); el.hidden=!m; if(m) vis.push(el)}); $suggest.hidden=!n; $suggest.textContent= n ? (vis.length? `${vis.length} resultado${vis.length>1?'s':''}` : 'Sin resultados') : ''; if(n && vis[0]) vis[0].scrollIntoView({block:'center'}) }
+    $q.addEventListener('input',()=>filter($q.value));
+    $q.addEventListener('focus',()=>{setTimeout(()=>{const first=items.find(x=>!x.el.hidden)?.el;if(first) first.scrollIntoView({block:'center'})},250)});
+    $q.addEventListener('keydown',e=>{if(e.key==='Escape'){ $q.value=''; filter(''); $q.blur(); }});
+
+    function setup(){
+      players.ex=buildPlayer($exp,document.getElementById('ui-explain'));
+      players.tr=buildPlayer($trk,document.getElementById('ui-track'));
+      applySpeedAll();
+      [$exp,$trk].forEach((a,i)=>{const label=i? 'Canción':'Explicación'; a.addEventListener('play',()=>{bindMini(a,label)}); a.addEventListener('pause',syncMini); a.addEventListener('timeupdate',syncMini); a.addEventListener('ended',stopMini)});
+      if($dlExp) $dlExp.addEventListener('click',e=>{e.preventDefault(); if(!current) return; const s=SONGS[current]; if(!s.explain) return; download(s.explain, cleanName(`${s.title} - explicacion${fileExt(s.explain)}`), $dlExp, $lblExp)});
+      if($dlTrk) $dlTrk.addEventListener('click',e=>{e.preventDefault(); if(!current) return; const s=SONGS[current]; if(!s.track) return; download(s.track, cleanName(`${s.title} - cancion${fileExt(s.track)}`), $dlTrk, $lblTrk)});
+      window.addEventListener('hashchange',router);
+      setZoom(getZoom()); router();
+
+      console.assert(formatLyrics('a\n\nb').includes('<p') && formatLyrics('a\nb').includes('<br>'), 'formatLyrics falló');
+      console.assert(formatLyrics('<>&"\'').includes('&lt;') && formatLyrics('<>&"\'').includes('&gt;'), 'escape falló');
+      console.assert(normalize('ÁÉÍÓÚ').includes('aeiou'), 'normalize falló');
+    }
+
+    document.addEventListener('DOMContentLoaded',setup);
   </script>
 </body>
 </html>
-
