@@ -15,20 +15,20 @@ Fum, fum, fum
 
 Sopla el viento por las calles
 Fum, fum, fum
-Y la virgen tiene frÃ­o
+Y la virgen tiene frío
 Fum, fum, fum
 Fum, fum, fum, fum, fum, fum fum
-Quieres niÃ±o mÃ­o
-En mi corazÃ³n nacer
+Quieres niño mío
+En mi corazón nacer
 Fum, fum, fum
 
 Cierren todos ya sus puertas
 Fum, fum, fum
-Y hasta el cielo se durmiÃ³
+Y hasta el cielo se durmió
 Fum, fum, fum
 Fum, fum, fum, fum, fum, fum fum
 Telas de oro y plata
-Yo te harÃ© un buen colchÃ³n
+Yo te haré un buen colchón
 Fum, fum, fum`
   },
   adeste:{title:'Adeste Fideles',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760100617/adeste_explicacion_g74foi.wav',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav'},
