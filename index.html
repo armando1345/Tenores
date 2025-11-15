@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <button id="dataToggle" class="data-toggle" type="button" aria-haspopup="dialog" aria-expanded="false">
+    Mis datos
+  </button>
   <div class="container">
     <header>
       <div class="logo-wrap">
@@ -181,9 +184,30 @@
     <button id="mini-close" class="mini-btn" aria-label="Detener y cerrar">&times;</button>
   </div>
 
+  <div id="dataPanel" class="data-panel" hidden>
+    <div class="data-panel__backdrop" data-role="close-panel" aria-hidden="true"></div>
+    <section class="data-panel__sheet" role="dialog" aria-labelledby="dataPanelTitle" aria-modal="true">
+      <header class="data-panel__header">
+        <div>
+          <p class="data-panel__eyebrow">Seguimiento</p>
+          <h2 id="dataPanelTitle">Mis datos del equipo</h2>
+          <p class="data-panel__intro">Resumen automatizado con los 9 ensayos registrados del 6&nbsp;de&nbsp;septiembre al 8&nbsp;de&nbsp;noviembre.</p>
+        </div>
+        <button id="dataClose" class="data-close" type="button" aria-label="Cerrar panel Mis datos">&times;</button>
+      </header>
+      <div class="data-panel__body">
+        <p class="data-panel__hint">Selecciona una opci&oacute;n para desplegar las gr&aacute;ficas y estad&iacute;sticas.</p>
+        <div id="dataCards" class="data-options" role="list"></div>
+        <section id="dataDetail" class="data-detail" aria-live="polite">
+          <p class="data-panel__empty">Activa &ldquo;Mis datos&rdquo; y elige un tenor para ver su desempe&ntilde;o.</p>
+        </section>
+      </div>
+    </section>
+  </div>
   <script src="app.js" defer></script>
 </body>
 </html>\r\n\r\n
+
 
 
 
