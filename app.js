@@ -49,7 +49,7 @@ const TEAM_OVERVIEW={
   averageMinutes:1422.8,
   averageAttendance:74,
   rehearsals:9,
-  timeframe:'Del 6 de septiembre al 8 de noviembre',
+  timeframe:'Periodo analizado',
   observations:[
     'Carlos (100%) y Santiago (98%) sostienen la asistencia m\u00e1s alta del equipo.',
     'Nivel alto (H\u00e9ctor, Marco y Diego) se mantiene por arriba del 80% aunque acumula retrasos frecuentes.',
@@ -79,10 +79,19 @@ const TENOR_MEMBERS_DATA=[
 
 const CALENDAR_MONTHS=['2025-11','2025-12'];
 const PRESENTATION_EVENTS=[
-  {id:'nov-20',date:'2025-11-20',title:'Serenata Plaza Fundadores',startTime:'20:30 h',callTime:'18:45 h',venue:'Plaza Fundadores',city:'Guadalajara, Jal.',meetingPoint:'Zona norte del escenario',summary:'Intervenci\u00f3n nocturna dentro del Festival Navide\u00f1o 2025.',instructions:'Uniforme de gala y llegada 15 minutos antes al punto de reuni\u00f3n para prueba de sonido.',tag:'Festival'},
-  {id:'nov-28',date:'2025-11-28',title:'Encuentro Coral Regional',startTime:'19:00 h',callTime:'17:10 h',venue:'Auditorio Benito Ju\u00e1rez',city:'Zapopan, Jal.',meetingPoint:'Lobby principal',summary:'Programa compartido con coros invitados de la regi\u00f3n.',instructions:'Llevar partituras impresas y coordinar transporte con el staff.',tag:'Encuentro'},
-  {id:'dec-05',date:'2025-12-05',title:'Gala Teatro Degollado',startTime:'21:00 h',callTime:'18:30 h',venue:'Teatro Degollado',city:'Guadalajara, Jal.',meetingPoint:'Vestidor nivel 1',summary:'Funci\u00f3n de beneficencia en favor de la casa hogar La Barca.',instructions:'Ensayo general en escenario a las 19:00 h. Llevar credencial del coro.',tag:'Beneficencia'},
-  {id:'dec-18',date:'2025-12-18',title:'Concierto en Plaza Bicentenario',startTime:'19:30 h',callTime:'17:45 h',venue:'Plaza Bicentenario',city:'Zapopan, Jal.',meetingPoint:'Estacionamiento norte',summary:'Cierre de temporada con repertorio navide\u00f1o completo.',instructions:'Traer chamarra oficial para la salida final y coordinar transporte grupal.',tag:'Comunidad'}
+  {id:'nov-20-incaf',date:'2025-11-20',title:'Coro Polif\u00f3nico',startTime:'5:00 pm',callTime:'03:00 pm',venue:'INCAF',city:'San Salvador',meetingPoint:'Recepci\u00f3n principal',summary:'Actuaci\u00f3n oficial del Coro Polif\u00f3nico en INCAF.',instructions:'Salida programada a las 03:00 pm desde la fundaci\u00f3n.',tag:'Presentaci\u00f3n'},
+  {id:'nov-21-quimicos',date:'2025-11-21',title:'Coro Polif\u00f3nico',startTime:'6:00 pm',callTime:'04:00 pm',venue:'Colegio de Qu\u00edmicos Farmac\u00e9uticos',city:'San Salvador',meetingPoint:'Parqueo lateral',summary:'Presentaci\u00f3n para el Colegio de Qu\u00edmicos Farmac\u00e9uticos.',instructions:'Salida coordinada a las 04:00 pm.',tag:'Presentaci\u00f3n'},
+  {id:'nov-29-fepade',date:'2025-11-29',title:'Show navide\u00f1o (bandas y coro)',startTime:'4:00 pm',callTime:'02:00 pm',venue:'FEPADE',city:'San Salvador',meetingPoint:'Acceso principal',summary:'Show navide\u00f1o junto a bandas invitadas en FEPADE.',instructions:'Salida general a las 02:00 pm.',tag:'Show'},
+  {id:'dec-01-alfa',date:'2025-12-01',title:'Coro Polif\u00f3nico',startTime:'7:00 pm',callTime:'04:30 pm',venue:'ALFA / Milenium Plaza',city:'Antiguo Cuscatl\u00e1n',meetingPoint:'Lobby principal',summary:'Concierto del coro en ALFA / Milenium Plaza.',instructions:'Salida prevista a las 04:30 pm.',tag:'Presentaci\u00f3n'},
+  {id:'dec-02-alfa',date:'2025-12-02',title:'Coro Polif\u00f3nico',startTime:'7:00 pm',callTime:'04:30 pm',venue:'ALFA / Milenium Plaza',city:'Antiguo Cuscatl\u00e1n',meetingPoint:'Lobby principal',summary:'Segunda fecha en ALFA / Milenium Plaza.',instructions:'Mantener salida a las 04:30 pm.',tag:'Presentaci\u00f3n'},
+  {id:'dec-05-nunciatura',date:'2025-12-05',title:'Coro Polif\u00f3nico',startTime:'6:30 pm',callTime:'04:30 pm',venue:'Nunciatura Apost\u00f3lica',city:'San Salvador',meetingPoint:'Entrada principal',summary:'Participaci\u00f3n protocolaria en la Nunciatura Apost\u00f3lica.',instructions:'Salida puntual a las 04:30 pm.',tag:'Presentaci\u00f3n'},
+  {id:'dec-06-binaes',date:'2025-12-06',title:'Show navide\u00f1o: Escuela Ancalmo, bandas, ensambles y coro',startTime:'4:00 pm',callTime:'02:00 pm',venue:'BINAES',city:'San Salvador',meetingPoint:'Vest\u00edbulo BINAES',summary:'Show navide\u00f1o con la Escuela Ancalmo y ensambles invitados.',instructions:'Salida general a las 02:00 pm.',tag:'Show'},
+  {id:'dec-07-bosques',date:'2025-12-07',title:'Coro Polif\u00f3nico',startTime:'7:00 pm',callTime:'04:00 pm',venue:'Bosques de la Paz',city:'San Salvador',meetingPoint:'\u00c1rea de estacionamiento',summary:'Presentaci\u00f3n comunitaria en Bosques de la Paz.',instructions:'Salida prevista a las 04:00 pm.',tag:'Presentaci\u00f3n'},
+  {id:'dec-11-ateneo',date:'2025-12-11',title:'Coro Polif\u00f3nico',startTime:'7:00 pm',callTime:'04:30 pm',venue:'Ateneo',city:'San Salvador',meetingPoint:'Pasillo principal',summary:'Recital del coro en el Ateneo.',instructions:'Salida a las 04:30 pm.',tag:'Presentaci\u00f3n'},
+  {id:'dec-13-merliot',date:'2025-12-13',title:'Coro Polif\u00f3nico',startTime:'10:30 am',callTime:'08:00 pm',venue:'Ni\u00f1os de Merliot',city:'Santa Tecla',meetingPoint:'Cancha techada',summary:'Actividad matutina con Ni\u00f1os de Merliot.',instructions:'Salida indicada a las 08:00 pm.',tag:'Presentaci\u00f3n'},
+  {id:'dec-14-osicala',date:'2025-12-14',title:'Coro Polif\u00f3nico',startTime:'1:00 pm',callTime:'06:00 am',venue:'Osicala',city:'Osicala',meetingPoint:'Casa de la Cultura',summary:'Viaje especial para la comunidad de Osicala.',instructions:'Salida temprana a las 06:00 am.',tag:'Gira'},
+  {id:'dec-16-ancalmo',date:'2025-12-16',title:'Coro Polif\u00f3nico',startTime:'1:00 pm',callTime:'10:30 am',venue:'Ancalmo',city:'San Salvador',meetingPoint:'Recepci\u00f3n central',summary:'Presentaci\u00f3n interna en Ancalmo.',instructions:'Salida a las 10:30 am.',tag:'Presentaci\u00f3n'},
+  {id:'dec-20-poma',date:'2025-12-20',title:'Coro Polif\u00f3nico',startTime:'5:00 pm',callTime:'03:00 pm',venue:'Teatro Poma',city:'San Salvador',meetingPoint:'Acceso artistas',summary:'Cierre de temporada en el Teatro Poma.',instructions:'Salida programada a las 03:00 pm.',tag:'Presentaci\u00f3n'}
 ];
 const DAY_NAMES=['L','M','X','J','V','S','D'];
 
@@ -318,7 +327,7 @@ function renderSong(id){
   const s=SONGS[id]; if(!s) return renderHome();
   currentSongId=id;
   $title.textContent=s.title;
-  $meta.textContent='El curso que te convertir� en "El Buen Tenor"';
+  $meta.textContent='El curso que te convertirá en "El Buen Tenor"';
   $exp.src=s.explain||''; $trk.src=s.track||'';
   [$exp,$trk].forEach(a=>{a.playbackRate=gSpeed;a.loop=false;});
   resetPlayers();
@@ -502,12 +511,11 @@ function renderDataDetail(id){
 }
 function renderTeamDetail(){
   if(!$overviewDetail) return;
-  const timeframeText=TEAM_OVERVIEW.timeframe||'Periodo analizado';
   const heroMinutePct=TEAM_OVERVIEW.totalMinutes?clampPercent((TEAM_OVERVIEW.averageMinutes/TEAM_OVERVIEW.totalMinutes)*100):0;
   const metrics=[
     {value:formatMinutes(TEAM_OVERVIEW.totalMinutes),label:'Tiempo total',note:`Equivalente a ${formatPlainNumber(TEAM_OVERVIEW.totalHours)} h de ensayo`},
     {value:formatMinutes(TEAM_OVERVIEW.averageMinutes),label:'Promedio por tenor',note:'Media hist\u00f3rica de la secci\u00f3n'},
-    {value:formatPlainNumber(TEAM_OVERVIEW.rehearsals),label:'Ensayos registrados',note:timeframeText},
+    {value:formatPlainNumber(TEAM_OVERVIEW.rehearsals),label:'Ensayos registrados',note:'Total de ensayos considerados'},
     {value:formatPercent(TEAM_OVERVIEW.averageAttendance),label:'Asistencia promedio',note:'Cuatro integrantes bajo el promedio'}
   ].map(metric=>`<article class="metric-card"><span>${metric.label}</span><strong>${metric.value}</strong><small>${metric.note}</small></article>`).join('');
   const attendanceRows=TENOR_MEMBERS.map(member=>{
@@ -521,14 +529,13 @@ function renderTeamDetail(){
       <div class="data-hero-text">
         <p class="kicker">Equipo Tenores</p>
         <h3>Salud general</h3>
-        <p class="data-timeframe">${timeframeText}</p>
         <div class="data-legend">
           <span class="badge">${formatPlainNumber(TEAM_OVERVIEW.rehearsals)} ensayos</span>
           <span class="badge badge--ghost">${formatPlainNumber(TEAM_OVERVIEW.totalMembers)} miembros</span>
           <span class="badge badge--ghost">Tiempo ensayado ${formatPercent(heroMinutePct)}</span>
         </div>
       </div>
-      <div class="dial dial--xl" style="--percent:${heroMinutePct}%;"><div class="dial-value"><strong>${formatPercent(heroMinutePct)}</strong><span>minutos</span></div><span class="dial-label">Avance plan anual</span></div>
+      <div class="dial dial--xl" style="--percent:${heroMinutePct}%;"><div class="dial-value"><strong>${formatPercent(heroMinutePct)}</strong><span>minutos</span></div><span class="dial-label">Tiempo ensayado</span></div>
     </article>
     <div class="overview-grid">${metrics}</div>
     <div class="overview-columns">
@@ -545,7 +552,6 @@ function renderTeamDetail(){
       <div class="table-header">
         <div>
           <h4>Asistencia por tenor</h4>
-          <p>${timeframeText}</p>
         </div>
         <span class="badge badge--ghost">${formatPlainNumber(TEAM_OVERVIEW.totalMembers)} integrantes</span>
       </div>
@@ -555,7 +561,6 @@ function renderTeamDetail(){
 }
 function renderMemberDetail(member){
   if(!$dataDetail) return;
-  const timeframeText=TEAM_OVERVIEW.timeframe||'Periodo analizado';
   const hasRehearsals=member.rehearsalsAttended!==null&&member.rehearsalsAttended!==undefined;
   const freqValue=hasRehearsals?`${member.rehearsalsAttended} / ${TEAM_OVERVIEW.rehearsals}`:'Sin registro';
   const freqLabel=hasRehearsals?'Ensayos cubiertos':'Sin desglose por ensayo';
@@ -597,7 +602,6 @@ function renderMemberDetail(member){
       <div class="data-hero-text">
         <p class="kicker">${member.level}</p>
         <h3>${member.name}</h3>
-        <p class="data-timeframe">${timeframeText}</p>
         <div class="data-legend">
           <span class="badge">Tiempo ensayado ${formatPercent(minutePct)}</span>
           <span class="badge badge--ghost">${pendingBadge}</span>
@@ -611,7 +615,7 @@ function renderMemberDetail(member){
         <h4>Ritmo de minutos</h4>
         <div class="data-legend" style="margin-bottom:10px">
           <span class="badge badge--ghost">${formatMinutes(member.minutes)} activos</span>
-          <span class="badge badge--ghost">${formatMinutes(TEAM_OVERVIEW.totalMinutes)} plan anual</span>
+          <span class="badge badge--ghost">Meta ${formatMinutes(TEAM_OVERVIEW.totalMinutes)}</span>
         </div>
         <div class="attendance-bar"><span style="--value:${minutePct}%;"></span></div>
         <p class="stat-card__note">${minutesNarrative}</p>
@@ -775,18 +779,15 @@ function openCalendarPopover(date,anchorRect){
     if($calendarPopoverTitle) $calendarPopoverTitle.textContent='Sin presentaciones';
     $calendarPopoverBody.innerHTML='<p class="presentations-empty">No hay presentaciones registradas para esta fecha.</p>';
   }else{
-    if($calendarPopoverTitle) $calendarPopoverTitle.textContent=events.length>1?'Presentaciones programadas':'Presentaci&oacute;n programada';
+    if($calendarPopoverTitle) $calendarPopoverTitle.textContent='Concierto';
     $calendarPopoverBody.innerHTML=events.map(event=>{
-      const indicaciones=[event.meetingPoint?`Punto de reuni&oacute;n: ${event.meetingPoint}.`:'' ,event.instructions].filter(Boolean).join(' ');
       return `<section class="calendar-popover__event">
-        <h4 style="margin:0 0 4px;font-size:18px">${event.title}</h4>
-        <p>${event.venue} &middot; ${event.city}</p>
+        <p>${event.venue}, ${event.city}</p>
         <div class="calendar-detail__meta">
           <div><small>Hora</small><span>${event.startTime}</span></div>
           <div><small>Salida</small><span>${event.callTime}</span></div>
           <div><small>Lugar</small><span>${event.venue}</span></div>
         </div>
-        <p><strong>Indicaciones:</strong> ${indicaciones||'Por confirmar.'}</p>
       </section>`;
     }).join('');
   }
@@ -1033,22 +1034,3 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   console.assert(formatLyrics('a\n\nb').includes('<p>'),'format ok');
   console.groupEnd();
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
