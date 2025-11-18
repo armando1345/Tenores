@@ -9,9 +9,16 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <button id="dataToggle" class="data-toggle" type="button" aria-haspopup="dialog" aria-expanded="false">
-    Mis datos
+  <button id="menuToggle" class="menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="quickMenu">
+    <span class="sr-only">Abrir men&uacute; de opciones</span>
+    <span class="menu-line" aria-hidden="true"></span>
+    <span class="menu-line" aria-hidden="true"></span>
+    <span class="menu-line" aria-hidden="true"></span>
   </button>
+  <div id="quickMenu" class="quick-menu" role="menu" aria-labelledby="menuToggle" hidden>
+    <button class="quick-menu__item" type="button" data-action="data" role="menuitem">Mis datos</button>
+    <button class="quick-menu__item" type="button" data-action="presentations" role="menuitem">Presentaciones</button>
+  </div>
   <div class="container">
     <header>
       <div class="logo-wrap">
@@ -190,24 +197,78 @@
       <header class="data-panel__header">
         <div>
           <p class="data-panel__eyebrow">Seguimiento</p>
-          <h2 id="dataPanelTitle">Mis datos del equipo</h2>
-          <p class="data-panel__intro">Resumen automatizado con los 9 ensayos registrados del 6&nbsp;de&nbsp;septiembre al 8&nbsp;de&nbsp;noviembre.</p>
+          <h2 id="dataPanelTitle">M&eacute;tricas del equipo</h2>
+          <p class="data-panel__intro">Aqu&iacute; ver&aacute;s los datos de los tenores, del 6&nbsp;de&nbsp;septiembre al 8&nbsp;de&nbsp;noviembre.</p>
         </div>
         <button id="dataClose" class="data-close" type="button" aria-label="Cerrar panel Mis datos">&times;</button>
       </header>
       <div class="data-panel__body">
-        <p class="data-panel__hint">Selecciona una opci&oacute;n para desplegar las gr&aacute;ficas y estad&iacute;sticas.</p>
-        <div id="dataCards" class="data-options" role="list"></div>
-        <section id="dataDetail" class="data-detail" aria-live="polite">
-          <p class="data-panel__empty">Activa &ldquo;Mis datos&rdquo; y elige un tenor para ver su desempe&ntilde;o.</p>
+        <div class="data-panel__tabs" role="tablist">
+          <button id="tabOverview" class="data-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="dataOverview" data-tab-target="overview">Resumen general</button>
+          <button id="tabTenors" class="data-tab" type="button" role="tab" aria-selected="false" aria-controls="dataTenors" data-tab-target="tenors">Tenores</button>
+        </div>
+        <section id="dataOverview" class="data-panel__section" role="tabpanel" aria-labelledby="tabOverview">
+          <div id="overviewDetail" class="data-detail data-detail--overview">
+            <p class="data-panel__empty">Cargando resumen&hellip;</p>
+          </div>
+        </section>
+        <section id="dataTenors" class="data-panel__section" role="tabpanel" aria-labelledby="tabTenors" hidden>
+          <div class="tenor-panel">
+            <div id="tenorListView" class="data-sidebar tenor-list-view" role="region" aria-label="Tenores disponibles">
+              <div class="data-sidebar__header">
+                <p>Explora cada integrante y consulta su desempe&ntilde;o.</p>
+              </div>
+              <div id="dataCards" class="data-list" role="list"></div>
+            </div>
+            <div id="tenorDetailView" class="tenor-detail" hidden>
+              <button id="tenorBack" class="data-back" type="button">
+                <span aria-hidden="true">&#8592;</span>
+                Lista de tenores
+              </button>
+              <section id="dataDetail" class="data-detail" aria-live="polite">
+                <p class="data-panel__empty">Selecciona un tenor para consultar sus datos.</p>
+              </section>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+  <div id="presentationsPanel" class="presentations-panel" hidden>
+    <div class="presentations-panel__backdrop" data-role="close-presentations" aria-hidden="true"></div>
+    <section class="presentations-panel__sheet" role="dialog" aria-labelledby="presentationsTitle" aria-modal="true">
+      <header class="presentations-panel__header">
+        <div>
+          <p class="presentations-panel__eyebrow">Agenda de campo</p>
+          <h2 id="presentationsTitle">Pr&oacute;ximas presentaciones</h2>
+          <p class="presentations-panel__intro">Resumen con lugar, hora del concierto y hora de salida del equipo.</p>
+        </div>
+        <button id="presentationsClose" class="presentations-close" type="button" aria-label="Cerrar panel Presentaciones">&times;</button>
+      </header>
+      <div class="presentations-panel__body">
+        <div class="presentations-panel__layout">
+          <section class="calendar-board">
+            <header class="calendar-board__header">
+              <p class="calendar-eyebrow">Calendario</p>
+              <h3>Noviembre y diciembre 2025</h3>
+              <p>Haz clic sobre un d&iacute;a con presentaciones para revisar los detalles.</p>
+            </header>
+            <div id="presentationsCalendar" class="calendar-months"></div>
+          </section>
+          <section id="calendarDetail" class="calendar-detail">
+            <p class="presentations-empty">Selecciona un d&iacute;a para ver la informaci&oacute;n.</p>
+          </section>
+        </div>
+        <section class="upcoming-board">
+          <div class="upcoming-header">
+            <h3>Pr&oacute;ximas presentaciones</h3>
+            <p>Las tres fechas m&aacute;s cercanas confirmadas para el coro.</p>
+          </div>
+          <div id="presentationsList" class="presentations-upcoming"></div>
         </section>
       </div>
     </section>
   </div>
   <script src="app.js" defer></script>
 </body>
-</html>\r\n\r\n
-
-
-
-
+</html>
