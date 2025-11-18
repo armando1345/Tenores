@@ -15,20 +15,20 @@ Fum, fum, fum
 
 Sopla el viento por las calles
 Fum, fum, fum
-Y la virgen tiene frÃ­o
+Y la virgen tiene frío
 Fum, fum, fum
 Fum, fum, fum, fum, fum, fum fum
-Quieres niÃ±o mÃ­o
-En mi corazÃ³n nacer
+Quieres niño mío
+En mi corazón nacer
 Fum, fum, fum
 
 Cierren todos ya sus puertas
 Fum, fum, fum
-Y hasta el cielo se durmiÃ³
+Y hasta el cielo se durmió
 Fum, fum, fum
 Fum, fum, fum, fum, fum, fum fum
 Telas de oro y plata
-Yo te harÃ© un buen colchÃ³n
+Yo te haré un buen colchón
 Fum, fum, fum`
   },
   adeste:{title:'Adeste Fideles',explain:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760100617/adeste_explicacion_g74foi.wav',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760051838/adeste_cancion_kefxux.wav'},
@@ -38,7 +38,7 @@ Fum, fum, fum`
   estrella:{title:'Estrella Errante',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997189/estrella_errante_cancion_m6bcdm.mp3'},
   paz:{title:'Himno a la paz',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997237/himno_a_la_paz_cancion_avurel.mp3'},
   merry:{title:'We wish you a merry christmas',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997255/we_wish_you_cancion_pgz1i2.mp3'},
-  kling:{title:'Kling GlÃ¶ckchen, klingelingeling',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1761827592/kling_cancion_xawypb.mp3'},
+  kling:{title:'Kling Glöckchen, klingelingeling',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1761827592/kling_cancion_xawypb.mp3'},
   tannenbaum:{title:'O Tannenbaum',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1761968289/oh_thanenbaum_kkhmya.mp3'}
 };
 
@@ -77,6 +77,15 @@ const TENOR_MEMBERS_DATA=[
   {id:'santiago',name:'Santiago',minutes:1890,attendance:98,minutesLost:30,rehearsalsAttended:null,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel Superior (98%-100%)',note:'98% de asistencia; faltan 30 minutos para igualar el total del coro.'}
 ];
 
+const CALENDAR_MONTHS=['2025-11','2025-12'];
+const PRESENTATION_EVENTS=[
+  {id:'nov-20',date:'2025-11-20',title:'Serenata Plaza Fundadores',startTime:'20:30 h',callTime:'18:45 h',venue:'Plaza Fundadores',city:'Guadalajara, Jal.',meetingPoint:'Zona norte del escenario',summary:'Intervenci\u00f3n nocturna dentro del Festival Navide\u00f1o 2025.',instructions:'Uniforme de gala y llegada 15 minutos antes al punto de reuni\u00f3n para prueba de sonido.',tag:'Festival'},
+  {id:'nov-28',date:'2025-11-28',title:'Encuentro Coral Regional',startTime:'19:00 h',callTime:'17:10 h',venue:'Auditorio Benito Ju\u00e1rez',city:'Zapopan, Jal.',meetingPoint:'Lobby principal',summary:'Programa compartido con coros invitados de la regi\u00f3n.',instructions:'Llevar partituras impresas y coordinar transporte con el staff.',tag:'Encuentro'},
+  {id:'dec-05',date:'2025-12-05',title:'Gala Teatro Degollado',startTime:'21:00 h',callTime:'18:30 h',venue:'Teatro Degollado',city:'Guadalajara, Jal.',meetingPoint:'Vestidor nivel 1',summary:'Funci\u00f3n de beneficencia en favor de la casa hogar La Barca.',instructions:'Ensayo general en escenario a las 19:00 h. Llevar credencial del coro.',tag:'Beneficencia'},
+  {id:'dec-18',date:'2025-12-18',title:'Concierto en Plaza Bicentenario',startTime:'19:30 h',callTime:'17:45 h',venue:'Plaza Bicentenario',city:'Zapopan, Jal.',meetingPoint:'Estacionamiento norte',summary:'Cierre de temporada con repertorio navide\u00f1o completo.',instructions:'Traer chamarra oficial para la salida final y coordinar transporte grupal.',tag:'Comunidad'}
+];
+const DAY_NAMES=['L','M','X','J','V','S','D'];
+
 const TENOR_LOOKUP=TENOR_MEMBERS_DATA.reduce((map,member)=>{map[member.id]=member;return map;},Object.create(null));
 const TENOR_MEMBERS=[...TENOR_MEMBERS_DATA].sort((a,b)=>a.name.localeCompare(b.name,'es',{sensitivity:'base'}));
 // Refs
@@ -114,13 +123,26 @@ const $dataPanel=document.getElementById('dataPanel');
 const $dataCards=document.getElementById('dataCards');
 const $dataDetail=document.getElementById('dataDetail');
 const $dataClose=document.getElementById('dataClose');
+const $overviewDetail=document.getElementById('overviewDetail');
+const $dataOverview=document.getElementById('dataOverview');
+const $dataTenors=document.getElementById('dataTenors');
+const $tenorListView=document.getElementById('tenorListView');
+const $tenorDetailView=document.getElementById('tenorDetailView');
+const $tenorBack=document.getElementById('tenorBack');
+const $menuToggle=document.getElementById('menuToggle');
+const $quickMenu=document.getElementById('quickMenu');
+const $presentationsPanel=document.getElementById('presentationsPanel');
+const $presentationsList=document.getElementById('presentationsList');
+const $presentationsClose=document.getElementById('presentationsClose');
+const $presentationsCalendar=document.getElementById('presentationsCalendar');
+const $calendarDetail=document.getElementById('calendarDetail');
 
 let currentSongId=null, currentAudio=null, currentLabel='', plainLyrics='';
 
 // Velocidad global
 const SPEEDS=[1,1.25,1.5,2];
 let gSpeed=1;
-let dataCardsReady=false,currentDataSection='team',dataPanelTimer=null;
+let dataCardsReady=false,currentDataMemberId=null,currentDataTab='overview',dataPanelTimer=null,presentationsTimer=null,isMenuOpen=false,selectedPresentationDate=null;
 
 // Helpers
 function setActiveCard(id){
@@ -131,7 +153,7 @@ function setActiveCard(id){
   });
 }
 function setLoading(btn,on,labelEl){
-  if(on){btn.classList.add('is-loading');btn.setAttribute('aria-disabled','true'); if(labelEl)labelEl.textContent='Descargando…';}
+  if(on){btn.classList.add('is-loading');btn.setAttribute('aria-disabled','true'); if(labelEl)labelEl.textContent='Descargando�';}
   else{btn.classList.remove('is-loading');btn.setAttribute('aria-disabled','false');}
 }
 function extFromUrl(url){
@@ -266,8 +288,8 @@ function createPlayerUI({id,audio,label}){
   return {reset,update,audio,label};
 }
 const players=[
-  createPlayerUI({id:'exp',audio:$exp,label:'Explicación'}),
-  createPlayerUI({id:'trk',audio:$trk,label:'Canción'})
+  createPlayerUI({id:'exp',audio:$exp,label:'Explicaci�n'}),
+  createPlayerUI({id:'trk',audio:$trk,label:'Canci�n'})
 ].filter(Boolean);
 players.forEach(player=>{
   if(!player) return;
@@ -292,7 +314,7 @@ function renderSong(id){
   const s=SONGS[id]; if(!s) return renderHome();
   currentSongId=id;
   $title.textContent=s.title;
-  $meta.textContent='El curso que te convertirá en "El Buen Tenor"';
+  $meta.textContent='El curso que te convertir� en "El Buen Tenor"';
   $exp.src=s.explain||''; $trk.src=s.track||'';
   [$exp,$trk].forEach(a=>{a.playbackRate=gSpeed;a.loop=false;});
   resetPlayers();
@@ -320,7 +342,7 @@ function hideMini(){ $mini.hidden=true; $mini.classList.remove('mini--hidden'); 
 function bindToMini(audio,label){
   currentAudio=audio; currentLabel=label; currentAudio.loop=false;
   $miniLoop.classList.remove('active'); $miniLoop.setAttribute('aria-label','Activar repetici\u00f3n continua');
-  $miniTitle.textContent=SONGS[currentSongId]?.title||'—'; $miniSub.textContent=label;
+  $miniTitle.textContent=SONGS[currentSongId]?.title||'�'; $miniSub.textContent=label;
   currentAudio.playbackRate=gSpeed; showMini(); updateMini();
 }
 function iconPlay(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="8,5 19,12 8,19 8,5"></polygon></svg>`}
@@ -335,7 +357,7 @@ function updateMini(){
   $miniProg.style.width=`${pct}%`; $miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));
 }
 [$exp,$trk].forEach((el,idx)=>{
-  const label=idx===0?'Explicación':'Canción';
+  const label=idx===0?'Explicaci�n':'Canci�n';
   el.addEventListener('play',()=>{bindToMini(el,label)});
   el.addEventListener('pause',updateMini);
   el.addEventListener('timeupdate',updateMini);
@@ -367,7 +389,7 @@ window.addEventListener('scroll',()=>{
 },{passive:true});
 $miniMeta.addEventListener('click',()=>{if(currentSongId) location.hash=currentSongId;});
 
-// Buscador + fix teclado mÃ³vil
+// Buscador + fix teclado móvil
 function normalize(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 const items=[...document.querySelectorAll('#grid [data-song]')].map(a=>({el:a,id:a.getAttribute('data-song'),title:normalize(a.querySelector('.mini-title').textContent)}));
 function applyFilter(q){
@@ -443,7 +465,7 @@ function ensureDataCards(){
 }
 function renderDataCards(){
   if(!$dataCards) return;
-  const cards=[{id:'team',name:'Datos del equipo',attendance:TEAM_OVERVIEW.averageAttendance,meta:`Promedio ${formatPercent(TEAM_OVERVIEW.averageAttendance)}`}].concat(TENOR_MEMBERS);
+  const cards=[...TENOR_MEMBERS];
   const frag=document.createDocumentFragment();
   cards.forEach(card=>{
     const btn=document.createElement('button');
@@ -451,41 +473,47 @@ function renderDataCards(){
     btn.className='data-card';
     btn.dataset.target=card.id;
     const pct=clampPercent(typeof card.attendance==='number'?card.attendance:TEAM_OVERVIEW.averageAttendance);
-    const meta=card.id==='team'?card.meta:`${formatPercent(card.attendance)} asistencia`;
-    btn.innerHTML=`<span class="data-card__name">${card.id==='team'?'Datos del equipo':card.name}</span><span class="data-card__meta">${meta}</span><span class="data-card__bar"><span style="--value:${pct}%;"></span></span>`;
+    const meta=card.level||`${formatPercent(card.attendance)} asistencia`;
+    btn.innerHTML=`<span class="data-card__name">${card.name}<small>${formatPercent(card.attendance)}</small></span><span class="data-card__meta">${meta}</span><span class="data-card__bar"><span style="--value:${pct}%;"></span></span>`;
     frag.appendChild(btn);
   });
   $dataCards.innerHTML='';
   $dataCards.appendChild(frag);
+  setActiveDataCard(currentDataMemberId);
 }
 function setActiveDataCard(id){
   if(!$dataCards) return;
+  const activeId=id||'';
   $dataCards.querySelectorAll('.data-card').forEach(btn=>{
-    btn.classList.toggle('active',btn.dataset.target===id);
+    btn.classList.toggle('active',btn.dataset.target===activeId);
   });
 }
 function renderDataDetail(id){
-  if(id==='team'||!TENOR_LOOKUP[id]) return renderTeamDetail();
-  return renderMemberDetail(TENOR_LOOKUP[id]);
+  if(!$dataDetail) return;
+  if(!id||!TENOR_LOOKUP[id]){
+    $dataDetail.innerHTML='<p class="data-panel__empty">Selecciona un tenor para consultar sus datos.</p>';
+    return;
+  }
+  renderMemberDetail(TENOR_LOOKUP[id]);
 }
 function renderTeamDetail(){
-  if(!$dataDetail) return;
+  if(!$overviewDetail) return;
   const timeframeText=TEAM_OVERVIEW.timeframe||'Periodo analizado';
   const heroPct=clampPercent(TEAM_OVERVIEW.averageAttendance);
   const metrics=[
     {value:formatMinutes(TEAM_OVERVIEW.totalMinutes),label:'Tiempo total',note:`Equivalente a ${formatPlainNumber(TEAM_OVERVIEW.totalHours)} h de ensayo`},
-    {value:formatMinutes(TEAM_OVERVIEW.averageMinutes),label:'Promedio por tenor',note:'Media histórica de la sección'},
+    {value:formatMinutes(TEAM_OVERVIEW.averageMinutes),label:'Promedio por tenor',note:'Media hist\u00f3rica de la secci\u00f3n'},
     {value:formatPlainNumber(TEAM_OVERVIEW.rehearsals),label:'Ensayos registrados',note:timeframeText},
     {value:formatPercent(TEAM_OVERVIEW.averageAttendance),label:'Asistencia promedio',note:'Cuatro integrantes bajo el promedio'}
   ].map(metric=>`<article class="metric-card"><span>${metric.label}</span><strong>${metric.value}</strong><small>${metric.note}</small></article>`).join('');
   const attendanceRows=TENOR_MEMBERS.map(member=>{
     const pct=clampPercent(member.attendance);
-    return `<div class="attendance-row"><div class="attendance-info"><strong>${member.name}</strong><span>${member.level}</span></div><div class="attendance-bar"><span style="--value:${pct}%;"></span></div><span class="attendance-value">${formatPercent(member.attendance)}</span></div>`;
+    return `<div class="tenor-stat"><div class="tenor-stat__meta"><strong>${member.name}</strong><span>${member.level}</span></div><div class="tenor-stat__meter"><span style="--value:${pct}%;"></span></div><span class="tenor-stat__value">${formatPercent(member.attendance)}</span></div>`;
   }).join('');
   const levelHtml=(TEAM_OVERVIEW.levels||[]).map(level=>`<div class="level-chip"><strong>${level.label}</strong><span>${level.members.join(', ')}</span></div>`).join('');
   const obsHtml=(TEAM_OVERVIEW.observations||[]).map(item=>`<li>${item}</li>`).join('')||'<li>Sin datos destacados.</li>';
-  $dataDetail.innerHTML=`<div class="data-detail">
-    <div class="data-detail__hero">
+  $overviewDetail.innerHTML=`<div class="data-detail__stack">
+    <article class="data-detail__hero overview-hero">
       <div class="data-hero-text">
         <p class="kicker">Equipo Tenores</p>
         <h3>Salud general</h3>
@@ -496,25 +524,27 @@ function renderTeamDetail(){
         </div>
       </div>
       <div class="dial dial--xl" style="--percent:${heroPct}%;"><div class="dial-value">${formatPercent(TEAM_OVERVIEW.averageAttendance)}</div><span class="dial-label">Asistencia promedio</span></div>
-    </div>
-    <div class="data-metrics">${metrics}</div>
-    <div class="data-split">
-      <section class="data-panel-box">
-        <h4>Asistencia por tenor</h4>
-        <div class="attendance-rows">${attendanceRows}</div>
-      </section>
+    </article>
+    <div class="overview-grid">${metrics}</div>
+    <div class="overview-columns">
       <section class="data-panel-box">
         <h4>Grupos de desempe\u00f1o</h4>
         <div class="level-grid">${levelHtml}</div>
-        <div class="data-legend" style="margin-top:12px">
-          <span class="badge badge--ghost">Meta ${formatMinutes(TEAM_OVERVIEW.totalMinutes)} (${formatPlainNumber(TEAM_OVERVIEW.totalHours)} h)</span>
-          <span class="badge badge--ghost">Promedio ${formatPercent(TEAM_OVERVIEW.averageAttendance)}</span>
-        </div>
+      </section>
+      <section class="data-panel-box">
+        <h4>Observaciones clave</h4>
+        <ul class="detail-list">${obsHtml}</ul>
       </section>
     </div>
-    <section class="data-panel-box data-panel-box--notes">
-      <h4>Observaciones clave</h4>
-      <ul class="detail-list">${obsHtml}</ul>
+    <section class="data-panel-box data-panel-box--table">
+      <div class="table-header">
+        <div>
+          <h4>Asistencia por tenor</h4>
+          <p>${timeframeText}</p>
+        </div>
+        <span class="badge badge--ghost">${formatPlainNumber(TEAM_OVERVIEW.totalMembers)} integrantes</span>
+      </div>
+      <div class="tenor-stats">${attendanceRows}</div>
     </section>
   </div>`;
 }
@@ -558,8 +588,8 @@ function renderMemberDetail(member){
   ].map(metric=>`<article class="metric-card"><span>${metric.label}</span><strong>${metric.value}</strong><small>${metric.note}</small></article>`).join('');
   const attendancePct=clampPercent(member.attendance);
   const tardyLegend=hasTardy?`${member.tardyCount||0} eventos registrados`:'En espera de registro en Hoja 2.';
-  $dataDetail.innerHTML=`<div class="data-detail">
-    <div class="data-detail__hero member-hero">
+  $dataDetail.innerHTML=`<div class="data-detail__stack">
+    <article class="data-detail__hero member-hero">
       <div class="data-hero-text">
         <p class="kicker">${member.level}</p>
         <h3>${member.name}</h3>
@@ -570,10 +600,10 @@ function renderMemberDetail(member){
         </div>
       </div>
       <div class="dial dial--xl" style="--percent:${attendancePct}%;"><div class="dial-value">${formatPercent(member.attendance)}</div><span class="dial-label">Asistencia</span></div>
-    </div>
-    <div class="data-metrics">${metrics}</div>
-    <div class="data-split">
-      <section class="data-panel-box">
+    </article>
+    <div class="member-metrics">${metrics}</div>
+    <div class="member-columns">
+      <section class="data-panel-box member-panel">
         <h4>Ritmo de minutos</h4>
         <div class="data-legend" style="margin-bottom:10px">
           <span class="badge badge--ghost">${formatMinutes(member.minutes)} activos</span>
@@ -582,7 +612,7 @@ function renderMemberDetail(member){
         <div class="attendance-bar"><span style="--value:${minutePct}%;"></span></div>
         <p class="stat-card__note">${minutesNarrative}</p>
       </section>
-      <section class="data-panel-box">
+      <section class="data-panel-box member-panel">
         <h4>Puntualidad</h4>
         <div class="data-legend" style="margin-bottom:10px">
           <span class="badge badge--ghost">${hasTardy?formatPercent(member.tardyPct):'Sin dato'}</span>
@@ -592,23 +622,262 @@ function renderMemberDetail(member){
         <p class="stat-card__note">${tardyNote}${tardyExtra?` ${tardyExtra}`:''}</p>
       </section>
     </div>
-    <section class="data-panel-box data-panel-box--notes">
+    <section class="data-panel-box data-panel-box--notes member-panel">
       <h4>Notas clave</h4>
       <ul class="detail-list">${bulletList}</ul>
     </section>
   </div>`;
 }
+function updateTenorView(){
+  if(!$tenorListView||!$tenorDetailView) return;
+  const hasSelection=currentDataMemberId&&TENOR_LOOKUP[currentDataMemberId];
+  $tenorListView.hidden=!!hasSelection;
+  $tenorDetailView.hidden=!hasSelection;
+  renderDataDetail(hasSelection?currentDataMemberId:null);
+  setActiveDataCard(hasSelection?currentDataMemberId:null);
+  if(hasSelection){$tenorDetailView.scrollTop=0;}
+  else if($tenorListView){$tenorListView.scrollTop=0;}
+}
+function showTenorDetail(id){
+  if(!TENOR_LOOKUP[id]) return;
+  currentDataMemberId=id;
+  setDataTab('tenors');
+}
+function resetTenorView(){
+  currentDataMemberId=null;
+  updateTenorView();
+}
+function setDataTab(tab){
+  if(!$dataPanel) return;
+  const normalized=tab==='overview'?'overview':'tenors';
+  currentDataTab=normalized;
+  const sections={overview:$dataOverview,tenors:$dataTenors};
+  document.querySelectorAll('[data-tab-target]').forEach(btn=>{
+    const is=btn.dataset.tabTarget===normalized;
+    btn.classList.toggle('is-active',is);
+    btn.setAttribute('aria-selected',is?'true':'false');
+  });
+  Object.entries(sections).forEach(([key,section])=>{
+    if(section) section.hidden=key!==normalized;
+  });
+  if(normalized==='tenors') updateTenorView();
+}
+
+function renderPresentations(){
+  renderCalendar();
+  renderUpcomingList();
+}
+
+function renderUpcomingList(){
+  if(!$presentationsList) return;
+  const upcoming=getUpcomingEvents(3);
+  if(!upcoming.length){
+    $presentationsList.innerHTML='<p class="presentations-empty">Sin presentaciones registradas.</p>';
+    return;
+  }
+  $presentationsList.innerHTML=upcoming.map(event=>{
+    const tag=event.tag?`<div class="upcoming-card__tag">${event.tag}</div>`:'';
+    return `<article class="upcoming-card">
+      <div>
+        <p class="calendar-eyebrow">${formatCalendarDate(event.date)}</p>
+        <h4>${event.title}</h4>
+      </div>
+      <div class="upcoming-card__meta">
+        <span>${event.startTime}</span>
+        <span>Salida ${event.callTime}</span>
+        <span>${event.venue}</span>
+      </div>
+      <p class="upcoming-card__summary">${event.summary}</p>
+      ${tag}
+    </article>`;
+  }).join('');
+}
+
+function renderCalendar(){
+  if(!$presentationsCalendar) return;
+  ensureSelectedPresentationDate();
+  const monthsHtml=CALENDAR_MONTHS.map(month=>buildCalendarMonth(month)).join('');
+  $presentationsCalendar.innerHTML=monthsHtml;
+  if(!$presentationsCalendar.dataset.bound){
+    $presentationsCalendar.addEventListener('click',ev=>{
+      const btn=ev.target.closest('.calendar-day');
+      if(!btn||!btn.dataset.date) return;
+      selectedPresentationDate=btn.dataset.date;
+      updateCalendarSelection();
+      renderCalendarDetail(selectedPresentationDate);
+    });
+    $presentationsCalendar.dataset.bound='true';
+  }
+  updateCalendarSelection();
+  renderCalendarDetail(selectedPresentationDate);
+}
+
+function buildCalendarMonth(monthKey){
+  const [yearStr,monthStr]=monthKey.split('-');
+  const year=Number(yearStr);
+  const monthIndex=Number(monthStr)-1;
+  const baseDate=new Date(year,monthIndex,1);
+  const monthLabel=baseDate.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+  const niceLabel=monthLabel.charAt(0).toUpperCase()+monthLabel.slice(1);
+  const totalDays=new Date(year,monthIndex+1,0).getDate();
+  const firstDayOffset=(baseDate.getDay()+6)%7;
+  const dayNameRow=DAY_NAMES.map(name=>`<span class="calendar-dayname">${name}</span>`).join('');
+  let dayCells='';
+  for(let i=0;i<firstDayOffset;i++){
+    dayCells+='<span class="calendar-day calendar-day--empty" aria-hidden="true"></span>';
+  }
+  for(let day=1;day<=totalDays;day++){
+    const dateStr=`${monthKey}-${String(day).padStart(2,'0')}`;
+    const hasEvent=getEventsOnDate(dateStr).length>0;
+    const classes=['calendar-day'];
+    if(hasEvent) classes.push('has-event');
+    else classes.push('is-empty');
+    if(dateStr===selectedPresentationDate) classes.push('is-selected');
+    const ariaLabel=formatCalendarDate(dateStr);
+    dayCells+=`<button type="button" class="${classes.join(' ')}" data-date="${dateStr}" aria-label="${ariaLabel}">${day}</button>`;
+  }
+  return `<article class="calendar-month">
+    <div class="calendar-month__title">${niceLabel}</div>
+    <div class="calendar-grid">${dayNameRow}${dayCells}</div>
+  </article>`;
+}
+
+function updateCalendarSelection(){
+  if(!$presentationsCalendar) return;
+  $presentationsCalendar.querySelectorAll('.calendar-day').forEach(btn=>{
+    if(!btn.dataset.date) return;
+    btn.classList.toggle('is-selected',btn.dataset.date===selectedPresentationDate);
+  });
+}
+
+function renderCalendarDetail(date){
+  if(!$calendarDetail) return;
+  const events=getEventsOnDate(date);
+  const dateLabel=formatCalendarDate(date);
+  if(!events.length){
+    $calendarDetail.innerHTML=`<div class="calendar-detail__header">
+      <p class="calendar-eyebrow">${dateLabel}</p>
+      <h3>Sin presentaciones</h3>
+    </div>
+    <p class="presentations-empty">No hay presentaciones registradas para esta fecha.</p>`;
+    return;
+  }
+  const cards=events.map(event=>{
+    const indicaciones=[event.meetingPoint?`Punto de reuni&oacute;n: ${event.meetingPoint}.`:'' ,event.instructions].filter(Boolean).join(' ');
+    return `<article class="calendar-detail__card">
+      <h4>${event.title}</h4>
+      <p class="calendar-detail__notes">${event.venue} &middot; ${event.city}</p>
+      <div class="calendar-detail__meta">
+        <div><small>Hora</small><span>${event.startTime}</span></div>
+        <div><small>Hora de salida</small><span>${event.callTime}</span></div>
+        <div><small>Lugar</small><span>${event.venue}</span></div>
+      </div>
+      <p class="calendar-detail__notes"><strong>Indicaciones:</strong> ${indicaciones||'Por confirmar.'}</p>
+    </article>`;
+  }).join('');
+  $calendarDetail.innerHTML=`<div class="calendar-detail__header">
+    <p class="calendar-eyebrow">${dateLabel}</p>
+    <h3>${events.length>1?'Presentaciones programadas':'Presentaci&oacute;n programada'}</h3>
+  </div>${cards}`;
+}
+
+function getEventsOnDate(date){
+  if(!date) return [];
+  return PRESENTATION_EVENTS.filter(event=>event.date===date);
+}
+
+function getUpcomingEvents(limit){
+  const sorted=[...PRESENTATION_EVENTS].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(typeof limit==='number') return sorted.slice(0,limit);
+  return sorted;
+}
+
+function ensureSelectedPresentationDate(){
+  if(selectedPresentationDate&&getEventsOnDate(selectedPresentationDate).length) return;
+  const upcoming=getUpcomingEvents(1);
+  if(upcoming.length) selectedPresentationDate=upcoming[0].date;
+  else selectedPresentationDate=CALENDAR_MONTHS[0]?`${CALENDAR_MONTHS[0]}-01`:null;
+}
+
+function formatCalendarDate(dateStr){
+  if(!dateStr) return 'Sin fecha';
+  const date=new Date(`${dateStr}T00:00:00`);
+  if(Number.isNaN(date.getTime())) return dateStr;
+  const label=date.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  return label.charAt(0).toUpperCase()+label.slice(1);
+}
+
+function openPresentationsPanel(){
+  if(!$presentationsPanel) return;
+  if(document.body.classList.contains('data-panel-open')) closeDataPanel();
+  if(presentationsTimer){clearTimeout(presentationsTimer);presentationsTimer=null;}
+  renderPresentations();
+  $presentationsPanel.hidden=false;
+  requestAnimationFrame(()=>document.body.classList.add('presentations-panel-open'));
+}
+function closePresentationsPanel(){
+  if(!$presentationsPanel||$presentationsPanel.hidden) return;
+  if(presentationsTimer){clearTimeout(presentationsTimer);presentationsTimer=null;}
+  document.body.classList.remove('presentations-panel-open');
+  presentationsTimer=setTimeout(()=>{
+    $presentationsPanel.hidden=true;
+    presentationsTimer=null;
+  },320);
+}
+
+function setupPresentationsPanel(){
+  if(!$presentationsPanel) return;
+  $presentationsPanel.hidden=true;
+  renderPresentations();
+  if($presentationsClose) $presentationsClose.addEventListener('click',closePresentationsPanel);
+  $presentationsPanel.addEventListener('click',ev=>{
+    if(ev.target&&ev.target.dataset&&ev.target.dataset.role==='close-presentations') closePresentationsPanel();
+  });
+  document.addEventListener('keydown',ev=>{
+    if(ev.key==='Escape'&&document.body.classList.contains('presentations-panel-open')) closePresentationsPanel();
+  });
+}
+
+function setMenuState(open){
+  if(!$menuToggle||!$quickMenu) return;
+  isMenuOpen=!!open;
+  $menuToggle.setAttribute('aria-expanded',isMenuOpen?'true':'false');
+  $quickMenu.hidden=!isMenuOpen;
+}
+
+function setupMenu(){
+  if(!$menuToggle||!$quickMenu) return;
+  setMenuState(false);
+  $menuToggle.addEventListener('click',()=>setMenuState(!isMenuOpen));
+  document.addEventListener('click',ev=>{
+    if(!isMenuOpen) return;
+    if(ev.target.closest('#menuToggle')||ev.target.closest('#quickMenu')) return;
+    setMenuState(false);
+  });
+  document.addEventListener('keydown',ev=>{
+    if(ev.key==='Escape'&&isMenuOpen) setMenuState(false);
+  });
+  $quickMenu.addEventListener('click',ev=>{
+    const btn=ev.target.closest('.quick-menu__item');
+    if(!btn) return;
+    const action=btn.dataset.action;
+    setMenuState(false);
+    if(action==='data'){ setDataTab('tenors'); openDataPanel();}
+    else if(action==='presentations') openPresentationsPanel();
+  });
+}
+
 function openDataPanel(targetId){
   if(!$dataPanel) return;
+  if(document.body.classList.contains('presentations-panel-open')) closePresentationsPanel();
   ensureDataCards();
-  const nextId=targetId||currentDataSection||'team';
-  currentDataSection=nextId;
+  const isValidTarget=targetId&&TENOR_LOOKUP[targetId];
+  if(isValidTarget) currentDataMemberId=targetId;
   if(dataPanelTimer){clearTimeout(dataPanelTimer);dataPanelTimer=null;}
   $dataPanel.hidden=false;
   requestAnimationFrame(()=>document.body.classList.add('data-panel-open'));
   if($dataToggle) $dataToggle.setAttribute('aria-expanded','true');
-  setActiveDataCard(nextId);
-  renderDataDetail(nextId);
+  setDataTab(currentDataTab||'overview');
 }
 function closeDataPanel(){
   if(!$dataPanel||$dataPanel.hidden) return;
@@ -621,13 +890,15 @@ function closeDataPanel(){
   },320);
 }
 function setupDataPanel(){
-  if(!$dataPanel||!$dataToggle) return;
+  if(!$dataPanel) return;
   $dataPanel.hidden=true;
-  $dataToggle.setAttribute('aria-expanded','false');
-  $dataToggle.addEventListener('click',()=>{
-    const isOpen=document.body.classList.contains('data-panel-open') && !$dataPanel.hidden;
-    if(isOpen) closeDataPanel(); else openDataPanel();
-  });
+  if($dataToggle){
+    $dataToggle.setAttribute('aria-expanded','false');
+    $dataToggle.addEventListener('click',()=>{
+      const isOpen=document.body.classList.contains('data-panel-open') && !$dataPanel.hidden;
+      if(isOpen) closeDataPanel(); else openDataPanel();
+    });
+  }
   if($dataClose) $dataClose.addEventListener('click',closeDataPanel);
   $dataPanel.addEventListener('click',ev=>{
     if(ev.target&&ev.target.dataset&&ev.target.dataset.role==='close-panel') closeDataPanel();
@@ -636,18 +907,28 @@ function setupDataPanel(){
     $dataCards.addEventListener('click',ev=>{
       const btn=ev.target.closest('.data-card');
       if(!btn) return;
-      const id=btn.dataset.target||'team';
-      currentDataSection=id;
-      setActiveDataCard(id);
-      renderDataDetail(id);
+      const id=btn.dataset.target||null;
+      if(!id) return;
+      showTenorDetail(id);
     });
   }
+  if($tenorBack) $tenorBack.addEventListener('click',resetTenorView);
+  const tabButtons=$dataPanel.querySelectorAll('[data-tab-target]');
+  tabButtons.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      setDataTab(btn.dataset.tabTarget);
+    });
+  });
+  setDataTab(currentDataTab);
   document.addEventListener('keydown',ev=>{
     if(ev.key==='Escape'&&!$dataPanel.hidden) closeDataPanel();
   });
 }
 setupDataPanel();
-// NavegaciÃ³n
+renderTeamDetail();
+setupPresentationsPanel();
+setupMenu();
+// Navegación
 function routerInit(){ setZoom(getZoom()); route(); }
 window.addEventListener('hashchange',route);
 window.addEventListener('DOMContentLoaded',routerInit);
@@ -655,7 +936,7 @@ window.addEventListener('DOMContentLoaded',routerInit);
 // Back link
 document.querySelector('.back').addEventListener('click',e=>{e.preventDefault(); history.replaceState(null,'',location.pathname+location.search); route();});
 
-// Confeti AÃš AÃš
+// Confeti AÚ AÚ
 (function(){
   const btn=document.getElementById('auBtn');
   function burst(){
@@ -677,7 +958,7 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   });
 })();
 
-// Tests bÃ¡sicos
+// Tests básicos
 (function tests(){
   console.group('%cTests Tenores','color:#0ffc7e');
   console.assert(typeof SONGS.fum==='object' && !!SONGS.fum.track,'fum ok');
@@ -685,21 +966,3 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   console.assert(formatLyrics('a\n\nb').includes('<p>'),'format ok');
   console.groupEnd();
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
