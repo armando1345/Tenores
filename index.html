@@ -10,7 +10,7 @@
 </head>
 <body>
   <button id="menuToggle" class="menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="quickMenu">
-    <span class="sr-only">Abrir men&uacute; de opciones</span>
+    <span class="sr-only">Abrir menú de opciones</span>
     <span class="menu-line" aria-hidden="true"></span>
     <span class="menu-line" aria-hidden="true"></span>
     <span class="menu-line" aria-hidden="true"></span>
@@ -26,7 +26,7 @@
       </div>
       <h1 class="site-title">Tenores</h1>
       <div class="accent-bar"></div>
-      <p class="subtitle">El curso que te convertir&aacute; en "El Buen Tenor"</p>
+      <p class="subtitle">El curso que te convertirá en "El Buen Tenor"</p>
     </header>
 
     <main>
@@ -57,19 +57,19 @@
 
       <section id="song-view" hidden>
         <a class="back" href="#">&larr; Volver</a>
-        <h2 class="song-title" id="song-title">T&iacute;tulo</h2>
-        <p class="song-meta" id="song-meta">El curso que te convertir&aacute; en "El Buen Tenor"</p>
+        <h2 class="song-title" id="song-title">Título</h2>
+        <p class="song-meta" id="song-meta">El curso que te convertirá en "El Buen Tenor"</p>
 
         <div class="audios-grid">
 
           <article class="audio-card">
             <div class="audio-card-header">
-              <h3>Explicaci&oacute;n</h3>
-              <span class="audio-tag">Gu&iacute;a vocal</span>
+              <h3>Explicación</h3>
+              <span class="audio-tag">Guía vocal</span>
             </div>
             <div class="audio-player" data-player="exp">
               <button class="audio-toggle" type="button" data-role="toggle" aria-label="Reproducir explicaci&oacute;n">
-                <span aria-hidden="true">&#9654;</span><span class="sr-only">Reproducir explicaci&oacute;n</span>
+                <span aria-hidden="true">&#9654;</span><span class="sr-only">Reproducir explicación</span>
               </button>
               <div class="audio-progress-group">
                 <div class="audio-progress" data-role="progress" tabindex="0" role="slider" aria-label="Progreso explicaci&oacute;n" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -168,7 +168,7 @@
     </main>
   </div>
 
-  <button id="auBtn" class="fab" aria-label="Activar Au Au"><span class="fab-line">Au</span><span class="fab-line">Au</span></button>
+  <button id="auBtn" class="fab" aria-label="Activar Au Au"><span class="fab-line">Aú</span><span class="fab-line">Aú</span></button>
 
   <div id="mini" class="mini" hidden>
     <button id="mini-toggle" class="mini-btn" aria-label="Reproducir">
@@ -198,7 +198,7 @@
         <div>
           <p class="data-panel__eyebrow">Seguimiento</p>
           <h2 id="dataPanelTitle">M&eacute;tricas del equipo</h2>
-          <p class="data-panel__intro">Aqu&iacute; ver&aacute;s los datos de los tenores, del 6&nbsp;de&nbsp;septiembre al 8&nbsp;de&nbsp;noviembre.</p>
+          <p class="data-panel__intro">Aquí verás los datos de los tenores, del 6 de septiembre al 8 de noviembre.</p>
         </div>
         <button id="dataClose" class="data-close" type="button" aria-label="Cerrar panel Mis datos">&times;</button>
       </header>
@@ -216,7 +216,7 @@
           <div class="tenor-panel">
             <div id="tenorListView" class="data-sidebar tenor-list-view" role="region" aria-label="Tenores disponibles">
               <div class="data-sidebar__header">
-                <p>Explora cada integrante y consulta su desempe&ntilde;o.</p>
+                <p>Explora cada integrante y consulta su desempeño.</p>
               </div>
               <div id="dataCards" class="data-list" role="list"></div>
             </div>
@@ -239,9 +239,8 @@
     <section class="presentations-panel__sheet" role="dialog" aria-labelledby="presentationsTitle" aria-modal="true">
       <header class="presentations-panel__header">
         <div>
-          <p class="presentations-panel__eyebrow">Agenda de campo</p>
-          <h2 id="presentationsTitle">Pr&oacute;ximas presentaciones</h2>
-          <p class="presentations-panel__intro">Resumen con lugar, hora del concierto y hora de salida del equipo.</p>
+          <p class="presentations-panel__eyebrow">Calendario</p>
+          <p class="presentations-panel__intro">Aquí conocerás las presentaciones programadas del coro, con todos sus detalles.</p>
         </div>
         <button id="presentationsClose" class="presentations-close" type="button" aria-label="Cerrar panel Presentaciones">&times;</button>
       </header>
@@ -249,26 +248,37 @@
         <div class="presentations-panel__layout">
           <section class="calendar-board">
             <header class="calendar-board__header">
-              <p class="calendar-eyebrow">Calendario</p>
-              <h3>Noviembre y diciembre 2025</h3>
-              <p>Haz clic sobre un d&iacute;a con presentaciones para revisar los detalles.</p>
+              <p class="calendar-eyebrow">(Noviembre - diciembre)</p>
+              <h1>Calendario de presentaciones</h1>
             </header>
             <div id="presentationsCalendar" class="calendar-months"></div>
-          </section>
-          <section id="calendarDetail" class="calendar-detail">
-            <p class="presentations-empty">Selecciona un d&iacute;a para ver la informaci&oacute;n.</p>
           </section>
         </div>
         <section class="upcoming-board">
           <div class="upcoming-header">
-            <h3>Pr&oacute;ximas presentaciones</h3>
-            <p>Las tres fechas m&aacute;s cercanas confirmadas para el coro.</p>
+            <h3>Próximas presentaciones</h3>
+            <p>Las tres fechas más cercanas confirmadas para el coro.</p>
           </div>
           <div id="presentationsList" class="presentations-upcoming"></div>
         </section>
       </div>
     </section>
   </div>
+  <div id="calendarPopover" class="calendar-popover" hidden>
+    <div class="calendar-popover__backdrop" data-role="close-calendar" aria-hidden="true"></div>
+    <article class="calendar-popover__card" role="dialog" aria-modal="true" aria-labelledby="calendarPopoverTitle">
+      <header class="calendar-popover__header">
+        <p id="calendarPopoverDate" class="calendar-eyebrow">Fecha</p>
+        <h3 id="calendarPopoverTitle">Presentación</h3>
+        <button id="calendarPopoverClose" class="calendar-popover__close" type="button" aria-label="Cerrar detalles">&times;</button>
+      </header>
+      <div id="calendarPopoverBody" class="calendar-popover__body"></div>
+    </article>
+  </div>
   <script src="app.js" defer></script>
 </body>
 </html>
+
+
+
+
