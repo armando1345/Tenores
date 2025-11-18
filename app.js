@@ -135,7 +135,11 @@ const $presentationsPanel=document.getElementById('presentationsPanel');
 const $presentationsList=document.getElementById('presentationsList');
 const $presentationsClose=document.getElementById('presentationsClose');
 const $presentationsCalendar=document.getElementById('presentationsCalendar');
-const $calendarDetail=document.getElementById('calendarDetail');
+const $calendarPopover=document.getElementById('calendarPopover');
+const $calendarPopoverBody=document.getElementById('calendarPopoverBody');
+const $calendarPopoverDate=document.getElementById('calendarPopoverDate');
+const $calendarPopoverTitle=document.getElementById('calendarPopoverTitle');
+const $calendarPopoverClose=document.getElementById('calendarPopoverClose');
 
 let currentSongId=null, currentAudio=null, currentLabel='', plainLyrics='';
 
@@ -499,7 +503,7 @@ function renderDataDetail(id){
 function renderTeamDetail(){
   if(!$overviewDetail) return;
   const timeframeText=TEAM_OVERVIEW.timeframe||'Periodo analizado';
-  const heroPct=clampPercent(TEAM_OVERVIEW.averageAttendance);
+  const heroMinutePct=TEAM_OVERVIEW.totalMinutes?clampPercent((TEAM_OVERVIEW.averageMinutes/TEAM_OVERVIEW.totalMinutes)*100):0;
   const metrics=[
     {value:formatMinutes(TEAM_OVERVIEW.totalMinutes),label:'Tiempo total',note:`Equivalente a ${formatPlainNumber(TEAM_OVERVIEW.totalHours)} h de ensayo`},
     {value:formatMinutes(TEAM_OVERVIEW.averageMinutes),label:'Promedio por tenor',note:'Media hist\u00f3rica de la secci\u00f3n'},
@@ -521,9 +525,10 @@ function renderTeamDetail(){
         <div class="data-legend">
           <span class="badge">${formatPlainNumber(TEAM_OVERVIEW.rehearsals)} ensayos</span>
           <span class="badge badge--ghost">${formatPlainNumber(TEAM_OVERVIEW.totalMembers)} miembros</span>
+          <span class="badge badge--ghost">Tiempo ensayado ${formatPercent(heroMinutePct)}</span>
         </div>
       </div>
-      <div class="dial dial--xl" style="--percent:${heroPct}%;"><div class="dial-value">${formatPercent(TEAM_OVERVIEW.averageAttendance)}</div><span class="dial-label">Asistencia promedio</span></div>
+      <div class="dial dial--xl" style="--percent:${heroMinutePct}%;"><div class="dial-value"><strong>${formatPercent(heroMinutePct)}</strong><span>minutos</span></div><span class="dial-label">Avance plan anual</span></div>
     </article>
     <div class="overview-grid">${metrics}</div>
     <div class="overview-columns">
@@ -556,7 +561,7 @@ function renderMemberDetail(member){
   const freqLabel=hasRehearsals?'Ensayos cubiertos':'Sin desglose por ensayo';
   const minutePct=clampPercent((member.minutes/TEAM_OVERVIEW.totalMinutes)*100);
   const missingMinutes=Math.max(0,TEAM_OVERVIEW.totalMinutes-Number(member.minutes||0));
-  const minutesNarrative=missingMinutes>0?`Le faltan ${formatMinutes(missingMinutes)} para igualar los 1920 minutos.`:'Complet\u00f3 el total de minutos planificado.';
+  const minutesNarrative=missingMinutes>0?`Le faltan ${formatMinutes(missingMinutes)} para igualar los ${formatMinutes(TEAM_OVERVIEW.totalMinutes)}.`:'Complet\u00f3 el total de minutos planificado.';
   const pendingBadge=missingMinutes>0?`${formatMinutes(missingMinutes)} pendientes`:'Sin minutos pendientes';
   const hasTardy=member.tardyPct!==null&&member.tardyPct!==undefined;
   const tardyWidth=hasTardy?clampPercent(member.tardyPct):0;
@@ -583,10 +588,9 @@ function renderMemberDetail(member){
   const metrics=[
     {value:formatMinutes(member.minutes),label:'Tiempo activo',note:'Meta 1920 min'},
     {value:formatMinutes(member.minutesLost),label:'Minutos perdidos',note:pendingBadge},
-    {value:formatPercent(member.attendance),label:'Asistencia',note:member.level},
+    {value:formatPercent(minutePct),label:'Tiempo ensayado',note:member.level},
     {value:freqValue,label:'Cobertura de ensayos',note:freqLabel}
   ].map(metric=>`<article class="metric-card"><span>${metric.label}</span><strong>${metric.value}</strong><small>${metric.note}</small></article>`).join('');
-  const attendancePct=clampPercent(member.attendance);
   const tardyLegend=hasTardy?`${member.tardyCount||0} eventos registrados`:'En espera de registro en Hoja 2.';
   $dataDetail.innerHTML=`<div class="data-detail__stack">
     <article class="data-detail__hero member-hero">
@@ -595,11 +599,11 @@ function renderMemberDetail(member){
         <h3>${member.name}</h3>
         <p class="data-timeframe">${timeframeText}</p>
         <div class="data-legend">
-          <span class="badge">Asistencia ${formatPercent(member.attendance)}</span>
+          <span class="badge">Tiempo ensayado ${formatPercent(minutePct)}</span>
           <span class="badge badge--ghost">${pendingBadge}</span>
         </div>
       </div>
-      <div class="dial dial--xl" style="--percent:${attendancePct}%;"><div class="dial-value">${formatPercent(member.attendance)}</div><span class="dial-label">Asistencia</span></div>
+      <div class="dial dial--xl" style="--percent:${minutePct}%;"><div class="dial-value"><strong>${formatPercent(minutePct)}</strong><span>minutos</span></div></div>
     </article>
     <div class="member-metrics">${metrics}</div>
     <div class="member-columns">
@@ -704,12 +708,12 @@ function renderCalendar(){
       if(!btn||!btn.dataset.date) return;
       selectedPresentationDate=btn.dataset.date;
       updateCalendarSelection();
-      renderCalendarDetail(selectedPresentationDate);
+      openCalendarPopover(selectedPresentationDate,rectToObject(btn.getBoundingClientRect()));
     });
     $presentationsCalendar.dataset.bound='true';
   }
   updateCalendarSelection();
-  renderCalendarDetail(selectedPresentationDate);
+  if($calendarPopover&&!$calendarPopover.hidden) positionCalendarPopover();
 }
 
 function buildCalendarMonth(monthKey){
@@ -750,35 +754,82 @@ function updateCalendarSelection(){
   });
 }
 
-function renderCalendarDetail(date){
-  if(!$calendarDetail) return;
+function rectToObject(rect){
+  if(!rect) return null;
+  return {top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right,width:rect.width,height:rect.height};
+}
+
+function getActiveCalendarDayRect(){
+  if(!$presentationsCalendar) return null;
+  const active=$presentationsCalendar.querySelector('.calendar-day.is-selected');
+  return active?rectToObject(active.getBoundingClientRect()):null;
+}
+
+function openCalendarPopover(date,anchorRect){
+  if(!$calendarPopover||!$calendarPopoverBody) return;
+  const anchor=anchorRect?rectToObject(anchorRect):null;
   const events=getEventsOnDate(date);
   const dateLabel=formatCalendarDate(date);
+  if($calendarPopoverDate) $calendarPopoverDate.textContent=dateLabel;
   if(!events.length){
-    $calendarDetail.innerHTML=`<div class="calendar-detail__header">
-      <p class="calendar-eyebrow">${dateLabel}</p>
-      <h3>Sin presentaciones</h3>
-    </div>
-    <p class="presentations-empty">No hay presentaciones registradas para esta fecha.</p>`;
-    return;
+    if($calendarPopoverTitle) $calendarPopoverTitle.textContent='Sin presentaciones';
+    $calendarPopoverBody.innerHTML='<p class="presentations-empty">No hay presentaciones registradas para esta fecha.</p>';
+  }else{
+    if($calendarPopoverTitle) $calendarPopoverTitle.textContent=events.length>1?'Presentaciones programadas':'Presentaci&oacute;n programada';
+    $calendarPopoverBody.innerHTML=events.map(event=>{
+      const indicaciones=[event.meetingPoint?`Punto de reuni&oacute;n: ${event.meetingPoint}.`:'' ,event.instructions].filter(Boolean).join(' ');
+      return `<section class="calendar-popover__event">
+        <h4 style="margin:0 0 4px;font-size:18px">${event.title}</h4>
+        <p>${event.venue} &middot; ${event.city}</p>
+        <div class="calendar-detail__meta">
+          <div><small>Hora</small><span>${event.startTime}</span></div>
+          <div><small>Salida</small><span>${event.callTime}</span></div>
+          <div><small>Lugar</small><span>${event.venue}</span></div>
+        </div>
+        <p><strong>Indicaciones:</strong> ${indicaciones||'Por confirmar.'}</p>
+      </section>`;
+    }).join('');
   }
-  const cards=events.map(event=>{
-    const indicaciones=[event.meetingPoint?`Punto de reuni&oacute;n: ${event.meetingPoint}.`:'' ,event.instructions].filter(Boolean).join(' ');
-    return `<article class="calendar-detail__card">
-      <h4>${event.title}</h4>
-      <p class="calendar-detail__notes">${event.venue} &middot; ${event.city}</p>
-      <div class="calendar-detail__meta">
-        <div><small>Hora</small><span>${event.startTime}</span></div>
-        <div><small>Hora de salida</small><span>${event.callTime}</span></div>
-        <div><small>Lugar</small><span>${event.venue}</span></div>
-      </div>
-      <p class="calendar-detail__notes"><strong>Indicaciones:</strong> ${indicaciones||'Por confirmar.'}</p>
-    </article>`;
-  }).join('');
-  $calendarDetail.innerHTML=`<div class="calendar-detail__header">
-    <p class="calendar-eyebrow">${dateLabel}</p>
-    <h3>${events.length>1?'Presentaciones programadas':'Presentaci&oacute;n programada'}</h3>
-  </div>${cards}`;
+  $calendarPopover.hidden=false;
+  requestAnimationFrame(()=>{
+    $calendarPopover.classList.add('is-visible');
+    positionCalendarPopover(anchor);
+  });
+}
+
+function closeCalendarPopover(){
+  if(!$calendarPopover||$calendarPopover.hidden) return;
+  $calendarPopover.classList.remove('is-visible');
+  const card=$calendarPopover.querySelector('.calendar-popover__card');
+  if(card){
+    card.style.top='';
+    card.style.left='';
+  }
+  setTimeout(()=>{ if($calendarPopover) $calendarPopover.hidden=true; },220);
+}
+
+function positionCalendarPopover(anchorRect){
+  if(!$calendarPopover||$calendarPopover.hidden) return;
+  const card=$calendarPopover.querySelector('.calendar-popover__card');
+  if(!card) return;
+  let rect=anchorRect||getActiveCalendarDayRect();
+  if(!rect){
+    rect={top:window.innerHeight/2,bottom:window.innerHeight/2,left:window.innerWidth/2,width:0,height:0};
+  }
+  const cardWidth=card.offsetWidth;
+  const cardHeight=card.offsetHeight;
+  const offset=16;
+  let top=(rect.bottom||rect.top||0)+offset;
+  if(top+cardHeight>window.innerHeight-offset){
+    top=(rect.top||rect.bottom||0)-cardHeight-offset;
+  }
+  if(top<offset) top=offset;
+  let left=(rect.left||0)+(rect.width||0)/2-cardWidth/2;
+  if(left<offset) left=offset;
+  const maxLeft=window.innerWidth-cardWidth-offset;
+  if(left>maxLeft) left=maxLeft;
+  card.style.top=`${Math.round(top)}px`;
+  card.style.left=`${Math.round(left)}px`;
 }
 
 function getEventsOnDate(date){
@@ -811,6 +862,7 @@ function openPresentationsPanel(){
   if(!$presentationsPanel) return;
   if(document.body.classList.contains('data-panel-open')) closeDataPanel();
   if(presentationsTimer){clearTimeout(presentationsTimer);presentationsTimer=null;}
+  closeCalendarPopover();
   renderPresentations();
   $presentationsPanel.hidden=false;
   requestAnimationFrame(()=>document.body.classList.add('presentations-panel-open'));
@@ -818,6 +870,7 @@ function openPresentationsPanel(){
 function closePresentationsPanel(){
   if(!$presentationsPanel||$presentationsPanel.hidden) return;
   if(presentationsTimer){clearTimeout(presentationsTimer);presentationsTimer=null;}
+  closeCalendarPopover();
   document.body.classList.remove('presentations-panel-open');
   presentationsTimer=setTimeout(()=>{
     $presentationsPanel.hidden=true;
@@ -836,6 +889,19 @@ function setupPresentationsPanel(){
   document.addEventListener('keydown',ev=>{
     if(ev.key==='Escape'&&document.body.classList.contains('presentations-panel-open')) closePresentationsPanel();
   });
+}
+
+function setupCalendarPopover(){
+  if(!$calendarPopover) return;
+  if($calendarPopoverClose) $calendarPopoverClose.addEventListener('click',closeCalendarPopover);
+  $calendarPopover.addEventListener('click',ev=>{
+    if(ev.target&&ev.target.dataset&&ev.target.dataset.role==='close-calendar') closeCalendarPopover();
+  });
+  document.addEventListener('keydown',ev=>{
+    if(ev.key==='Escape'&&!$calendarPopover.hidden) closeCalendarPopover();
+  });
+  window.addEventListener('resize',()=>{ if($calendarPopover&&!$calendarPopover.hidden) positionCalendarPopover(); });
+  window.addEventListener('scroll',()=>{ if($calendarPopover&&!$calendarPopover.hidden) positionCalendarPopover(); },{passive:true});
 }
 
 function setMenuState(open){
@@ -927,6 +993,7 @@ function setupDataPanel(){
 setupDataPanel();
 renderTeamDetail();
 setupPresentationsPanel();
+setupCalendarPopover();
 setupMenu();
 // Navegación
 function routerInit(){ setZoom(getZoom()); route(); }
@@ -966,3 +1033,22 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   console.assert(formatLyrics('a\n\nb').includes('<p>'),'format ok');
   console.groupEnd();
 })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
