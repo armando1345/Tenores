@@ -1,365 +1,284 @@
-:root{
-  --bg:#0a0a0a;--fg:#ffffff;--fg-muted:#dfe4ea;
-  --card:#111213;--card-border:#1b1d1f;
-  --accent:#0ffc7e;--accent-ink:#06170f;
-  --radius-xl:28px;--radius-lg:20px;
-  --shadow-1:0 10px 30px rgba(0,0,0,.35);
-  --container:1080px;--lyrics-zoom:1
-}
-*,*::before,*::after{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);
-  font-family:Futura,'Futura PT','Avenir Next',Avenir,'Trebuchet MS',system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;line-height:1.35}
-a,a:visited{color:var(--fg);text-decoration:none}
-[hidden]{display:none!important}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tenores</title>
+  <meta name="description" content="El curso que te convertirá; en &quot;El Buen Tenor&quot;" />
+  <link rel="icon" type="image/svg+xml" href="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <button id="menuToggle" class="menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="quickMenu">
+    <span class="sr-only">Abrir menú de opciones</span>
+    <span class="menu-line" aria-hidden="true"></span>
+    <span class="menu-line" aria-hidden="true"></span>
+    <span class="menu-line" aria-hidden="true"></span>
+  </button>
+  <div id="quickMenu" class="quick-menu" role="menu" aria-labelledby="menuToggle" hidden>
+    <button class="quick-menu__item" type="button" data-action="data" role="menuitem">Mis datos</button>
+    <button class="quick-menu__item" type="button" data-action="presentations" role="menuitem">Presentaciones</button>
+  </div>
+  <div class="container">
+    <header>
+      <div class="logo-wrap">
+        <img src="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" alt="Logo Tenores" />
+      </div>
+      <h1 class="site-title">Tenores</h1>
+      <div class="accent-bar"></div>
+      <p class="subtitle">El curso que te convertirá en "El Buen Tenor"</p>
+    </header>
 
-.container{width:100%;max-width:var(--container);margin:0 auto;padding:32px 20px 52px}
-header{display:grid;place-items:center;gap:18px;padding-top:28px}
-.logo-wrap{width:108px;height:108px;border-radius:50%;overflow:hidden;position:relative;
-  box-shadow:0 0 40px rgba(15,252,126,.4),0 0 80px rgba(15,252,126,.2);
-  background:radial-gradient(circle at 50% 50%,rgba(15,252,126,.15),transparent 70%),#0f0f0f;
-  transition:box-shadow .4s ease,transform .4s ease}
-.logo-wrap:hover{box-shadow:0 0 60px rgba(15,252,126,.6),0 0 120px rgba(15,252,126,.4);transform:scale(1.03)}
-.logo-wrap::after{content:"";position:absolute;inset:-10px;border-radius:50%;
-  background:radial-gradient(circle,rgba(15,252,126,.4),transparent 70%);z-index:-1;filter:blur(18px)}
-.logo-wrap img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-h1.site-title{margin:0;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:clamp(28px,2.6vw + 8px,46px)}
-.accent-bar{width:112px;height:3px;background:var(--accent);border-radius:999px;margin:6px auto 8px}
-.subtitle{color:#b8bec4;font-size:15px;opacity:.92;text-align:center;max-width:620px;font-weight:500;letter-spacing:.01em}
-main{margin-top:34px}
+    <main>
+      <section id="home" aria-labelledby="canciones-titulo">
+        <h2 id="canciones-titulo" class="sr-only">Canciones del coro</h2>
 
-/* Search */
-.search{position:relative;margin:6px 0 14px}
-.search input{width:100%;padding:14px 16px 14px 44px;border-radius:14px;border:1px solid #232527;background:#0f1112;color:#fff;font-weight:500;letter-spacing:.015em;outline:none;transition:border-color .18s}
-.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,252,126,.12)}
-.search .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#b8bec4}
-.suggest{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;color:#8f98a3;background:#111314;border:1px solid #242628;padding:6px 8px;border-radius:999px}
+        <div class="search">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-3.5-3.5"/>
+          </svg>
+          <input id="q" type="search" placeholder="Buscar canci&oacute;n&hellip;" autocomplete="off" aria-label="Buscar canci&oacute;n" />
+          <span class="suggest" id="suggest" hidden></span>
+        </div>
 
-/* Grid */
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;align-items:stretch}
-.mini-card{background:linear-gradient(180deg,#121314 0%,#0f1011 100%);border:1px solid var(--card-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-1);position:relative;overflow:hidden;min-height:160px;display:grid;place-items:center;text-align:center;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
-.mini-card::before{content:"";position:absolute;inset:0;opacity:.06;filter:grayscale(1);background:center/60% no-repeat url('https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg')}
-.mini-card:hover{transform:translateY(-2px);border-color:#222527;box-shadow:0 16px 40px rgba(0,0,0,.45)}
-.mini-card.active{border-color:rgba(15,252,126,.6);box-shadow:0 0 0 2px rgba(15,252,126,.35),var(--shadow-1)}
-.mini-title{z-index:1;padding:10px 16px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#fff;position:relative;overflow:hidden;white-space:nowrap;max-width:88%;display:inline-block;text-overflow:ellipsis}
-.mini-title::after{content:"";position:absolute;top:0;left:-120%;width:120%;height:100%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.25),transparent 60%);transform:skewX(-20deg);transition:transform .6s ease}
-.mini-card:hover .mini-title::after{transform:translateX(220%) skewX(-20deg)}
-.mini-badge{position:absolute;top:10px;left:10px;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;background:#0f1112;border:1px solid #242628;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);font-weight:700;font-size:12px;color:var(--fg-muted);letter-spacing:.05em}
+        <div id="grid" class="grid" aria-labelledby="canciones-titulo">
+          <a class="mini-card" href="#fum" data-song="fum"><span class="mini-badge">01</span><span class="mini-title">Fum Fum Fum</span></a>
+          <a class="mini-card" href="#campanas" data-song="campanas"><span class="mini-badge">02</span><span class="mini-title">Canto de las campanas</span></a>
+          <a class="mini-card" href="#adeste" data-song="adeste"><span class="mini-badge">03</span><span class="mini-title">Adeste Fideles</span></a>
+          <a class="mini-card" href="#dona" data-song="dona"><span class="mini-badge">04</span><span class="mini-title">Dona Nobis Pacem</span></a>
+          <a class="mini-card" href="#fuentecilla" data-song="fuentecilla"><span class="mini-badge">05</span><span class="mini-title">Fuentecilla que corres</span></a>
+          <a class="mini-card" href="#estrella" data-song="estrella"><span class="mini-badge">06</span><span class="mini-title">Estrella Errante</span></a>
+          <a class="mini-card" href="#paz" data-song="paz"><span class="mini-badge">07</span><span class="mini-title">Himno a la paz</span></a>
+          <a class="mini-card" href="#merry" data-song="merry"><span class="mini-badge">08</span><span class="mini-title">We wish you a merry christmas</span></a>
+          <a class="mini-card" href="#kling" data-song="kling"><span class="mini-badge">09</span><span class="mini-title">Kling Gl&ouml;ckchen</span></a>
+          <a class="mini-card" href="#tannenbaum" data-song="tannenbaum"><span class="mini-badge">10</span><span class="mini-title">O Tannenbaum</span></a>
+        </div>
+      </section>
 
-/* Song view */
-#song-view[hidden],#home[hidden]{display:none}
-.back{display:inline-flex;gap:.6ch;align-items:center;margin-bottom:16px;padding:8px 12px;border-radius:999px;border:1px solid #1f2123;background:#0f1112}
-.song-title{margin:0 0 6px;font-size:clamp(22px,2.2vw + 6px,32px);font-weight:800}
-.song-meta{color:#c1c7cd;font-size:14px;margin-bottom:18px;font-weight:500;letter-spacing:.015em}
-.audios-grid{display:grid;gap:16px;grid-template-columns:1fr}
-@media(min-width:840px){.audios-grid{grid-template-columns:1fr 1fr}}
-.audio-card{background:linear-gradient(180deg,#141516 0%,#0f1011 100%);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-1)}
-.audio-card-header{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:14px}
-.audio-card-header h3{margin:0;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted);font-weight:700}
-.audio-tag{display:inline-flex;align-items:center;gap:.4ch;padding:6px 10px;border-radius:999px;background:rgba(15,252,126,.1);color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.audio-player{display:flex;align-items:center;gap:18px;padding:14px 16px;border-radius:16px;background:rgba(17,18,19,.85);border:1px solid rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
-.audio-player.is-active{border-color:rgba(15,252,126,.4);box-shadow:0 0 0 1px rgba(15,252,126,.18),0 18px 36px rgba(8,28,18,.26),inset 0 1px 0 rgba(255,255,255,.08);background:rgba(17,18,19,.95)}
-.audio-toggle{width:50px;height:50px;border-radius:50%;border:1px solid rgba(15,252,126,.6);background:rgba(15,252,126,.12);color:var(--accent);display:grid;place-items:center;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease;color .18s ease}
-.audio-toggle:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(15,252,126,.18);border-color:rgba(15,252,126,.85);background:rgba(15,252,126,.18);}
-.audio-toggle svg{width:22px;height:22px}
-.audio-toggle.is-playing{background:var(--accent);color:var(--accent-ink);border-color:transparent;box-shadow:0 10px 28px rgba(15,252,126,.28);transform:scale(1.02)}
-.audio-progress-group{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
-.audio-progress{position:relative;width:100%;height:6px;border-radius:999px;background:#1b1d1f;overflow:hidden;cursor:pointer}
-.audio-progress::before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-.audio-progress-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,var(--accent) 0%,rgba(15,252,126,.25) 100%);border-radius:inherit;transition:width .12s linear}
-.audio-times{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;letter-spacing:.03em;color:#97a1ac}
-.audio-cta{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.audio-card audio{display:none}
+      <section id="song-view" hidden>
+        <a class="back" href="#">&larr; Volver</a>
+        <h2 class="song-title" id="song-title">Título</h2>
+        <p class="song-meta" id="song-meta">El curso que te convertirá en "El Buen Tenor"</p>
 
-.dots{width:40px;height:40px;border-radius:14px;border:1px solid #242628;background:#111314;color:#d0d6dd;display:grid;place-items:center;transition:transform .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
-.dots:hover{transform:translateY(-1px);border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 2px rgba(15,252,126,.14)}
-.dots svg{width:18px;height:6px}
-.audio-cta .btn{font-weight:600}
+        <div class="audios-grid">
 
-@media(max-width:720px){
-  .audio-player{flex-direction:column;align-items:flex-start;gap:14px}
-  .audio-cta{width:100%;justify-content:space-between}
-  .audio-cta .btn{width:100%;justify-content:center}
-}
+          <article class="audio-card">
+            <div class="audio-card-header">
+              <h3>Explicación</h3>
+              <span class="audio-tag">Guía vocal</span>
+            </div>
+            <div class="audio-player" data-player="exp">
+              <button class="audio-toggle" type="button" data-role="toggle" aria-label="Reproducir explicaci&oacute;n">
+                <span aria-hidden="true">&#9654;</span><span class="sr-only">Reproducir explicación</span>
+              </button>
+              <div class="audio-progress-group">
+                <div class="audio-progress" data-role="progress" tabindex="0" role="slider" aria-label="Progreso explicaci&oacute;n" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                  <div class="audio-progress-fill" data-role="fill"></div>
+                </div>
+                <div class="audio-times">
+                  <span class="audio-time" data-role="current">00:00</span>
+                  <span class="audio-time" data-role="duration">--:--</span>
+                </div>
+              </div>
+              <div class="audio-cta">
+                <div class="more">
+                  <button class="dots" data-menu="exp" aria-haspopup="true" aria-expanded="false">
+                    <svg viewBox="0 0 16 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                      <circle cx="2" cy="2" r="1"></circle>
+                      <circle cx="8" cy="2" r="1"></circle>
+                      <circle cx="14" cy="2" r="1"></circle>
+                    </svg>
+                    <span class="sr-only">Ajustar velocidad</span>
+                  </button>
+                  <div class="speed-menu" data-for="exp" hidden>
+                    <button class="speed" data-speed="1">1x</button>
+                    <button class="speed" data-speed="1.25">1.25x</button>
+                    <button class="speed" data-speed="1.5">1.5x</button>
+                    <button class="speed" data-speed="2">2x</button>
+                  </div>
+                </div>
+                <a id="dl-explain" class="btn small quiet" href="#" download>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+                  <span class="label" id="lbl-explain">Descargar</span>
+                </a>
+              </div>
+            </div>
+            <audio id="audio-explain" preload="none"></audio>
+          </article>
+          <article class="audio-card">
+            <div class="audio-card-header">
+              <h3>Canci&oacute;n</h3>
+              <span class="audio-tag">Versi&oacute;n completa</span>
+            </div>
+            <div class="audio-player" data-player="trk">
+              <button class="audio-toggle" type="button" data-role="toggle" aria-label="Reproducir canci&oacute;n">
+                <span aria-hidden="true">&#9654;</span><span class="sr-only">Reproducir canci&oacute;n</span>
+              </button>
+              <div class="audio-progress-group">
+                <div class="audio-progress" data-role="progress" tabindex="0" role="slider" aria-label="Progreso canci&oacute;n" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                  <div class="audio-progress-fill" data-role="fill"></div>
+                </div>
+                <div class="audio-times">
+                  <span class="audio-time" data-role="current">00:00</span>
+                  <span class="audio-time" data-role="duration">--:--</span>
+                </div>
+              </div>
+              <div class="audio-cta">
+                <div class="more">
+                  <button class="dots" data-menu="trk" aria-haspopup="true" aria-expanded="false">
+                    <svg viewBox="0 0 16 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                      <circle cx="2" cy="2" r="1"></circle>
+                      <circle cx="8" cy="2" r="1"></circle>
+                      <circle cx="14" cy="2" r="1"></circle>
+                    </svg>
+                    <span class="sr-only">Ajustar velocidad</span>
+                  </button>
+                  <div class="speed-menu" data-for="trk" hidden>
+                    <button class="speed" data-speed="1">1x</button>
+                    <button class="speed" data-speed="1.25">1.25x</button>
+                    <button class="speed" data-speed="1.5">1.5x</button>
+                    <button class="speed" data-speed="2">2x</button>
+                  </div>
+                </div>
+                <a id="dl-track" class="btn small quiet" href="#" download>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+                  <span class="label" id="lbl-track">Descargar</span>
+                </a>
+              </div>
+            </div>
+            <audio id="audio-track" preload="none"></audio>
+          </article>
+<article class="audio-card lyrics-card">
+            <div class="lyrics-header">
+              <h3>Letra</h3>
+              <div class="lyrics-controls">
+                <button id="fontDown" class="chip small" aria-label="Reducir tama&ntilde;o">A&minus;</button>
+                <button id="fontUp" class="chip small" aria-label="Aumentar tama&ntilde;o">A+</button>
+              </div>
+            </div>
+            <div id="lyrics-wrap" class="lyrics-wrap">
+              <div id="lyrics" class="lyrics"><em>Letra no disponible a&uacute;n.</em></div>
+            </div>
+            <div class="btn-row" style="justify-content:center;margin-top:6px">
+              <button id="toggle-lyrics" class="btn btn-ghost small" hidden>Ver m&aacute;s</button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
 
-/* Speed menu minimal */
-.more{position:relative}
-.dots{width:36px;height:36px;border-radius:999px;border:1px solid #242628;background:#111314;color:#fff;display:grid;place-items:center}
-.speed-menu{position:absolute;right:0;top:44px;background:#0f1112;border:1px solid #242628;border-radius:12px;box-shadow:var(--shadow-1);padding:6px;display:grid;gap:4px;min-width:120px;z-index:30}
-.speed{border:1px solid transparent;background:transparent;color:#cbd2d8;border-radius:10px;padding:8px 10px;text-align:left}
-.speed.active{color:#0ffc7e;border-color:rgba(15,252,126,.22);background:rgba(15,252,126,.06)}
-.speed:hover{border-color:rgba(255,255,255,.12);color:#fff}
+  <button id="auBtn" class="fab" aria-label="Activar Au Au"><span class="fab-line">Aú</span><span class="fab-line">Aú</span></button>
 
-/* Buttons */
-.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:.6ch;padding:10px 14px;border-radius:999px;border:1px solid #242628;background:#0f1112;color:#fff;font-weight:600;letter-spacing:.01em;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
-.btn:hover{transform:translateY(-1px);box-shadow:0 0 0 3px rgba(15,252,126,.12);border-color:var(--accent)}
-.btn.small{padding:6px 8px;font-size:12px}
-.btn.quiet{border-color:transparent;background:transparent;color:#c6cbd1;opacity:.9}
-.btn.quiet:hover{transform:none;box-shadow:0 0 0 2px rgba(15,252,126,.08);border-color:rgba(15,252,126,.18);color:#fff}
-.btn svg{width:.95rem;height:.95rem}
+  <div id="mini" class="mini" hidden>
+    <button id="mini-toggle" class="mini-btn" aria-label="Reproducir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="8,5 19,12 8,19 8,5"></polygon>
+      </svg>
+    </button>
+    <button id="mini-loop" class="mini-btn" aria-label="Activar repetici&oacute;n continua">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+      </svg>
+    </button>
+    <div id="mini-meta" class="mini-meta" title="Abrir canci&oacute;n">
+      <div id="mini-title" class="mini-title">&mdash;</div>
+      <div id="mini-sub" class="mini-sub">&mdash;</div>
+    </div>
+    <div id="mini-bar" class="mini-bar" aria-label="Barra de progreso" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+      <div id="mini-prog" class="mini-prog"></div>
+    </div>
+    <button id="mini-close" class="mini-btn" aria-label="Detener y cerrar">&times;</button>
+  </div>
 
-/* Lyrics minimal */
-.lyrics-card{grid-column:1 / -1}
-.lyrics-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-.lyrics-controls{display:flex;gap:8px;flex-wrap:wrap}
-.chip{border:1px solid #242628;background:#0f1112;color:#fff;border-radius:999px;padding:8px 10px;display:inline-flex;align-items:center;gap:.35ch;line-height:1;font-weight:700}
-.chip.small{padding:6px 8px;font-size:12px}
-.lyrics-wrap{position:relative;max-width:66ch;margin-inline:auto}
-.lyrics{white-space:normal;line-height:1.7;letter-spacing:.01em;color:#cbd2d8;font-size:calc(15px * var(--lyrics-zoom))}
-.lyrics p{margin:0 0 12px}
-.lyrics em{color:#9aa3ad}
-.lyrics-wrap.is-collapsed{max-height:32rem;overflow:hidden}
-.lyrics-wrap.is-collapsed::after{content:"";position:absolute;left:0;right:0;bottom:0;height:84px;background:linear-gradient(180deg,rgba(10,10,10,0) 0%, rgba(10,10,10,0.9) 60%, rgba(10,10,10,1) 100%);pointer-events:none}
-.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+  <div id="dataPanel" class="data-panel" hidden>
+    <div class="data-panel__backdrop" data-role="close-panel" aria-hidden="true"></div>
+    <section class="data-panel__sheet" role="dialog" aria-labelledby="dataPanelTitle" aria-modal="true">
+      <header class="data-panel__header">
+        <div>
+          <p class="data-panel__eyebrow">Seguimiento</p>
+          <h2 id="dataPanelTitle">Métricas del equipo</h2>
+          <p class="data-panel__intro">Aquí verás los datos de los tenores, durante sus ensayos.</p>
+        </div>
+        <button id="dataClose" class="data-close" type="button" aria-label="Cerrar panel Mis datos">&times;</button>
+      </header>
+      <div class="data-panel__body">
+        <div class="data-panel__tabs" role="tablist">
+          <button id="tabOverview" class="data-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="dataOverview" data-tab-target="overview">Resumen general</button>
+          <button id="tabTenors" class="data-tab" type="button" role="tab" aria-selected="false" aria-controls="dataTenors" data-tab-target="tenors">Tenores</button>
+        </div>
+        <section id="dataOverview" class="data-panel__section" role="tabpanel" aria-labelledby="tabOverview">
+          <div id="overviewDetail" class="data-detail data-detail--overview">
+            <p class="data-panel__empty">Cargando resumen&hellip;</p>
+          </div>
+        </section>
+        <section id="dataTenors" class="data-panel__section" role="tabpanel" aria-labelledby="tabTenors" hidden>
+          <div class="tenor-panel">
+            <div id="tenorListView" class="data-sidebar tenor-list-view" role="region" aria-label="Tenores disponibles">
+              <div class="data-sidebar__header">
+                <p>Explora cada integrante y consulta su desempeño.</p>
+              </div>
+              <div id="dataCards" class="data-list" role="list"></div>
+            </div>
+            <div id="tenorDetailView" class="tenor-detail" hidden>
+              <button id="tenorBack" class="data-back" type="button">
+                <span aria-hidden="true">&#8592;</span>
+                Lista de tenores
+              </button>
+              <section id="dataDetail" class="data-detail" aria-live="polite">
+                <p class="data-panel__empty">Selecciona un tenor para consultar sus datos.</p>
+              </section>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+  <div id="presentationsPanel" class="presentations-panel" hidden>
+    <div class="presentations-panel__backdrop" data-role="close-presentations" aria-hidden="true"></div>
+    <section class="presentations-panel__sheet" role="dialog" aria-labelledby="presentationsTitle" aria-modal="true">
+      <header class="presentations-panel__header">
+        <div>
+          <p class="presentations-panel__eyebrow">Calendario</p>
+          <p class="presentations-panel__intro">Aquí conocerás las presentaciones programadas del coro, con todos sus detalles.</p>
+        </div>
+        <button id="presentationsClose" class="presentations-close" type="button" aria-label="Cerrar panel Presentaciones">&times;</button>
+      </header>
+      <div class="presentations-panel__body">
+        <div class="presentations-panel__layout">
+          <section class="calendar-board">
+            <header class="calendar-board__header">
+              <p class="calendar-eyebrow">(Noviembre - diciembre)</p>
+              <h1>Calendario de presentaciones</h1>
+            </header>
+            <div id="presentationsCalendar" class="calendar-months"></div>
+          </section>
+        </div>
+        <section class="upcoming-board">
+          <div class="upcoming-header">
+            <h3>Próximas presentaciones</h3>
+            <p>Las tres fechas más cercanas confirmadas para el coro.</p>
+          </div>
+          <div id="presentationsList" class="presentations-upcoming"></div>
+        </section>
+      </div>
+    </section>
+  </div>
+  <div id="calendarPopover" class="calendar-popover" hidden>
+    <div class="calendar-popover__backdrop" data-role="close-calendar" aria-hidden="true"></div>
+    <article class="calendar-popover__card" role="dialog" aria-modal="true" aria-labelledby="calendarPopoverTitle">
+      <header class="calendar-popover__header">
+        <p id="calendarPopoverDate" class="calendar-eyebrow">Fecha</p>
+        <h3 id="calendarPopoverTitle">Presentación</h3>
+        <button id="calendarPopoverClose" class="calendar-popover__close" type="button" aria-label="Cerrar detalles">&times;</button>
+      </header>
+      <div id="calendarPopoverBody" class="calendar-popover__body"></div>
+    </article>
+  </div>
+  <script src="app.js" defer></script>
+</body>
+</html>
 
-/* Datos panel */
-.menu-toggle{position:fixed;top:16px;left:16px;right:auto;z-index:95;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:54px;height:54px;border-radius:18px;border:1.5px solid rgba(255,255,255,.15);background:rgba(7,8,9,.92);box-shadow:0 14px 32px rgba(0,0,0,.5),0 0 0 2px rgba(15,252,126,.08);backdrop-filter:blur(8px);cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
-.menu-toggle:hover,.menu-toggle[aria-expanded="true"]{transform:translateY(-2px);border-color:rgba(15,252,126,.6);box-shadow:0 18px 40px rgba(0,0,0,.55),0 0 0 3px rgba(15,252,126,.15)}
-.menu-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
-.menu-line{display:block;width:28px;height:3px;border-radius:999px;background:#f2f5f7;transition:transform .22s ease,opacity .22s ease,background .22s ease}
-.menu-toggle[aria-expanded="true"] .menu-line{background:var(--accent)}
-.quick-menu{position:fixed;top:80px;left:16px;right:auto;width:210px;padding:12px;border-radius:18px;background:rgba(6,7,8,.95);border:1px solid #1e2125;box-shadow:0 24px 40px rgba(0,0,0,.55);backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:8px;z-index:90}
-.quick-menu__item{border:0;border-radius:14px;padding:12px 16px;background:rgba(255,255,255,.02);color:#fff;font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:12px;text-align:left;cursor:pointer;transition:background .18s ease,transform .18s ease,color .18s ease}
-.quick-menu__item:hover{background:rgba(15,252,126,.12);color:var(--accent);transform:translateX(-3px)}
-.quick-menu__item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.quick-menu[hidden]{display:none}
-body.data-panel-open .menu-toggle,
-body.presentations-panel-open .menu-toggle,
-body.data-panel-open .fab,
-body.presentations-panel-open .fab,
-body.data-panel-open .mini,
-body.presentations-panel-open .mini{opacity:0;pointer-events:none}
-body.data-panel-open .mini,
-body.presentations-panel-open .mini{transform:translateY(20px)}
-body.data-panel-open .quick-menu,
-body.presentations-panel-open .quick-menu{display:none}
-
-body.data-panel-open{overflow:hidden}
-.data-panel{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:65;pointer-events:none;padding:48px 16px}
-.data-panel__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);pointer-events:auto;opacity:0;transition:opacity .3s ease}
-.data-panel__sheet{position:relative;width:min(520px,100%);max-width:100%;max-height:calc(100vh - 40px);background:rgba(5,7,8,.96);border:1px solid #1a1d1f;border-radius:32px;box-shadow:-10px 20px 60px rgba(0,0,0,.6);padding:32px 28px 38px;overflow-y:auto;pointer-events:auto;z-index:1;transform:translateY(32px);opacity:0;transition:transform .35s ease,opacity .35s ease}
-body.data-panel-open .data-panel__backdrop{opacity:1}
-body.data-panel-open .data-panel__sheet{transform:translateY(0);opacity:1}
-@media(max-width:720px){
-  .data-panel{align-items:flex-end;padding:0}
-  .data-panel__sheet{width:100%;border-radius:0;border-left:1px solid #1a1d1f;max-height:100vh;height:100vh}
-}
-.data-panel__header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
-.data-panel__eyebrow{margin:0;font-size:12px;color:var(--accent);letter-spacing:.28em;text-transform:uppercase;font-weight:800}
-.data-panel__intro{margin:.4em 0 0;color:#9ca5b1;font-size:14px;line-height:1.4}
-.data-panel__body{margin-top:18px;display:flex;flex-direction:column;gap:18px}
-.data-panel__tabs{display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid #1d2023;padding-bottom:8px}
-.data-tab{border:1px solid transparent;border-bottom:3px solid transparent;border-radius:14px 14px 0 0;padding:10px 16px;background:transparent;color:#9ba3b1;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:color .18s ease,border-color .18s ease,background .18s ease}
-.data-tab.is-active{color:#fff;border-color:rgba(15,252,126,.4);background:rgba(15,252,126,.08)}
-.data-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.data-panel__section{margin:0}
-.data-panel__section[hidden]{display:none}
-.data-layout{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
-@media(max-width:960px){.data-layout{grid-template-columns:1fr;}}
-.data-sidebar{border:1px solid #1d2023;border-radius:22px;padding:16px;background:rgba(5,6,7,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);display:flex;flex-direction:column;gap:12px}
-.data-sidebar__header p{margin:0;color:#97a0ac;font-size:13px;line-height:1.4}
-.data-list{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 320px);overflow-y:auto;padding-right:4px}
-.tenor-panel{position:relative;min-height:420px}
-.tenor-list-view{max-height:none}
-.tenor-detail{display:flex;flex-direction:column;gap:16px}
-.data-back{align-self:flex-start;display:inline-flex;align-items:center;gap:.6ch;padding:10px 16px;border-radius:999px;border:1px solid #1f2223;background:rgba(255,255,255,.02);color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:border-color .18s ease,color .18s ease,transform .18s ease}
-.data-back:hover{border-color:rgba(15,252,126,.4);color:var(--accent);transform:translateX(-2px)}
-.data-close{border:1px solid #26292c;background:rgba(255,255,255,.02);color:#d7dce3;width:44px;height:44px;border-radius:50%;font-size:22px;font-weight:700;cursor:pointer;transition:border-color .18s ease,color .18s ease,transform .18s ease}
-.data-close:hover{color:var(--accent);border-color:rgba(15,252,126,.4);transform:translateY(-1px)}
-.data-card{border:1px solid #1d2023;border-radius:16px;padding:14px 16px;background:rgba(255,255,255,.02);color:#fff;text-align:left;cursor:pointer;font:inherit;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;display:flex;flex-direction:column;gap:6px}
-.data-card:hover{transform:translateY(-1px);border-color:rgba(15,252,126,.4)}
-.data-card.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(15,252,126,.2);background:rgba(15,252,126,.06)}
-.data-card__name{display:flex;justify-content:space-between;align-items:center;font-weight:700;letter-spacing:.03em;text-transform:uppercase;font-size:13px;gap:6px}
-.data-card__name small{margin-left:auto;font-size:11px;font-weight:600;color:#8f97a5;text-transform:none;letter-spacing:0}
-.data-card__meta{display:block;font-size:12px;color:#8f97a5}
-.data-card__bar{height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-.data-card__bar span{display:block;height:100%;width:var(--value,0%);background:linear-gradient(90deg,var(--accent),rgba(15,252,126,.18))}
-.data-detail{border:1px solid #1c1f22;border-radius:24px;padding:24px;background:rgba(6,7,8,.92);box-shadow:var(--shadow-1);min-height:360px}
-.data-detail--overview{padding:0;border:none;background:transparent;box-shadow:none}
-.data-detail h4{margin:16px 0 8px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#a0a8b4}
-.data-detail__header{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;margin-bottom:16px}
-.data-detail__header h3{margin:0;font-size:20px;text-transform:uppercase;letter-spacing:.08em}
-.trend-chip{display:inline-flex;align-items:center;gap:.5ch;padding:6px 12px;border-radius:999px;border:1px solid rgba(15,252,126,.35);background:rgba(15,252,126,.08);color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.data-detail__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
-.stat-pill{padding:12px;border:1px solid #202226;border-radius:18px;background:rgba(255,255,255,.02)}
-.stat-pill strong{display:block;font-size:20px;margin-bottom:4px}
-.stat-pill span{font-size:11px;color:#8d96a5;letter-spacing:.08em;text-transform:uppercase}
-.attendance-rows{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-.attendance-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
-.attendance-info{min-width:120px}
-.attendance-info strong{display:block;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
-.attendance-info span{font-size:12px;color:#8d95a3}
-.attendance-bar{flex:1;min-width:140px;height:6px;border-radius:999px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
-.attendance-bar::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-.attendance-bar span{display:block;height:100%;width:var(--value,0%);background:linear-gradient(90deg,var(--accent),rgba(15,252,126,.2))}
-.attendance-value{font-weight:800;font-size:13px}
-.dial{width:150px;max-width:100%;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--accent) var(--percent,0%),rgba(255,255,255,.12) 0);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;position:relative;flex-shrink:0;padding:20px;box-sizing:border-box}
-.dial::after{content:"";position:absolute;inset:24px;border-radius:inherit;background:#050607;box-shadow:inset 0 0 18px rgba(0,0,0,.6);z-index:0}
-.dial-value{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:30px;font-weight:800;color:#fff;z-index:1;line-height:1}
-.dial-value strong{font-size:34px;font-weight:800}
-.dial-value span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9fa8b4}
-.dial-label{display:block;font-size:12px;color:#9fa8b4;letter-spacing:.08em;text-transform:uppercase;margin-top:4px;text-align:center;position:relative;z-index:1}
-.stat-card{border:1px solid #1f2226;border-radius:18px;padding:14px;background:rgba(255,255,255,.02)}
-.stat-card strong{display:block;font-size:18px;margin-bottom:6px}
-.stat-card span{font-size:12px;color:#8e97a5;letter-spacing:.08em;text-transform:uppercase}
-.stat-card__note{margin:10px 0 0;font-size:13px;color:#a2abb8}
-.detail-list{margin:12px 0 0;padding-left:18px;color:#c9d0d8;font-size:14px;line-height:1.6}
-.detail-list li{margin-bottom:8px}
-.level-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
-.level-chip{border:1px solid #1f2226;border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.02)}
-.level-chip strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
-.level-chip span{display:block;font-size:12px;color:#949dad;margin-top:4px}
-.data-panel__empty{margin:0;text-align:center;color:#97a0ac}
-.data-panel__sheet::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top left,rgba(15,252,126,.08),transparent 45%);opacity:.7;pointer-events:none}
-.data-detail__stack{display:flex;flex-direction:column;gap:18px}
-.overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0}
-.overview-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.tenor-stats{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-.tenor-stat{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.03);flex-wrap:wrap}
-.tenor-stat__meta{min-width:140px}
-.tenor-stat__meta strong{display:block;font-size:14px;text-transform:uppercase;letter-spacing:.05em}
-.tenor-stat__meta span{font-size:12px;color:#8d95a3}
-.tenor-stat__meter{flex:1;min-width:160px;height:6px;border-radius:999px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
-.tenor-stat__meter span{display:block;height:100%;width:var(--value,0%);background:linear-gradient(90deg,var(--accent),rgba(15,252,126,.18))}
-.tenor-stat__value{font-weight:700;font-size:13px}
-.table-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
-.table-header p{margin:4px 0 0;color:#8d96a5;font-size:13px}
-.data-detail__hero{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px;border:1px solid #1f2225;border-radius:24px;background:linear-gradient(135deg,rgba(15,252,126,.12),rgba(8,10,12,.92));box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
-.data-hero-text{flex:1;min-width:0}
-.data-hero-text .kicker{margin:0;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#9eecc3;font-weight:800}
-.data-hero-text h3{margin:6px 0 4px;font-size:24px;letter-spacing:.08em;text-transform:uppercase}
-.data-hero-text p{margin:0;color:#c5ccd4;line-height:1.4;font-size:14px}
-.data-timeframe{color:#8a93a1;font-size:13px;margin-top:4px}
-.data-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.badge{display:inline-flex;align-items:center;gap:.35ch;padding:6px 12px;border-radius:999px;border:1px solid rgba(15,252,126,.5);background:rgba(15,252,126,.1);color:#dfffe9;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.badge--ghost{border-color:#2a2d31;background:rgba(255,255,255,.04);color:#b9c1cc}
-.data-metrics,.overview-grid,.member-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
-.data-metrics{margin:20px 0}
-.metric-card{padding:16px;border:1px solid #1b1e20;border-radius:18px;background:rgba(255,255,255,.02);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);display:flex;flex-direction:column;gap:6px}
-.metric-card strong{display:block;font-size:26px;margin:6px 0;color:#fff}
-.metric-card span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#919aa6}
-.metric-card small{display:block;font-size:12px;color:#8c95a4;line-height:1.4}
-.member-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.member-metrics{margin:6px 0 12px}
-.member-panel{display:flex;flex-direction:column;gap:12px}
-.data-panel-box{border:1px solid #1c1f22;border-radius:20px;padding:18px;background:rgba(5,6,7,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
-.data-panel-box h4{margin:0 0 10px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#a5aebb}
-.data-panel-box--notes{margin-top:18px}
-.data-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.dial--xl{width:200px;max-width:40%}
-.member-hero{background:linear-gradient(135deg,rgba(15,252,126,.18),rgba(5,8,9,.95))}
-.member-hero .data-hero-text h3{font-size:28px}
-.data-panel__sheet .detail-list{margin-left:18px}
-
-.presentations-panel{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;z-index:64;pointer-events:none;padding:48px 20px}
-.presentations-panel__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);opacity:0;transition:opacity .3s ease;pointer-events:auto}
-.presentations-panel__sheet{position:relative;width:min(920px,calc(100% - 32px));max-height:calc(100vh - 64px);background:rgba(6,8,9,.96);border:1px solid #1b1e21;border-radius:28px;padding:32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.65);overflow-y:auto;transform:translateY(30px);opacity:0;transition:transform .35s ease,opacity .35s ease;pointer-events:auto}
-body.presentations-panel-open{overflow:hidden}
-body.presentations-panel-open .presentations-panel__backdrop{opacity:1}
-body.presentations-panel-open .presentations-panel__sheet{transform:translateY(0);opacity:1}
-.presentations-panel__header{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
-.presentations-panel__eyebrow{margin:0;font-size:12px;color:var(--accent);letter-spacing:.28em;text-transform:uppercase;font-weight:800}
-.presentations-panel__intro{margin:.6em 0 0;color:#a6afbc;font-size:14px;line-height:1.5}
-.presentations-close{border:1px solid #26292c;background:rgba(255,255,255,.02);color:#d7dce3;width:44px;height:44px;border-radius:50%;font-size:22px;font-weight:700;cursor:pointer;transition:border-color .18s ease,color .18s ease,transform .18s ease}
-.presentations-close:hover{color:var(--accent);border-color:rgba(15,252,126,.4);transform:translateY(-1px)}
-.presentations-panel__body{margin-top:22px;display:flex;flex-direction:column;gap:22px}
-.presentations-panel__layout{display:flex;flex-direction:column;gap:18px}
-@media(max-width:900px){.presentations-panel__layout{gap:16px}}
-.calendar-board{border:1px solid #1d2023;border-radius:24px;padding:20px;background:rgba(5,6,7,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.02);display:flex;flex-direction:column;gap:16px}
-.calendar-board__header h3{margin:6px 0;font-size:22px}
-.calendar-board__header p{margin:0;color:#9fa7b3}
-.calendar-eyebrow{margin:0;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:800}
-.calendar-months{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.calendar-month{border:1px solid #1c1f22;border-radius:20px;padding:14px;background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:12px}
-.calendar-month__title{margin:0;font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:#dfe4ea;display:flex;justify-content:space-between;align-items:center}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.calendar-dayname{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#7d8695;text-align:center}
-.calendar-day{border:1px solid transparent;border-radius:12px;padding:10px 0;background:rgba(255,255,255,.02);color:#fff;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-family:inherit;font-size:13px;transition:background .18s ease,border-color .18s ease,color .18s ease}
-.calendar-day.is-empty{color:#5f6775}
-.calendar-day--empty{background:transparent;border-color:transparent;cursor:default}
-.calendar-day.has-event::after{content:"";display:block;width:6px;height:6px;border-radius:999px;background:var(--accent);margin-top:2px}
-.calendar-day.is-selected{border-color:var(--accent);background:rgba(15,252,126,.08);color:var(--accent)}
-.calendar-day:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.calendar-day[disabled]{opacity:.4;pointer-events:none}
-.calendar-popover{position:fixed;inset:0;z-index:80;pointer-events:none}
-.calendar-popover__backdrop{position:absolute;inset:0;background:rgba(5,7,8,.35);backdrop-filter:blur(3px);opacity:0;transition:opacity .2s ease;pointer-events:auto}
-.calendar-popover__card{position:fixed;top:0;left:0;border-radius:24px;border:1px solid #1d2023;background:rgba(6,8,9,.98);padding:24px 26px;box-shadow:0 24px 60px rgba(0,0,0,.55);min-width:260px;max-width:360px;opacity:0;transform:translate3d(0,-8px,0);transition:opacity .2s ease,transform .2s ease;pointer-events:auto}
-.calendar-popover__header{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.calendar-popover__header h3{margin:0;font-size:20px}
-.calendar-popover__close{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:1px solid #26292c;background:rgba(255,255,255,.02);color:#d7dce3;font-size:20px;font-weight:700;cursor:pointer;transition:border-color .18s ease,color .18s ease,transform .18s ease}
-.calendar-popover__close:hover{color:var(--accent);border-color:rgba(15,252,126,.4);transform:translateY(-1px)}
-.calendar-popover__body{display:flex;flex-direction:column;gap:16px}
-.calendar-popover__card p{margin:0;color:#b7bec8;font-size:14px}
-.calendar-popover__event:not(:last-child){padding-bottom:12px;border-bottom:1px solid #1d2023}
-.calendar-popover__event h4{margin:0 0 4px;font-size:18px}
-.calendar-detail__meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;font-size:13px}
-.calendar-detail__meta span{display:block;font-weight:700;color:#fff}
-.calendar-detail__meta small{display:block;font-size:12px;color:#8d97a6;text-transform:uppercase;letter-spacing:.1em}
-.calendar-popover.is-visible{pointer-events:auto}
-.calendar-popover.is-visible .calendar-popover__backdrop{opacity:1}
-.calendar-popover.is-visible .calendar-popover__card{transform:translateY(0);opacity:1}
-.upcoming-board{border:1px solid #1d2023;border-radius:24px;padding:20px;background:rgba(5,6,7,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.02);display:flex;flex-direction:column;gap:16px}
-.upcoming-header h3{margin:0;font-size:18px;text-transform:uppercase;letter-spacing:.1em}
-.upcoming-header p{margin:6px 0 0;color:#9fa7b3;font-size:13px}
-.presentations-upcoming{display:flex;flex-direction:column;gap:12px}
-.upcoming-card{border:1px solid #1d2023;border-radius:18px;padding:16px;background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
-.upcoming-card h4{margin:0;font-size:18px}
-.upcoming-card__meta{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;color:#9fa7b3}
-.upcoming-card__meta span{display:inline-flex;align-items:center;gap:.35ch;padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
-.upcoming-card__summary{margin:0;color:#b7bec8;font-size:13px}
-.upcoming-card__tag{align-self:flex-start;padding:4px 10px;border-radius:999px;border:1px solid rgba(15,252,126,.4);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
-.presentations-empty{margin:0;text-align:center;color:#9fa7b3;font-size:14px}
-.presentation-card{border:1px solid #1d2125;border-radius:24px;padding:20px;background:linear-gradient(135deg,rgba(15,252,126,.12),rgba(6,8,9,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-.presentation-card__kicker{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:#9eecc3;font-weight:800}
-.presentation-card h3{margin:6px 0;font-size:22px;letter-spacing:.05em}
-.presentation-card__place{margin:0;color:#c0c7d2;font-size:14px}
-.presentation-card__summary{margin:14px 0 0;color:#aab2bf;line-height:1.5;font-size:14px}
-.presentation-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:18px 0 0}
-.presentation-meta dt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8f98a3;margin-bottom:6px}
-.presentation-meta dd{margin:0;font-size:16px;font-weight:700}
-.presentation-tag{display:inline-flex;align-items:center;gap:.4ch;margin-top:10px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.2);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#cfd6df}
-@media(max-width:640px){
-  .menu-toggle{left:12px;right:auto;top:12px;width:48px;height:48px;border-radius:16px}
-  .quick-menu{top:70px;left:12px;right:auto;width:190px}
-  .presentations-panel__sheet{width:100%;height:100%;max-height:none;border-radius:0;padding:28px 20px}
-  .presentations-panel__layout{gap:16px}
-  .calendar-board,.upcoming-board{padding:18px}
-  .data-layout{gap:16px}
-  .data-list{max-height:none}
-  .tenor-panel{min-height:auto}
-  .attendance-row{flex-direction:column;align-items:flex-start}
-  .attendance-bar{width:100%;min-width:0}
-  .fab{top:16px}
-  .data-detail__hero{flex-direction:column;align-items:flex-start}
-  .dial--xl{width:140px;max-width:100%}
-}
-
-/* Mini player */
-.mini{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;background:#0f1112;border:1px solid #242628;border-radius:16px;box-shadow:var(--shadow-1);display:flex;align-items:center;gap:12px;padding:10px 12px;transition:transform .25s ease,opacity .25s ease}
-.mini--hidden{transform:translateY(150%);opacity:.2;pointer-events:none}
-.mini-btn{width:40px;height:40px;border-radius:999px;border:1px solid #242628;background:#111314;color:#fff;display:grid;place-items:center}
-.mini-btn.active{color:var(--accent)}
-.mini-meta{min-width:0;cursor:pointer}
-.mini-title{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mini-sub{font-size:12px;color:#b8bec4}
-.mini-bar{flex:1;height:8px;background:#1b1d1f;border-radius:999px;overflow:hidden;cursor:pointer;touch-action:none}
-.mini-prog{width:0%;height:100%;background:var(--accent)}
-@media (min-width:840px){.mini{left:24px;right:auto;width:420px}}
-
-/* FAB */
-.fab{position:fixed;top:16px;right:16px;z-index:60;width:64px;height:64px;border-radius:999px;border:1px solid #242628;background:#111314;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:900;line-height:1;box-shadow:var(--shadow-1);transition:transform .18s,box-shadow .18s,border-color .18s}
-.fab:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,252,126,.12)}
-.fab-line{font-size:14px;letter-spacing:.06em}
-
-/* Confetti */
-.confetti{position:fixed;top:-10px;left:0;width:8px;height:12px;background:var(--accent);opacity:.9;will-change:transform,opacity;pointer-events:none;z-index:59;animation:fall 900ms linear forwards}
-@keyframes fall{to{transform:translate(var(--x,0), calc(100vh + 20px)) rotate(var(--r, 180deg)); opacity:0.95;}}
-@media (prefers-reduced-motion: reduce){
-  *{scroll-behavior:auto}
-  .logo-wrap,.btn,.mini{transition:none}
-  .confetti{animation:none;display:none}
-}
 
 
 
