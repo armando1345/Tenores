@@ -43,38 +43,39 @@ Fum, fum, fum`
 };
 
 const TEAM_OVERVIEW={
-  totalMinutes:1920,
-  totalHours:32,
+  totalMinutes:2160,
+  totalHours:36,
   totalMembers:9,
-  averageMinutes:1422.8,
-  averageAttendance:74,
-  rehearsals:9,
-  timeframe:'Periodo analizado',
+  averageMinutes:1632.6,
+  averageAttendance:76,
+  rehearsals:10,
+  timeframe:'6 de septiembre - 15 de noviembre',
   observations:[
-    'Carlos (100%) y Santiago (98%) sostienen la asistencia m\u00e1s alta del equipo.',
-    'Nivel alto (H\u00e9ctor, Marco y Diego) se mantiene por arriba del 80% aunque acumula retrasos frecuentes.',
-    'Mario e Isa\u00edas integran el nivel medio con entre 630 y 721 minutos por recuperar.',
-    'Oswaldo y Caleb se encuentran por debajo del 50% del plan y concentran el foco rojo.',
-    'Marco justifica el 67% de sus retrasos; H\u00e9ctor y Diego registran retardos sin justificaci\u00f3n.'
+    'Promedio de asistencia por tiempo: 76% (27.21 horas activas por tenor sobre una meta de 36).',
+    'Carlos (100%) y Santiago (99%) sostienen el liderazgo de la cuerda con cobertura casi total de los ensayos.',
+    'H\u00e9ctor, Marco y Diego se mantienen en rango bueno (82%-83%), pero las tardanzas reiteradas reducen el tiempo efectivo (Marco llega tarde 67% de las veces).',
+    'Mario (71%) e Isa\u00edas (67%) contin\u00faan en zona de riesgo por ausencias completas al inicio del periodo.',
+    'Caleb (53%) y Oswaldo (44%) concentran el nivel cr\u00edtico tras perder casi la mitad del plan de minutos.',
+    'Octubre mostr\u00f3 el punto m\u00e1s d\u00e9bil del grupo (11 y 25 de octubre); vale revisar causas externas.'
   ],
   levels:[
-    {label:'Nivel superior (98%-100%)',members:['Carlos','Santiago']},
-    {label:'Nivel alto (80%-81%)',members:['H\u00e9ctor','Marco','Diego']},
-    {label:'Nivel medio (62%-67%)',members:['Mario','Isa\u00edas']},
-    {label:'Nivel bajo (48%-49%)',members:['Oswaldo','Caleb']}
+    {label:'Nivel superior (99%-100%)',members:['Carlos','Santiago']},
+    {label:'Nivel alto (82%-83%)',members:['H\u00e9ctor','Marco','Diego']},
+    {label:'Nivel medio (67%-71%)',members:['Mario','Isa\u00edas']},
+    {label:'Nivel bajo (44%-53%)',members:['Oswaldo','Caleb']}
   ]
 };
 
 const TENOR_MEMBERS_DATA=[
-  {id:'caleb',name:'Caleb',minutes:930,attendance:48,minutesLost:990,rehearsalsAttended:5,tardyPct:40,tardyCount:2,tardyJustifiedPct:0,level:'Nivel Bajo (48%-49%)',note:'Requiere recuperar 990 minutos para alcanzar la carga total.'},
-  {id:'carlos',name:'Carlos',minutes:1920,attendance:100,minutesLost:0,rehearsalsAttended:9,tardyPct:0,tardyCount:0,tardyJustifiedPct:0,level:'Nivel Superior (98%-100%)',note:'Asistencia perfecta en los 9 ensayos analizados.'},
-  {id:'diego',name:'Diego',minutes:1528.8,attendance:80,minutesLost:391.2,rehearsalsAttended:8,tardyPct:38,tardyCount:3,tardyJustifiedPct:0,level:'Nivel Alto (80%-81%)',note:'80% del tiempo cubierto pero con 3 llegadas tarde sin justificar.'},
-  {id:'hector',name:'H\u00e9ctor',minutes:1557.6,attendance:81,minutesLost:362.4,rehearsalsAttended:7,tardyPct:43,tardyCount:3,tardyJustifiedPct:0,level:'Nivel Alto (80%-81%)',note:'Buena asistencia, aunque 43% de sus ensayos comenz\u00f3 tarde.'},
-  {id:'isaias',name:'Isa\u00edas',minutes:1198.8,attendance:62,minutesLost:721.2,rehearsalsAttended:6,tardyPct:33,tardyCount:2,tardyJustifiedPct:0,level:'Nivel Medio (62%-67%)',note:'Debe recuperar 721 minutos y reducir sus retrasos (33%).'},
-  {id:'marco',name:'Marco',minutes:1545,attendance:80,minutesLost:375,rehearsalsAttended:8,tardyPct:75,tardyCount:6,tardyJustifiedPct:67,level:'Nivel Alto (80%-81%)',note:'75% de sus ensayos inicia tarde, aunque 67% tiene justificaci\u00f3n.'},
-  {id:'mario',name:'Mario',minutes:1290,attendance:67,minutesLost:630,rehearsalsAttended:null,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel Medio (62%-67%)',note:'Se ubica en el nivel medio con 630 minutos perdidos; falta desglose por ensayo.'},
-  {id:'oswaldo',name:'Oswaldo',minutes:945,attendance:49,minutesLost:975,rehearsalsAttended:null,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel Bajo (48%-49%)',note:'Pierde 975 minutos frente a la meta y requiere plan de recuperaci\u00f3n.'},
-  {id:'santiago',name:'Santiago',minutes:1890,attendance:98,minutesLost:30,rehearsalsAttended:null,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel Superior (98%-100%)',note:'98% de asistencia; faltan 30 minutos para igualar el total del coro.'}
+  {id:'carlos',name:'Carlos',minutes:2160,attendance:100,minutesLost:0,rehearsalsAttended:10,tardyPct:0,tardyCount:0,tardyJustifiedPct:0,level:'Nivel superior (99%-100%)',note:'No ha perdido ni un minuto de ensayo durante las 10 sesiones analizadas.'},
+  {id:'santiago',name:'Santiago',minutes:2130,attendance:99,minutesLost:30,rehearsalsAttended:10,tardyPct:20,tardyCount:2,tardyJustifiedPct:50,level:'Nivel superior (99%-100%)',note:'Rendimiento casi perfecto; solo 30 minutos perdidos y la mitad de sus tardanzas fueron justificadas.'},
+  {id:'hector',name:'H\u00e9ctor',minutes:1796.4,attendance:83,minutesLost:363.6,rehearsalsAttended:8,tardyPct:50,tardyCount:4,tardyJustifiedPct:0,level:'Nivel alto (82%-83%)',note:'Es consistente, pero las ausencias del 13 de septiembre y 8 de noviembre y sus tardanzas sin justificar reducen su promedio.'},
+  {id:'marco',name:'Marco',minutes:1785,attendance:83,minutesLost:375,rehearsalsAttended:9,tardyPct:67,tardyCount:6,tardyJustifiedPct:67,level:'Nivel alto (82%-83%)',note:'Solo falt\u00f3 el 25 de octubre, aunque llega tarde o se retira antes en 67% de los ensayos (la mayor\u00eda con justificaci\u00f3n).'},
+  {id:'diego',name:'Diego',minutes:1768.8,attendance:82,minutesLost:391.2,rehearsalsAttended:9,tardyPct:33,tardyCount:3,tardyJustifiedPct:0,level:'Nivel alto (82%-83%)',note:'Buen desempe\u00f1o general; la ausencia del 11 de octubre y algunas tardanzas representan su mayor reto.'},
+  {id:'mario',name:'Mario',minutes:1530,attendance:71,minutesLost:630,rehearsalsAttended:8,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel medio (67%-71%)',note:'Ha perdido 630 minutos (m\u00e1s de 10 horas) por ausencias clave el 13 y 25 de septiembre.'},
+  {id:'isaias',name:'Isa\u00edas',minutes:1438.8,attendance:67,minutesLost:721.2,rehearsalsAttended:7,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel medio (67%-71%)',note:'Falt\u00f3 el 13 y 20 de septiembre y el 4 de octubre, lo que signific\u00f3 perder 33% del contenido antes de estabilizarse.'},
+  {id:'caleb',name:'Caleb',minutes:1140,attendance:53,minutesLost:1020,rehearsalsAttended:6,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel bajo (44%-53%)',note:'Situaci\u00f3n cr\u00edtica: dos bloques consecutivos de ausencias en septiembre y octubre lo dejaron con 47% del plan pendiente.'},
+  {id:'oswaldo',name:'Oswaldo',minutes:945,attendance:44,minutesLost:1215,rehearsalsAttended:6,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel bajo (44%-53%)',note:'Asisti\u00f3 bien en septiembre, pero desde el 11 de octubre registra cuatro ausencias seguidas y una final, casi abandonando el proceso.'}
 ];
 
 const CALENDAR_MONTHS=['2025-11','2025-12'];
@@ -590,8 +591,8 @@ function renderMemberDetail(member){
       : 'No hay datos de puntualidad para este tenor en Hoja 2.'
   ].filter(Boolean);
   const bulletList=bulletItems.length?bulletItems.map(item=>`<li>${item}</li>`).join(''):'<li>Sin datos adicionales.</li>';
-  const metrics=[
-    {value:formatMinutes(member.minutes),label:'Tiempo activo',note:'Meta 1920 min'},
+    const metrics=[
+      {value:formatMinutes(member.minutes),label:'Tiempo activo',note:'Meta 2160 min'},
     {value:formatMinutes(member.minutesLost),label:'Minutos perdidos',note:pendingBadge},
     {value:formatPercent(minutePct),label:'Tiempo ensayado',note:member.level},
     {value:freqValue,label:'Cobertura de ensayos',note:freqLabel}
@@ -1034,3 +1035,4 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   console.assert(formatLyrics('a\n\nb').includes('<p>'),'format ok');
   console.groupEnd();
 })();
+
