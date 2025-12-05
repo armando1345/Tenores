@@ -39,7 +39,9 @@ Fum, fum, fum`
   paz:{title:'Himno a la paz',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997237/himno_a_la_paz_cancion_avurel.mp3'},
   merry:{title:'We wish you a merry christmas',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1760997255/we_wish_you_cancion_pgz1i2.mp3'},
   kling:{title:'Kling Glöckchen, klingelingeling',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1761827592/kling_cancion_xawypb.mp3'},
-  tannenbaum:{title:'O Tannenbaum',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1761968289/oh_thanenbaum_kkhmya.mp3'}
+  tannenbaum:{title:'O Tannenbaum',explain:'',track:'https://res.cloudinary.com/dcwx23x5o/video/upload/v1761968289/oh_thanenbaum_kkhmya.mp3'},
+  mundo:{title:'Mundo feliz',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1764903368/mundo-feliz_udqafi.wav'},
+  stelle:{title:'Tu scendi dalle stelle',explain:'',track:'https://res.cloudinary.com/dul66qlpq/video/upload/v1764903364/tu-scendi_xbmuo7.wav'}
 };
 
 const TEAM_OVERVIEW={
@@ -371,7 +373,7 @@ function updateMini(){
   $miniProg.style.width=`${pct}%`; $miniBar.setAttribute('aria-valuenow',String(Math.round(pct)));
 }
 [$exp,$trk].forEach((el,idx)=>{
-  const label=idx===0?'Explicaci�n':'Canci�n';
+  const label=idx===0?'Explicación':'Canción';
   el.addEventListener('play',()=>{bindToMini(el,label)});
   el.addEventListener('pause',updateMini);
   el.addEventListener('timeupdate',updateMini);
