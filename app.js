@@ -100,7 +100,7 @@ const PRESENTATION_EVENTS=[
 ];
 const DAY_NAMES=['L','M','X','J','V','S','D'];
 const LETTER_TITLE=`Esta es mi carta de despedida como jefe de cuerda`;
-const LETTER_SUBTITLE=`No es solo un texto para decir adiós. Es, sobre todo, una forma de dejarles lo mejor que puedo antes de irme`;
+const LETTER_SUBTITLE=`No es solo un texto para decir adiós. Es, sobre todo, una guía para el futuro del equipo`;
 const TENOR_CHIP_LIMIT=2;
 const LETTER_HTML=`Quiero que esta carta sea un abrazo para cada tenor, pero también una guía.
 ¡Aú, aú!
@@ -1539,24 +1539,3 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   console.assert(formatLyrics('a\n\nb').includes('<p>'),'format ok');
   console.groupEnd();
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
