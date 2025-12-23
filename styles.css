@@ -55,9 +55,14 @@ main{margin-top:34px}
 .letter-card__media{order:2;grid-area:media}
 .letter-card__media img{
   width:100%;
+  height:auto;
+  aspect-ratio:16/9;
+  min-height:140px;
   border-radius:16px;
   border:1px solid rgba(255,255,255,.08);
   display:block;
+  object-fit:cover;
+  background:radial-gradient(circle at 30% 30%,rgba(15,252,126,.08),transparent 50%),#0d0f10;
 }
 .letter-card__body{display:flex;flex-direction:column;gap:10px}
 .letter-card__kicker{
@@ -560,15 +565,19 @@ body.letter-reader-open .mini{opacity:0;pointer-events:none}
 .letter-banner{
   display:block;
   width:100%;
-  max-height:170px;
+  max-height:210px;
+  min-height:150px;
+  aspect-ratio:16/9;
   object-fit:cover;
   border-radius:20px;
   border:1px solid var(--letter-border);
   box-shadow:0 18px 40px rgba(0,0,0,.16);
   margin:10px 0 18px;
+  background:radial-gradient(circle at 20% 20%,rgba(15,106,70,.12),transparent 55%),#0c0d0e;
 }
 .letter-banner--reader{
-  max-height:200px;
+  max-height:240px;
+  min-height:170px;
   margin:0 0 20px;
 }
 
