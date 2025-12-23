@@ -1388,6 +1388,16 @@ function setupLetterFlow(){
   if(!$letterModal||!$letterReader) return;
   setLetterCopy();
   setLetterCardVisible(false);
+  if($letterCard){
+    const activateCard=()=>openLetterReader();
+    $letterCard.addEventListener('click',activateCard);
+    $letterCard.addEventListener('keydown',ev=>{
+      if(ev.key==='Enter'||ev.key===' '){
+        ev.preventDefault();
+        activateCard();
+      }
+    });
+  }
   if($letterCardOpen){
     $letterCardOpen.addEventListener('click',()=>{
       openLetterReader();
@@ -1529,24 +1539,3 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   console.assert(formatLyrics('a\n\nb').includes('<p>'),'format ok');
   console.groupEnd();
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
