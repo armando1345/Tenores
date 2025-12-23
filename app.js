@@ -111,110 +111,171 @@ En esta carta encontrarán 3 cosas:
 ________________________________________
 ## Mis recomendaciones para el equipo
 Empiezo con una pregunta incómoda:
+
 ¿Por qué querríamos malos tenores?
+
 Durante la temporada les hablé muchas veces de "el buen tenor".
 "El buen tenor es la clave", repetí una y otra vez.
 Y hoy quiero volver a esa idea, pero desde una pregunta diferente:
+
 ¿por qué querríamos malos tenores entre nosotros?
 Antes de hablar del buen tenor, vale la pena pensar en eso.
+
 El buen tenor es el que busca lo mejor para el equipo, incluso cuando nadie lo está mirando.
 Es generoso.
 Es honorable.
 Se esfuerza por conocer cada canción, no por lucirse, sino porque sabe que el equipo lo componemos TODOS.
+
 El buen tenor quiere que el coro suene mejor.
 Quiere que sus compañeros crezcan.
 Quiere aportar.
 Piensen en una buena persona: alguien trabajador, comprometido, que suma y cuida lo que tiene.
+
 Ese es el buen tenor.
-El mal tenor es lo contrario.
+
+El mal tenor es lo contrario:
+
 • Habla mal de sus compañeros a sus espaldas y rompe la confianza.
 • No se compromete de verdad: pone fiestas o cualquier cosa por encima del coro.
 • No busca mejorar, se conforma con poco y se exige menos.
+
 Y vuelvo a la pregunta, con todo el cariño que le tengo a este equipo:
-¿por qué querríamos ese tipo de actitudes dentro entre nosotros?
+
+¿por qué querríamos ese tipo de actitudes entre nosotros?
+
 **No hay ningún motivo. Ninguno.**
-Por eso mi primera recomendación es sencilla, pero y muy profunda:
+
+Por eso mi primera recomendación es sencilla, pero muy profunda:
+
 **trata de ser el buen tenor.**
+
 No vas a ser perfecto.
+
 Nadie lo ha sido nunca en este coro, ni yo mismo.
 Lo único verdaderamente importante es intentarlo.
+
 Intentarlo cada ensayo.
-Intentarlo incluso cuando cuesta.
+
 Si es posible hacer algo bien, ¿por qué lo haríamos mal?
+
 Si cantar parado es técnicamente mejor que cantar sentado, ¿por qué quedarnos sentados?
+
 Ese es solo un ejemplo para que entiendas lo que quiero decir: si podemos hacer algo bien, entonces intentémoslo.
+
 Quiero contarte algo...
+
 A lo largo de estos 15 años del coro ha habido conflictos que nos han afectado más de lo que a veces se admite.
+
 Mi retiro en 2019 se debió, en parte, a uno de esos conflictos.
+
 Y muchas personas valiosas se han ido a lo largo de los años por razones similares.
+
 Cuando el ambiente se vuelve tenso, algo se rompe.
+
 La confianza se debilita.
+
 Y el coro, inevitablemente, canta peor.
+
 La mayoría de esos conflictos no nacen de grandes problemas, sino de pequeñas actitudes repetidas: egoísmo, complejos de estrella, hipocresía, desinterés.
 Por eso insisto tanto en la idea del buen tenor.
 Porque cuando uno intenta serlo, cuida al equipo.
 Y cuando muchos lo intentan, el coro se vuelve un lugar más sano y fuerte.
+
 Si intentas ser el buen tenor, no solo te sentirás más cómodo aquí.
 Construirás relaciones más bonitas.
 Y, como el buen tenor también se esfuerza: sonaremos mejor.
+
 Esta idea no es algo que se me ocurrió al azar.
+
 La pensé durante los años que estuve fuera de la fundación, recordando lo bueno, lo difícil y lo valioso de los tenores.
+
 Al próximo jefe de cuerda quiero dejarle una recomendación:
 potencia esta idea.
+
 Si logra quedarse en la mente y en el corazón del equipo, servirá durante muchos años.
-**Larga vida al buen tenor.**
+
+**¡Larga vida al buen tenor!**
 ________________________________________
 ## Mi segunda recomendación
 **Cuiden la cultura tenoril.**
+
 Los tenores siempre hemos tenido nuestro estilo.
+
 Desde los primeros años del coro hubo bromas, chistes, nalgadas y risas.
+
 No importa la generación:
 ese siempre ha sido nuestro humor.
 Y está bien.
 No solo es divertido.
 Es necesario para que el equipo respire.
+
 ¿Se imaginan una temporada de coro sin eso?
 Sería demasiado pesada, tensa y agotadora.
+
 Los buenos tenores saben cuándo ser responsables, trabajadores y serios.
+
 Pero también saben cuándo relajarse, bromear y romper la tensión.
+
 A veces incluso siendo un poco vulgares.
+
 Y no pasa nada. Personalmente, lo aplaudo.
+
 Eso también es cariño.
 Eso también es pertenencia.
 Eso también es equipo.
 No pierdan eso.
+
 Cuídenlo.
+
 ## Lo bueno y lo malo de la temporada 2025 (sin filtros)
 No hablo del coro en general.
 Hablo de nosotros: los tenores.
+
 La pregunta clave es simple:
 ¿mejoramos esta temporada?
-**Mi respuesta es un sí rotundo. SÍ.**
+**Mi respuesta es un sí rotundo. 
+
+SÍ.**
+
 Lo confirmé hablando con varios de ustedes: prácticamente todos coincidieron en algo importante — este año el equipo se sintió más unido que la temporada anterior. Y eso no es menor.
+
 Héctor cumplió su rol como tenor de apoyo con honores.
+
 Prácticamente todos los convocados asistieron a todas las presentaciones.
 
 Recuperamos tradiciones de disciplina que nos van a servir mucho en el futuro.
 
 Errores típicos en las melodías que señalé al inicio de la temporada ya no se escuchan en las últimas grabaciones del coro.
 En términos claros:
+
 fue una buena temporada y fuimos un buen equipo en la historia de los tenores del coro.
+
 Ahora bien, siendo exigentes (como hay que ser):
 no fuimos los mejores tenores en la historia del coro.
+
 Pero eso no es una acusación. Soy exigente porque debemos serlo y no conformarnos.
+
 Lo hicimos bien.
+
 Y cuando digo bien, quiero decir que estuvimos a la altura, dimos la cara y representamos al equipo con honor.
+
 Y lo más importante de todo:
+
 **mejoramos muchísimo respecto a cómo empezamos.**
+
 ¿En qué fallamos?
+
 Veamos...
+
 1. Dominio de las melodías
 Éramos 10 tenores (más Rodrigo como invitado en entrenamiento) y, siendo realista, creo que solo 2 o 3 conocíamos todas las canciones sin errores.
 La mayoría las manejaba en un 80%–90%. Eso es decente… pero no es suficiente si queremos aspirar a un nivel de clase mundial.
+
 2. Pronunciación
 En varias canciones en otros idiomas tuvimos errores de pronunciación.
 Especialmente en alemán.
 No es un detalle menor: una pronunciación uniforme facilita el acople.
+
 3. Acople
 Hacia el final de la temporada mejoramos bastante, pero aun así hubo momentos en los que algunas voces sobresalieron más de lo que debían.
 El coro no es lucirse.
@@ -226,38 +287,62 @@ Me he llevado bien con ustedes. Ha sido una temporada agradable para mi.
 Me gustó regresar.
 
 Y quiero que quede algo muy claro: mi deseo de que a los tenores les vaya bien nunca se ha ido ni se irá.
+
 Me fui la primera vez y cada vez que escuchaba un villancico, en mi mente estaba la melodía de tenores.
-Veía que mi papá se iba a dirigir los conciertos y pensaba "espero que los tenores estén siendo los mejores esta temporada"
+
+Veía que mi papá se iba a dirigir los conciertos y pensaba "espero que los tenores estén siendo los mejores esta temporada."
+
 Se los dije desde el inicio y lo repito ahora:
+
 mis prioridades en el coro siempre fueron tres —
 **tenores, tenores, tenores.**
+
 Así que merecen una explicación honesta de por qué me voy.
+
 **No me voy por conflictos.**
+
 El ambiente actual es sano y tiene mucho potencial de crecimiento, si lo seguimos cuidando con el concepto de "el buen tenor".
+
 Simplemente tengo otros proyectos que requieren ahora todo mi foco.
+
 Como saben, estudio marketing y quiero montar mi propio proyecto de asesorías para ayudar a que las empresas sean más rentables.
+
 Para que eso funcione, necesito dedicarle tiempo, estrategia y energía.
+
 Pero esta vez no me voy como en 2019.
+
 Aquella vez desaparecí por completo.
+
 No tenía teléfono propio, se acabó la temporada y perdí contacto con todos.
 Además, yo mismo quise tomar distancia.
+
 Esta vez es distinto.
+
 Ustedes tienen mi número.
+
 Podemos hablar cuando se pueda.
+
 Si quieren actualizar la página de tenores, puedo ayudar.
+
 Si el próximo jefe de cuerda necesita un consejero, con gusto puedo compartir los secretos que he aprendido en estos 8 años cantando para los tenores y 6 dirigiendo al equipo.
+
 No estaré en la fundación, pero sí planeo seguir apoyando a nuestro equipo desde la distancia si así lo desean ustedes.
-Gracias a Caleb, Diego, Elmer, Isaías, Héctor, Marco, Mario, Oswaldo, Rodrigo y Santiago por esta temporada.
+
+Gracias a **Caleb, Diego, Elmer, Isaías, Héctor, Marco, Mario, Oswaldo, Rodrigo y Santiago** por esta temporada.
+
 Para mí fue un honor volver a representar a los tenores en los conciertos y hacerlo a su lado.
-**Esta despedida va con mucho cariño, de tenor a tenor**
-(incluyendo a los barítonos en la palabra tenor, claro).
+
+**Esta despedida va con mucho cariño, de tenor a tenor** (incluyendo a los barítonos en la palabra tenor, claro).
+
 Mucha suerte el otro año y pasen una feliz navidad con su familia.
+
 Tenores, tenores, tenores.
+
 Una nalgada muy fuerte de buena suerte.
 
 **Y… ¡Aú, aú!**
 
-.`;
+`;
 
 const TENOR_LOOKUP=TENOR_MEMBERS_DATA.reduce((map,member)=>{map[member.id]=member;return map;},Object.create(null));
 const TENOR_MEMBERS=[...TENOR_MEMBERS_DATA].sort((a,b)=>a.name.localeCompare(b.name,'es',{sensitivity:'base'}));
