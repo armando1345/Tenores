@@ -45,42 +45,44 @@ Fum, fum, fum`
 };
 
 const TEAM_OVERVIEW={
-  totalMinutes:2160,
-  totalHours:36,
+  totalMinutes:2400,
+  totalHours:40,
   totalMembers:9,
-  averageMinutes:1632.6,
-  averageAttendance:76,
-  rehearsals:10,
-  timeframe:'6 de septiembre - 15 de noviembre',
+  averageMinutes:1879,
+  averageAttendance:78.3,
+  rehearsals:11,
+  timeframe:'6 de septiembre - 22 de noviembre',
   observations:[
-    'Promedio de asistencia por tiempo: 76% (27.21 horas activas por tenor sobre una meta de 36).',
-    'Carlos (100%) y Santiago (99%) sostienen el liderazgo de la cuerda con cobertura casi total de los ensayos.',
-    'H\u00e9ctor, Marco y Diego se mantienen en rango bueno (82%-83%), pero las tardanzas reiteradas reducen el tiempo efectivo (Marco llega tarde 67% de las veces).',
-    'Mario (71%) e Isa\u00edas (67%) contin\u00faan en zona de riesgo por ausencias completas al inicio del periodo.',
-    'Caleb (53%) y Oswaldo (44%) concentran el nivel cr\u00edtico tras perder casi la mitad del plan de minutos.',
-    'Octubre mostr\u00f3 el punto m\u00e1s d\u00e9bil del grupo (11 y 25 de octubre); vale revisar causas externas.'
+    'Promedio de asistencia por tiempo: 78.3% (31.3 horas activas por tenor sobre una meta de 40).',
+    'Carlos y Santiago alcanzan 100% de asistencia y sostienen el liderazgo de la cuerda.',
+    'Marco mantiene alta asistencia, pero registra 60% de llegadas tarde, el peor indicador de puntualidad.',
+    'La impuntualidad promedio es 28.2%: en casi 1 de cada 3 ensayos se llega tarde.',
+    'Caleb y Oswaldo pierden cerca de la mitad del ciclo, riesgo directo para el repertorio.',
+    'Brecha de compromiso: 100% vs 49.4% entre el mejor y el menor registro.'
   ],
   levels:[
-    {label:'Nivel superior (99%-100%)',members:['Carlos','Santiago']},
-    {label:'Nivel alto (82%-83%)',members:['H\u00e9ctor','Marco','Diego']},
-    {label:'Nivel medio (67%-71%)',members:['Mario','Isa\u00edas']},
-    {label:'Nivel bajo (44%-53%)',members:['Oswaldo','Caleb']}
+    {label:'Nivel superior (100%)',members:['Carlos','Santiago']},
+    {label:'Nivel alto (84%-88%)',members:['Marco','Diego','H\u00e9ctor']},
+    {label:'Nivel medio (69%-74%)',members:['Mario','Isa\u00edas']},
+    {label:'Nivel critico (49%-51%)',members:['Caleb','Oswaldo']}
   ]
 };
 
 const TENOR_MEMBERS_DATA=[
-  {id:'carlos',name:'Carlos',minutes:2160,attendance:100,minutesLost:0,rehearsalsAttended:10,tardyPct:0,tardyCount:0,tardyJustifiedPct:0,level:'Nivel superior (99%-100%)',note:'No ha perdido ni un minuto de ensayo durante las 10 sesiones analizadas.'},
-  {id:'santiago',name:'Santiago',minutes:2130,attendance:99,minutesLost:30,rehearsalsAttended:10,tardyPct:20,tardyCount:2,tardyJustifiedPct:50,level:'Nivel superior (99%-100%)',note:'Rendimiento casi perfecto; solo 30 minutos perdidos y la mitad de sus tardanzas fueron justificadas.'},
-  {id:'hector',name:'H\u00e9ctor',minutes:1796.4,attendance:83,minutesLost:363.6,rehearsalsAttended:8,tardyPct:50,tardyCount:4,tardyJustifiedPct:0,level:'Nivel alto (82%-83%)',note:'Es consistente, pero las ausencias del 13 de septiembre y 8 de noviembre y sus tardanzas sin justificar reducen su promedio.'},
-  {id:'marco',name:'Marco',minutes:1785,attendance:83,minutesLost:375,rehearsalsAttended:9,tardyPct:67,tardyCount:6,tardyJustifiedPct:67,level:'Nivel alto (82%-83%)',note:'Solo falt\u00f3 el 25 de octubre, aunque llega tarde o se retira antes en 67% de los ensayos (la mayor\u00eda con justificaci\u00f3n).'},
-  {id:'diego',name:'Diego',minutes:1768.8,attendance:82,minutesLost:391.2,rehearsalsAttended:9,tardyPct:33,tardyCount:3,tardyJustifiedPct:0,level:'Nivel alto (82%-83%)',note:'Buen desempe\u00f1o general; la ausencia del 11 de octubre y algunas tardanzas representan su mayor reto.'},
-  {id:'mario',name:'Mario',minutes:1530,attendance:71,minutesLost:630,rehearsalsAttended:8,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel medio (67%-71%)',note:'Ha perdido 630 minutos (m\u00e1s de 10 horas) por ausencias clave el 13 y 25 de septiembre.'},
-  {id:'isaias',name:'Isa\u00edas',minutes:1438.8,attendance:67,minutesLost:721.2,rehearsalsAttended:7,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel medio (67%-71%)',note:'Falt\u00f3 el 13 y 20 de septiembre y el 4 de octubre, lo que signific\u00f3 perder 33% del contenido antes de estabilizarse.'},
-  {id:'caleb',name:'Caleb',minutes:1140,attendance:53,minutesLost:1020,rehearsalsAttended:6,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel bajo (44%-53%)',note:'Situaci\u00f3n cr\u00edtica: dos bloques consecutivos de ausencias en septiembre y octubre lo dejaron con 47% del plan pendiente.'},
-  {id:'oswaldo',name:'Oswaldo',minutes:945,attendance:44,minutesLost:1215,rehearsalsAttended:6,tardyPct:null,tardyCount:null,tardyJustifiedPct:null,level:'Nivel bajo (44%-53%)',note:'Asisti\u00f3 bien en septiembre, pero desde el 11 de octubre registra cuatro ausencias seguidas y una final, casi abandonando el proceso.'}
+  {id:'carlos',name:'Carlos',minutes:2400,attendance:100,minutesLost:0,rehearsalsAttended:11,tardyPct:0,tardyCount:0,tardyJustifiedPct:0,level:'Excelente (100%)',note:'Asistencia perfecta y 0 tardanzas; pilar de la cuerda durante todo el ciclo.'},
+  {id:'santiago',name:'Santiago',minutes:2400,attendance:100,minutesLost:0,rehearsalsAttended:11,tardyPct:18.2,tardyCount:2,tardyJustifiedPct:null,level:'Excelente (100%)',note:'Asistencia perfecta tras ajuste; puntualidad razonable (18.2%).'},
+  {id:'hector',name:'H\u00e9ctor',minutes:2036.4,attendance:84.85,minutesLost:363.6,rehearsalsAttended:9,tardyPct:33.3,tardyCount:3,tardyJustifiedPct:null,level:'Bueno (85%)',note:'Constante en presencia (9 de 11), con 33.3% de tardanzas; area de mejora.'},
+  {id:'marco',name:'Marco',minutes:2115,attendance:88.13,minutesLost:285,rehearsalsAttended:10,tardyPct:60,tardyCount:6,tardyJustifiedPct:null,level:'Bueno (88%)',note:'Alta asistencia, pero impuntualidad critica (60% de llegadas tarde) afecta la disciplina.'},
+  {id:'diego',name:'Diego',minutes:2098.8,attendance:87.45,minutesLost:301.2,rehearsalsAttended:10,tardyPct:30,tardyCount:3,tardyJustifiedPct:null,level:'Bueno (87%)',note:'Asistencia solida, pero llega tarde en 30% de los ensayos; debe mejorar puntualidad.'},
+  {id:'mario',name:'Mario',minutes:1770,attendance:73.75,minutesLost:630,rehearsalsAttended:8,tardyPct:37.5,tardyCount:3,tardyJustifiedPct:null,level:'Regular (74%)',note:'Punto medio: pierde mas de 10 horas y llega tarde con frecuencia (37.5%).'},
+  {id:'isaias',name:'Isa\u00edas',minutes:1678.8,attendance:69.95,minutesLost:721.2,rehearsalsAttended:8,tardyPct:25,tardyCount:2,tardyJustifiedPct:null,level:'Regular (70%)',note:'Ha perdido cerca del 30% del contenido; requiere estabilidad para no caer en zona critica.'},
+  {id:'caleb',name:'Caleb',minutes:1230,attendance:51.25,minutesLost:1170,rehearsalsAttended:6,tardyPct:33,tardyCount:2,tardyJustifiedPct:50,level:'Critico (51%)',note:'Ha perdido casi la mitad del proceso; asistencia esporadica (6 de 11). La mitad de sus tardanzas fueron justificadas, pero la ausencia es alarmante.'},
+  {id:'oswaldo',name:'Oswaldo',minutes:1185,attendance:49.38,minutesLost:1215,rehearsalsAttended:6,tardyPct:16.7,tardyCount:1,tardyJustifiedPct:null,level:'Critico (49%)',note:'Asistencia mas baja de la seccion; ha perdido mas tiempo del que ensayo. Riesgo maximo.'}
 ];
 
 const CALENDAR_MONTHS=['2025-11','2025-12'];
+const SEASON_END_DATE='2025-11-22';
+const SEASON_NOTICE_MESSAGE='La temporada de coro ya termino. El equipo hizo un buen trabajo.';
 const PRESENTATION_EVENTS=[
   {id:'nov-20-incaf',date:'2025-11-20',title:'Coro Polif\u00f3nico',startTime:'5:00 pm',callTime:'03:00 pm',venue:'INCAF',city:'San Salvador',meetingPoint:'Recepci\u00f3n principal',summary:'Actuaci\u00f3n oficial del Coro Polif\u00f3nico en INCAF.',instructions:'Salida programada a las 03:00 pm desde la fundaci\u00f3n.',tag:'Presentaci\u00f3n'},
   {id:'nov-21-quimicos',date:'2025-11-21',title:'Coro Polif\u00f3nico',startTime:'6:00 pm',callTime:'04:00 pm',venue:'Colegio de Qu\u00edmicos Farmac\u00e9uticos',city:'San Salvador',meetingPoint:'Parqueo lateral',summary:'Presentaci\u00f3n para el Colegio de Qu\u00edmicos Farmac\u00e9uticos.',instructions:'Salida coordinada a las 04:00 pm.',tag:'Presentaci\u00f3n'},
@@ -97,6 +99,163 @@ const PRESENTATION_EVENTS=[
   {id:'dec-20-poma',date:'2025-12-20',title:'Coro Polif\u00f3nico',startTime:'5:00 pm',callTime:'03:00 pm',venue:'Teatro Poma',city:'San Salvador',meetingPoint:'Acceso artistas',summary:'Cierre de temporada en el Teatro Poma.',instructions:'Salida programada a las 03:00 pm.',tag:'Presentaci\u00f3n'}
 ];
 const DAY_NAMES=['L','M','X','J','V','S','D'];
+const LETTER_TITLE=`Esta es mi carta de despedida como jefe de cuerda`;
+const LETTER_SUBTITLE=`No es solo un texto para decir adiós. Es, sobre todo, una forma de dejarles lo mejor que puedo antes de irme`;
+const TENOR_CHIP_LIMIT=2;
+const LETTER_HTML=`Quiero que esta carta sea un abrazo para cada tenor, pero también una guía.
+¡Aú, aú!
+En esta carta encontrarán 3 cosas:
+1. **Mis recomendaciones finales** para el equipo y para el próximo jefe de voz. Algunos de ustedes representarán al país en el festival de Costa Rica, y eso me llena de orgullo. Pero todos, absolutamente todos, tienen la responsabilidad de ayudar a que este coro siga creciendo y sea incluso mejor que en sus mejores días.
+2. **Lo bueno y lo malo** del equipo de tenores 2025. Seré honesto. Sin filtros. Yo soy muy patriótico por los tenores, como saben, así que: lo que estuvo mal se dice, y lo que estuvo bien se reconoce.
+3. **La razón por la que me voy.**
+________________________________________
+## Mis recomendaciones para el equipo
+Empiezo con una pregunta incómoda:
+¿Por qué querríamos malos tenores?
+Durante la temporada les hablé muchas veces de "el buen tenor".
+"El buen tenor es la clave", repetí una y otra vez.
+Y hoy quiero volver a esa idea, pero desde una pregunta diferente:
+¿por qué querríamos malos tenores entre nosotros?
+Antes de hablar del buen tenor, vale la pena pensar en eso.
+El buen tenor es el que busca lo mejor para el equipo, incluso cuando nadie lo está mirando.
+Es generoso.
+Es honorable.
+Se esfuerza por conocer cada canción, no por lucirse, sino porque sabe que el equipo lo componemos TODOS.
+El buen tenor quiere que el coro suene mejor.
+Quiere que sus compañeros crezcan.
+Quiere aportar.
+Piensen en una buena persona: alguien trabajador, comprometido, que suma y cuida lo que tiene.
+Ese es el buen tenor.
+El mal tenor es lo contrario.
+• Habla mal de sus compañeros a sus espaldas y rompe la confianza.
+• No se compromete de verdad: pone fiestas o cualquier cosa por encima del coro.
+• No busca mejorar, se conforma con poco y se exige menos.
+Y vuelvo a la pregunta, con todo el cariño que le tengo a este equipo:
+¿por qué querríamos ese tipo de actitudes dentro entre nosotros?
+**No hay ningún motivo. Ninguno.**
+Por eso mi primera recomendación es sencilla, pero y muy profunda:
+**trata de ser el buen tenor.**
+No vas a ser perfecto.
+Nadie lo ha sido nunca en este coro, ni yo mismo.
+Lo único verdaderamente importante es intentarlo.
+Intentarlo cada ensayo.
+Intentarlo incluso cuando cuesta.
+Si es posible hacer algo bien, ¿por qué lo haríamos mal?
+Si cantar parado es técnicamente mejor que cantar sentado, ¿por qué quedarnos sentados?
+Ese es solo un ejemplo para que entiendas lo que quiero decir: si podemos hacer algo bien, entonces intentémoslo.
+Quiero contarte algo...
+A lo largo de estos 15 años del coro ha habido conflictos que nos han afectado más de lo que a veces se admite.
+Mi retiro en 2019 se debió, en parte, a uno de esos conflictos.
+Y muchas personas valiosas se han ido a lo largo de los años por razones similares.
+Cuando el ambiente se vuelve tenso, algo se rompe.
+La confianza se debilita.
+Y el coro, inevitablemente, canta peor.
+La mayoría de esos conflictos no nacen de grandes problemas, sino de pequeñas actitudes repetidas: egoísmo, complejos de estrella, hipocresía, desinterés.
+Por eso insisto tanto en la idea del buen tenor.
+Porque cuando uno intenta serlo, cuida al equipo.
+Y cuando muchos lo intentan, el coro se vuelve un lugar más sano y fuerte.
+Si intentas ser el buen tenor, no solo te sentirás más cómodo aquí.
+Construirás relaciones más bonitas.
+Y, como el buen tenor también se esfuerza: sonaremos mejor.
+Esta idea no es algo que se me ocurrió al azar.
+La pensé durante los años que estuve fuera de la fundación, recordando lo bueno, lo difícil y lo valioso de los tenores.
+Al próximo jefe de cuerda quiero dejarle una recomendación:
+potencia esta idea.
+Si logra quedarse en la mente y en el corazón del equipo, servirá durante muchos años.
+**Larga vida al buen tenor.**
+________________________________________
+## Mi segunda recomendación
+**Cuiden la cultura tenoril.**
+Los tenores siempre hemos tenido nuestro estilo.
+Desde los primeros años del coro hubo bromas, chistes, nalgadas y risas.
+No importa la generación:
+ese siempre ha sido nuestro humor.
+Y está bien.
+No solo es divertido.
+Es necesario para que el equipo respire.
+¿Se imaginan una temporada de coro sin eso?
+Sería demasiado pesada, tensa y agotadora.
+Los buenos tenores saben cuándo ser responsables, trabajadores y serios.
+Pero también saben cuándo relajarse, bromear y romper la tensión.
+A veces incluso siendo un poco vulgares.
+Y no pasa nada. Personalmente, lo aplaudo.
+Eso también es cariño.
+Eso también es pertenencia.
+Eso también es equipo.
+No pierdan eso.
+Cuídenlo.
+## Lo bueno y lo malo de la temporada 2025 (sin filtros)
+No hablo del coro en general.
+Hablo de nosotros: los tenores.
+La pregunta clave es simple:
+¿mejoramos esta temporada?
+**Mi respuesta es un sí rotundo. SÍ.**
+Lo confirmé hablando con varios de ustedes: prácticamente todos coincidieron en algo importante — este año el equipo se sintió más unido que la temporada anterior. Y eso no es menor.
+Héctor cumplió su rol como tenor de apoyo con honores.
+Prácticamente todos los convocados asistieron a todas las presentaciones.
+
+Recuperamos tradiciones de disciplina que nos van a servir mucho en el futuro.
+
+Errores típicos en las melodías que señalé al inicio de la temporada ya no se escuchan en las últimas grabaciones del coro.
+En términos claros:
+fue una buena temporada y fuimos un buen equipo en la historia de los tenores del coro.
+Ahora bien, siendo exigentes (como hay que ser):
+no fuimos los mejores tenores en la historia del coro.
+Pero eso no es una acusación. Soy exigente porque debemos serlo y no conformarnos.
+Lo hicimos bien.
+Y cuando digo bien, quiero decir que estuvimos a la altura, dimos la cara y representamos al equipo con honor.
+Y lo más importante de todo:
+**mejoramos muchísimo respecto a cómo empezamos.**
+¿En qué fallamos?
+Veamos...
+1. Dominio de las melodías
+Éramos 10 tenores (más Rodrigo como invitado en entrenamiento) y, siendo realista, creo que solo 2 o 3 conocíamos todas las canciones sin errores.
+La mayoría las manejaba en un 80%–90%. Eso es decente… pero no es suficiente si queremos aspirar a un nivel de clase mundial.
+2. Pronunciación
+En varias canciones en otros idiomas tuvimos errores de pronunciación.
+Especialmente en alemán.
+No es un detalle menor: una pronunciación uniforme facilita el acople.
+3. Acople
+Hacia el final de la temporada mejoramos bastante, pero aun así hubo momentos en los que algunas voces sobresalieron más de lo que debían.
+El coro no es lucirse.
+Recomiendo al próximo jefe de cuerda poner atención especial a estos tres puntos.
+Si los trabajamos bien, llegaremos mucho más fuertes a la próxima temporada navideña y a Costa Rica.
+
+## ¿Por qué me voy?
+Me he llevado bien con ustedes. Ha sido una temporada agradable para mi.
+Me gustó regresar.
+
+Y quiero que quede algo muy claro: mi deseo de que a los tenores les vaya bien nunca se ha ido ni se irá.
+Me fui la primera vez y cada vez que escuchaba un villancico, en mi mente estaba la melodía de tenores.
+Veía que mi papá se iba a dirigir los conciertos y pensaba "espero que los tenores estén siendo los mejores esta temporada"
+Se los dije desde el inicio y lo repito ahora:
+mis prioridades en el coro siempre fueron tres —
+**tenores, tenores, tenores.**
+Así que merecen una explicación honesta de por qué me voy.
+**No me voy por conflictos.**
+El ambiente actual es sano y tiene mucho potencial de crecimiento, si lo seguimos cuidando con el concepto de "el buen tenor".
+Simplemente tengo otros proyectos que requieren ahora todo mi foco.
+Como saben, estudio marketing y quiero montar mi propio proyecto de asesorías para ayudar a que las empresas sean más rentables.
+Para que eso funcione, necesito dedicarle tiempo, estrategia y energía.
+Pero esta vez no me voy como en 2019.
+Aquella vez desaparecí por completo.
+No tenía teléfono propio, se acabó la temporada y perdí contacto con todos.
+Además, yo mismo quise tomar distancia.
+Esta vez es distinto.
+Ustedes tienen mi número.
+Podemos hablar cuando se pueda.
+Si quieren actualizar la página de tenores, puedo ayudar.
+Si el próximo jefe de cuerda necesita un consejero, con gusto puedo compartir los secretos que he aprendido en estos 8 años cantando para los tenores y 6 dirigiendo al equipo.
+No estaré en la fundación, pero sí planeo seguir apoyando a nuestro equipo desde la distancia si así lo desean ustedes.
+Gracias a Caleb, Diego, Elmer, Isaías, Héctor, Marco, Mario, Oswaldo, Rodrigo y Santiago por esta temporada.
+Para mí fue un honor volver a representar a los tenores en los conciertos y hacerlo a su lado.
+**Esta despedida va con mucho cariño, de tenor a tenor**
+(incluyendo a los barítonos en la palabra tenor, claro).
+Mucha suerte el otro año y pasen una feliz navidad con su familia.
+Tenores, tenores, tenores.
+Una nalgada muy fuerte de buena suerte.
+
+**Y… ¡Aú, aú!**`;
 
 const TENOR_LOOKUP=TENOR_MEMBERS_DATA.reduce((map,member)=>{map[member.id]=member;return map;},Object.create(null));
 const TENOR_MEMBERS=[...TENOR_MEMBERS_DATA].sort((a,b)=>a.name.localeCompare(b.name,'es',{sensitivity:'base'}));
@@ -152,6 +311,16 @@ const $calendarPopoverBody=document.getElementById('calendarPopoverBody');
 const $calendarPopoverDate=document.getElementById('calendarPopoverDate');
 const $calendarPopoverTitle=document.getElementById('calendarPopoverTitle');
 const $calendarPopoverClose=document.getElementById('calendarPopoverClose');
+const $seasonNotice=document.getElementById('seasonNotice');
+const $letterModal=document.getElementById('letterModal');
+const $letterModalTitle=document.getElementById('letterModalTitle');
+const $letterReader=document.getElementById('letterReader');
+const $letterReaderTitle=document.getElementById('letterReaderTitle');
+const $letterReaderSubtitle=document.getElementById('letterReaderSubtitle');
+const $letterContent=document.getElementById('letterContent');
+const $letterOpen=document.getElementById('letterOpen');
+const $letterCard=document.getElementById('letterCard');
+const $letterCardOpen=document.getElementById('letterCardOpen');
 
 let currentSongId=null, currentAudio=null, currentLabel='', plainLyrics='';
 
@@ -159,6 +328,7 @@ let currentSongId=null, currentAudio=null, currentLabel='', plainLyrics='';
 const SPEEDS=[1,1.25,1.5,2];
 let gSpeed=1;
 let dataCardsReady=false,currentDataMemberId=null,currentDataTab='overview',dataPanelTimer=null,presentationsTimer=null,isMenuOpen=false,selectedPresentationDate=null;
+let letterModalTimer=null,letterReaderTimer=null,focusTrapState=null,letterDismissedOnce=false,tenorChipCount=0;
 
 // Helpers
 function setActiveCard(id){
@@ -578,12 +748,8 @@ function renderMemberDetail(member){
     tardyNote=member.tardyPct===0?'Ingreso puntual en todos los ensayos registrados.':`${formatPercent(member.tardyPct)} de los ensayos asistidos comenzaron tarde.`;
   }
   let tardyExtra='';
-  if(hasTardy){
-    if(typeof member.tardyJustifiedPct==='number'){
-      tardyExtra=member.tardyJustifiedPct>0?`${formatPercent(member.tardyJustifiedPct)} de los retrasos fueron justificados.`:'No hubo retrasos justificados.';
-    }else{
-      tardyExtra='No hay detalle de justificaci\u00f3n.';
-    }
+  if(hasTardy && typeof member.tardyJustifiedPct==='number' && member.tardyPct>0){
+    tardyExtra=member.tardyJustifiedPct>0?`${formatPercent(member.tardyJustifiedPct)} de los retrasos fueron justificados.`:'No hubo retrasos justificados.';
   }
   const bulletItems=[
     member.note,
@@ -594,7 +760,7 @@ function renderMemberDetail(member){
   ].filter(Boolean);
   const bulletList=bulletItems.length?bulletItems.map(item=>`<li>${item}</li>`).join(''):'<li>Sin datos adicionales.</li>';
     const metrics=[
-      {value:formatMinutes(member.minutes),label:'Tiempo activo',note:'Meta 2160 min'},
+      {value:formatMinutes(member.minutes),label:'Tiempo activo',note:`Meta ${formatMinutes(TEAM_OVERVIEW.totalMinutes)}`},
     {value:formatMinutes(member.minutesLost),label:'Minutos perdidos',note:pendingBadge},
     {value:formatPercent(minutePct),label:'Tiempo ensayado',note:member.level},
     {value:freqValue,label:'Cobertura de ensayos',note:freqLabel}
@@ -727,6 +893,7 @@ function buildCalendarMonth(monthKey){
   const [yearStr,monthStr]=monthKey.split('-');
   const year=Number(yearStr);
   const monthIndex=Number(monthStr)-1;
+  const todayKey=getLocalDateKey();
   const baseDate=new Date(year,monthIndex,1);
   const monthLabel=baseDate.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
   const niceLabel=monthLabel.charAt(0).toUpperCase()+monthLabel.slice(1);
@@ -744,6 +911,7 @@ function buildCalendarMonth(monthKey){
     if(hasEvent) classes.push('has-event');
     else classes.push('is-empty');
     if(dateStr===selectedPresentationDate) classes.push('is-selected');
+    if(dateStr===todayKey) classes.push('is-today');
     const ariaLabel=formatCalendarDate(dateStr);
     dayCells+=`<button type="button" class="${classes.join(' ')}" data-date="${dateStr}" aria-label="${ariaLabel}">${day}</button>`;
   }
@@ -764,6 +932,13 @@ function updateCalendarSelection(){
 function rectToObject(rect){
   if(!rect) return null;
   return {top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right,width:rect.width,height:rect.height};
+}
+
+function getLocalDateKey(date=new Date()){
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,'0');
+  const d=String(date.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
 }
 
 function getActiveCalendarDayRect(){
@@ -854,6 +1029,14 @@ function ensureSelectedPresentationDate(){
   else selectedPresentationDate=CALENDAR_MONTHS[0]?`${CALENDAR_MONTHS[0]}-01`:null;
 }
 
+function updateSeasonNotice(){
+  if(!$seasonNotice) return;
+  const todayKey=getLocalDateKey();
+  const ended=todayKey>=SEASON_END_DATE;
+  $seasonNotice.hidden=!ended;
+  if(ended) $seasonNotice.textContent=SEASON_NOTICE_MESSAGE;
+}
+
 function formatCalendarDate(dateStr){
   if(!dateStr) return 'Sin fecha';
   const date=new Date(`${dateStr}T00:00:00`);
@@ -867,6 +1050,7 @@ function openPresentationsPanel(){
   if(document.body.classList.contains('data-panel-open')) closeDataPanel();
   if(presentationsTimer){clearTimeout(presentationsTimer);presentationsTimer=null;}
   closeCalendarPopover();
+  updateSeasonNotice();
   renderPresentations();
   $presentationsPanel.hidden=false;
   requestAnimationFrame(()=>document.body.classList.add('presentations-panel-open'));
@@ -885,6 +1069,7 @@ function closePresentationsPanel(){
 function setupPresentationsPanel(){
   if(!$presentationsPanel) return;
   $presentationsPanel.hidden=true;
+  updateSeasonNotice();
   renderPresentations();
   if($presentationsClose) $presentationsClose.addEventListener('click',closePresentationsPanel);
   $presentationsPanel.addEventListener('click',ev=>{
@@ -935,6 +1120,312 @@ function setupMenu(){
     if(action==='data'){ setDataTab('tenors'); openDataPanel();}
     else if(action==='presentations') openPresentationsPanel();
   });
+}
+
+function storageGet(storage,key){
+  try{return storage.getItem(key);}
+  catch{return null;}
+}
+function storageSet(storage,key,value){
+  try{storage.setItem(key,value);}
+  catch{}
+}
+function storageRemove(storage,key){
+  try{storage.removeItem(key);}
+  catch{}
+}
+
+function setLetterCardVisible(visible){
+  if(!$letterCard) return;
+  $letterCard.hidden=!visible;
+}
+
+function getFocusableElements(container){
+  if(!container) return [];
+  const selector='a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  return Array.from(container.querySelectorAll(selector)).filter(el=>{
+    if(el.hasAttribute('disabled')) return false;
+    if(el.getAttribute('aria-hidden')==='true') return false;
+    return el.getClientRects().length>0;
+  });
+}
+
+function activateFocusTrap(container,initialFocus){
+  if(!container) return;
+  deactivateFocusTrap(false);
+  const previous=document.activeElement;
+  function onKeydown(ev){
+    if(ev.key!=='Tab') return;
+    const focusables=getFocusableElements(container);
+    if(!focusables.length){
+      ev.preventDefault();
+      if(!container.hasAttribute('tabindex')) container.setAttribute('tabindex','-1');
+      container.focus();
+      return;
+    }
+    const first=focusables[0];
+    const last=focusables[focusables.length-1];
+    if(ev.shiftKey&&document.activeElement===first){
+      ev.preventDefault();
+      last.focus();
+    }else if(!ev.shiftKey&&document.activeElement===last){
+      ev.preventDefault();
+      first.focus();
+    }
+  }
+  focusTrapState={container,previous,onKeydown};
+  document.addEventListener('keydown',onKeydown);
+  const focusables=getFocusableElements(container);
+  const target=initialFocus||focusables[0]||container;
+  if(target&&typeof target.focus==='function') target.focus();
+}
+
+function deactivateFocusTrap(restoreFocus=true){
+  if(!focusTrapState) return;
+  document.removeEventListener('keydown',focusTrapState.onKeydown);
+  const previous=focusTrapState.previous;
+  focusTrapState=null;
+  if(!restoreFocus||!previous||typeof previous.focus!=='function') return;
+  if(typeof previous.getClientRects==='function'&&previous.getClientRects().length===0) return;
+  previous.focus();
+}
+
+function formatLetterInline(text){
+  let safe=escapeHtml(text);
+  safe=safe.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  safe=safe.replace(/\[\[(.+?)\]\]/g,'<span class="letter-badge">$1</span>');
+  safe=safe.replace(/\b(buen tenor|buenos tenores)\b/gi,match=>{
+    if(tenorChipCount<TENOR_CHIP_LIMIT){
+      tenorChipCount+=1;
+      return `<span class="tenor-chip">${match}</span>`;
+    }
+    return match;
+  });
+  return safe;
+}
+
+function renderLetterContent(raw){
+  const text=String(raw||'').replace(/\r\n/g,'\n').trim();
+  if(!text||text.includes('{{CARTA_COMPLETA}}')){
+    return '<p class="letter-placeholder">Pega el contenido en LETTER_HTML para ver la carta aqui.</p>';
+  }
+  tenorChipCount=0;
+  const lines=text.split('\n');
+  const blocks=[];
+  let paragraph=[];
+  let list=null;
+  let quote=[];
+  let callout=[];
+
+  function flushParagraph(){
+    if(!paragraph.length) return;
+    const content=paragraph.map(line=>formatLetterInline(line)).join('<br>');
+    blocks.push(`<p>${content}</p>`);
+    paragraph=[];
+  }
+  function flushList(){
+    if(!list) return;
+    const items=list.items.map(item=>`<li>${formatLetterInline(item)}</li>`).join('');
+    blocks.push(`<${list.type}>${items}</${list.type}>`);
+    list=null;
+  }
+  function flushQuote(){
+    if(!quote.length) return;
+    const content=quote.map(line=>formatLetterInline(line)).join('<br>');
+    blocks.push(`<blockquote>${content}</blockquote>`);
+    quote=[];
+  }
+  function flushCallout(){
+    if(!callout.length) return;
+    const content=callout.map(line=>formatLetterInline(line)).join('<br>');
+    blocks.push(`<div class="letter-callout">${content}</div>`);
+    callout=[];
+  }
+
+  lines.forEach(line=>{
+    const trimmed=line.trim();
+    if(!trimmed){
+      flushParagraph();
+      flushList();
+      flushQuote();
+      flushCallout();
+      return;
+    }
+    if(/^_{3,}$/.test(trimmed)||/^-{3,}$/.test(trimmed)||/^\*{3,}$/.test(trimmed)){
+      flushParagraph();
+      flushList();
+      flushQuote();
+      flushCallout();
+      blocks.push('<hr class="letter-divider">');
+      return;
+    }
+    const headingMatch=trimmed.match(/^(#{1,3})\s+(.+)/);
+    if(headingMatch){
+      flushParagraph();
+      flushList();
+      flushQuote();
+      flushCallout();
+      const level=headingMatch[1].length;
+      const tag=level>=3?'h3':'h2';
+      blocks.push(`<${tag}>${formatLetterInline(headingMatch[2])}</${tag}>`);
+      return;
+    }
+    if(trimmed.startsWith('>> ')){
+      flushParagraph();
+      flushList();
+      flushQuote();
+      callout.push(trimmed.slice(3));
+      return;
+    }
+    if(trimmed.startsWith('> ')){
+      flushParagraph();
+      flushList();
+      flushCallout();
+      quote.push(trimmed.slice(2));
+      return;
+    }
+    const orderedMatch=trimmed.match(/^(\d+)[\.\)]\s+(.+)/);
+    if(orderedMatch){
+      flushParagraph();
+      flushQuote();
+      flushCallout();
+      if(!list||list.type!=='ol'){
+        flushList();
+        list={type:'ol',items:[]};
+      }
+      list.items.push(orderedMatch[2]);
+      return;
+    }
+    const unorderedMatch=trimmed.match(/^[-*\u2022]\s+(.+)/);
+    if(unorderedMatch){
+      flushParagraph();
+      flushQuote();
+      flushCallout();
+      if(!list||list.type!=='ul'){
+        flushList();
+        list={type:'ul',items:[]};
+      }
+      list.items.push(unorderedMatch[1]);
+      return;
+    }
+    flushList();
+    flushQuote();
+    flushCallout();
+    paragraph.push(trimmed);
+  });
+
+  flushParagraph();
+  flushList();
+  flushQuote();
+  flushCallout();
+  return blocks.join('');
+}
+
+function setLetterCopy(){
+  if($letterModalTitle) $letterModalTitle.textContent=LETTER_TITLE;
+  if($letterReaderTitle) $letterReaderTitle.textContent=LETTER_TITLE;
+  if($letterReaderSubtitle) $letterReaderSubtitle.textContent=LETTER_SUBTITLE;
+  if($letterContent) $letterContent.innerHTML=renderLetterContent(LETTER_HTML);
+}
+
+function shouldShowLetterModal(){
+  if(!$letterModal) return false;
+  if(letterDismissedOnce) return false;
+  return true;
+}
+
+function markLetterSessionDismissed(){
+  letterDismissedOnce=true;
+}
+
+function openLetterModal(){
+  if(!$letterModal) return;
+  if(letterModalTimer){clearTimeout(letterModalTimer);letterModalTimer=null;}
+  $letterModal.hidden=false;
+  document.body.classList.add('letter-modal-open');
+  requestAnimationFrame(()=>{ $letterModal.classList.add('is-open'); });
+  activateFocusTrap($letterModal,$letterOpen);
+  setLetterCardVisible(false);
+}
+
+function closeLetterModal(restoreFocus=true,showCard=true){
+  if(!$letterModal||$letterModal.hidden) return;
+  $letterModal.classList.remove('is-open');
+  document.body.classList.remove('letter-modal-open');
+  deactivateFocusTrap(restoreFocus);
+  letterModalTimer=setTimeout(()=>{
+    $letterModal.hidden=true;
+    letterModalTimer=null;
+  },240);
+  if(showCard) setLetterCardVisible(true);
+}
+
+function openLetterReader(){
+  if(!$letterReader) return;
+  markLetterSessionDismissed();
+  if(letterReaderTimer){clearTimeout(letterReaderTimer);letterReaderTimer=null;}
+  $letterReader.hidden=false;
+  document.body.classList.add('letter-reader-open');
+  requestAnimationFrame(()=>{ $letterReader.classList.add('is-open'); });
+  const focusTarget=$letterReader.querySelector('[data-role="close-letter-reader"]');
+  activateFocusTrap($letterReader,focusTarget);
+  setLetterCardVisible(false);
+}
+
+function closeLetterReader(){
+  if(!$letterReader||$letterReader.hidden) return;
+  $letterReader.classList.remove('is-open');
+  document.body.classList.remove('letter-reader-open');
+  deactivateFocusTrap(true);
+  letterReaderTimer=setTimeout(()=>{
+    $letterReader.hidden=true;
+    letterReaderTimer=null;
+  },240);
+  setLetterCardVisible(true);
+}
+
+function setupLetterFlow(){
+  if(!$letterModal||!$letterReader) return;
+  setLetterCopy();
+  setLetterCardVisible(false);
+  if($letterCardOpen){
+    $letterCardOpen.addEventListener('click',()=>{
+      openLetterReader();
+    });
+  }
+  if($letterOpen){
+    $letterOpen.addEventListener('click',()=>{
+      markLetterSessionDismissed();
+      closeLetterModal(false,false);
+      openLetterReader();
+    });
+  }
+  $letterModal.addEventListener('click',ev=>{
+    const closer=ev.target.closest('[data-role="close-letter-modal"]');
+    if(!closer) return;
+    markLetterSessionDismissed();
+    closeLetterModal(true);
+  });
+  $letterReader.addEventListener('click',ev=>{
+    const closer=ev.target.closest('[data-role="close-letter-reader"]');
+    if(!closer) return;
+    closeLetterReader();
+  });
+  document.addEventListener('keydown',ev=>{
+    if(ev.key!=='Escape') return;
+    if($letterReader&&!$letterReader.hidden){
+      closeLetterReader();
+      ev.preventDefault();
+      return;
+    }
+    if($letterModal&&!$letterModal.hidden){
+      markLetterSessionDismissed();
+      closeLetterModal(true);
+      ev.preventDefault();
+    }
+  });
+  if(shouldShowLetterModal()) openLetterModal();
+  else setLetterCardVisible(true);
 }
 
 function openDataPanel(targetId){
@@ -999,6 +1490,7 @@ renderTeamDetail();
 setupPresentationsPanel();
 setupCalendarPopover();
 setupMenu();
+setupLetterFlow();
 // Navegación
 function routerInit(){ setZoom(getZoom()); route(); }
 window.addEventListener('hashchange',route);
@@ -1037,4 +1529,24 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   console.assert(formatLyrics('a\n\nb').includes('<p>'),'format ok');
   console.groupEnd();
 })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
