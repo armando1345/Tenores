@@ -40,7 +40,7 @@
           <input id="q" type="search" placeholder="Buscar canci&oacute;n&hellip;" autocomplete="off" aria-label="Buscar canci&oacute;n" />
           <span class="suggest" id="suggest" hidden></span>
         </div>
-        <div id="letterCard" class="letter-card" hidden>
+        <div id="letterCard" class="letter-card" role="button" tabindex="0" aria-label="Abrir carta de despedida" hidden>
           <div class="letter-card__media">
             <img src="assets/letter-banner.svg" alt="Tenores" />
           </div>
@@ -293,8 +293,8 @@
       <button class="letter-close" type="button" data-role="close-letter-modal" aria-label="Cerrar carta">&times;</button>
       <div class="letter-modal__body">
         <p class="letter-kicker">Carta</p>
-        <img class="letter-banner" src="assets/letter-banner.svg" alt="Tenores" />
         <h2 id="letterModalTitle" class="letter-modal__title">{{TITULAR}}</h2>
+        <img class="letter-banner" src="assets/letter-banner.svg" alt="Tenores" />
         <div class="letter-modal__actions">
           <button id="letterOpen" class="letter-btn letter-btn--primary" type="button">Leer carta</button>
         </div>
@@ -309,15 +309,14 @@
         <span>Tenores</span>
       </div>
       <header class="letter-reader__header">
-        <button class="letter-btn letter-btn--ghost letter-back" type="button" data-role="close-letter-reader">Volver</button>
+        <button class="letter-btn letter-btn--ghost letter-back" type="button" data-role="close-letter-reader">&#8592; Volver</button>
         <p class="letter-kicker">Lectura</p>
-        <button class="letter-close" type="button" data-role="close-letter-reader" aria-label="Cerrar lector">&times;</button>
       </header>
       <div class="letter-reader__body">
         <div class="letter-reader__hero">
-          <img class="letter-banner letter-banner--reader" src="assets/letter-banner.svg" alt="Tenores" />
           <h1 id="letterReaderTitle" class="letter-reader__title"></h1>
           <p id="letterReaderSubtitle" class="letter-reader__subtitle"></p>
+          <img class="letter-banner letter-banner--reader" src="assets/letter-banner.svg" alt="Tenores" />
         </div>
         <div id="letterContent" class="letter-content"></div>
       </div>
