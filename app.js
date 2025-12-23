@@ -54,11 +54,11 @@ const TEAM_OVERVIEW={
   timeframe:'6 de septiembre - 22 de noviembre',
   observations:[
     'Promedio de asistencia por tiempo: 78.3% (31.3 horas activas por tenor sobre una meta de 40).',
-    'Carlos y Santiago alcanzan 100% de asistencia y sostienen el liderazgo de la cuerda.',
-    'Marco mantiene alta asistencia, pero registra 60% de llegadas tarde, el peor indicador de puntualidad.',
+    'Carlos y Santiago alcanzan 100% de minutos ensayados.',
+    'Marco mantiene alta asistencia, pero registra 60% de llegadas tarde.',
     'La impuntualidad promedio es 28.2%: en casi 1 de cada 3 ensayos se llega tarde.',
-    'Caleb y Oswaldo pierden cerca de la mitad del ciclo, riesgo directo para el repertorio.',
-    'Brecha de compromiso: 100% vs 49.4% entre el mejor y el menor registro.'
+    'Caleb y Oswaldo perdieron cerca de la mitad de minutos.',
+    'Brecha: 100% vs 49.4% entre el mejor y el menor registro.'
   ],
   levels:[
     {label:'Nivel superior (100%)',members:['Carlos','Santiago']},
@@ -255,7 +255,9 @@ Mucha suerte el otro año y pasen una feliz navidad con su familia.
 Tenores, tenores, tenores.
 Una nalgada muy fuerte de buena suerte.
 
-**Y… ¡Aú, aú!**`;
+**Y… ¡Aú, aú!**
+
+.`;
 
 const TENOR_LOOKUP=TENOR_MEMBERS_DATA.reduce((map,member)=>{map[member.id]=member;return map;},Object.create(null));
 const TENOR_MEMBERS=[...TENOR_MEMBERS_DATA].sort((a,b)=>a.name.localeCompare(b.name,'es',{sensitivity:'base'}));
