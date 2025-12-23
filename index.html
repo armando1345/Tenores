@@ -40,6 +40,17 @@
           <input id="q" type="search" placeholder="Buscar canci&oacute;n&hellip;" autocomplete="off" aria-label="Buscar canci&oacute;n" />
           <span class="suggest" id="suggest" hidden></span>
         </div>
+        <div id="letterCard" class="letter-card" hidden>
+          <div class="letter-card__media">
+            <img src="assets/letter-banner.svg" alt="Tenores" />
+          </div>
+          <div class="letter-card__body">
+            <p class="letter-card__kicker">Carta</p>
+            <h3 class="letter-card__title">Mi carta de despedida como jefe de cuerda</h3>
+            <p class="letter-card__text">Una gu&iacute;a para el futuro del equipo tenoril.</p>
+            <button id="letterCardOpen" class="letter-btn letter-btn--primary" type="button">Leer carta</button>
+          </div>
+        </div>
 
         <div id="grid" class="grid" aria-labelledby="canciones-titulo">
           <a class="mini-card" href="#fum" data-song="fum"><span class="mini-badge">01</span><span class="mini-title">Fum Fum Fum</span></a>
@@ -247,6 +258,7 @@
         <button id="presentationsClose" class="presentations-close" type="button" aria-label="Cerrar panel Presentaciones">&times;</button>
       </header>
       <div class="presentations-panel__body">
+        <div id="seasonNotice" class="season-notice" role="status" aria-live="polite" hidden></div>
         <div class="presentations-panel__layout">
           <section class="calendar-board">
             <header class="calendar-board__header">
@@ -256,13 +268,7 @@
             <div id="presentationsCalendar" class="calendar-months"></div>
           </section>
         </div>
-        <section class="upcoming-board">
-          <div class="upcoming-header">
-            <h3>Próximas presentaciones</h3>
-            <p>Las tres fechas más cercanas confirmadas para el coro.</p>
-          </div>
-          <div id="presentationsList" class="presentations-upcoming"></div>
-        </section>
+        
       </div>
     </section>
   </div>
@@ -277,6 +283,52 @@
       <div id="calendarPopoverBody" class="calendar-popover__body"></div>
     </article>
   </div>
+  <div id="letterModal" class="letter-modal" role="dialog" aria-modal="true" aria-labelledby="letterModalTitle" hidden>
+    <div class="letter-modal__backdrop" data-role="close-letter-modal" aria-hidden="true"></div>
+    <div class="letter-modal__card" role="document">
+      <div class="letter-brand" aria-hidden="true">
+        <img src="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" alt="" />
+        <span>Tenores</span>
+      </div>
+      <button class="letter-close" type="button" data-role="close-letter-modal" aria-label="Cerrar carta">&times;</button>
+      <div class="letter-modal__body">
+        <p class="letter-kicker">Carta</p>
+        <img class="letter-banner" src="assets/letter-banner.svg" alt="Tenores" />
+        <h2 id="letterModalTitle" class="letter-modal__title">{{TITULAR}}</h2>
+        <div class="letter-modal__actions">
+          <button id="letterOpen" class="letter-btn letter-btn--primary" type="button">Leer carta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <section id="letterReader" class="letter-reader" role="dialog" aria-modal="true" aria-labelledby="letterReaderTitle" hidden>
+    <div class="letter-reader__backdrop" data-role="close-letter-reader" aria-hidden="true"></div>
+    <div class="letter-reader__panel" role="document">
+      <div class="letter-brand letter-brand--reader" aria-hidden="true">
+        <img src="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" alt="" />
+        <span>Tenores</span>
+      </div>
+      <header class="letter-reader__header">
+        <button class="letter-btn letter-btn--ghost letter-back" type="button" data-role="close-letter-reader">Volver</button>
+        <p class="letter-kicker">Lectura</p>
+        <button class="letter-close" type="button" data-role="close-letter-reader" aria-label="Cerrar lector">&times;</button>
+      </header>
+      <div class="letter-reader__body">
+        <div class="letter-reader__hero">
+          <img class="letter-banner letter-banner--reader" src="assets/letter-banner.svg" alt="Tenores" />
+          <h1 id="letterReaderTitle" class="letter-reader__title"></h1>
+          <p id="letterReaderSubtitle" class="letter-reader__subtitle"></p>
+        </div>
+        <div id="letterContent" class="letter-content"></div>
+      </div>
+    </div>
+  </section>
   <script src="app.js" defer></script>
 </body>
 </html>
+
+
+
+
+
+
