@@ -1539,3 +1539,24 @@ document.querySelector('.back').addEventListener('click',e=>{e.preventDefault();
   console.assert(formatLyrics('a\n\nb').includes('<p>'),'format ok');
   console.groupEnd();
 })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
