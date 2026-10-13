@@ -1,0 +1,62 @@
+// Smoke test del runtime real workerd/Miniflare. Solo recursos efímeros locales.
+// Requiere pnpm install y wrangler deploy --dry-run --outdir output/worker.
+import { createRequire } from 'node:module';
+import { resolve } from 'node:path';
+import { readFile, readdir, writeFile, mkdir, realpath } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import { sqlStatements } from './sql-statements.mjs';
+const require=createRequire(await realpath(resolve('node_modules/wrangler/package.json')));
+const { Miniflare, convertV4MiniflareOptions }=require('miniflare');
+const mf=new Miniflare(convertV4MiniflareOptions({name:'tenores-runtime-test',modules:true,scriptPath:resolve('output/worker/worker.js'),compatibilityDate:'2026-10-12',compatibilityFlags:['nodejs_compat'],bindings:{BOOTSTRAP_SECRET:'runtime-test-key-only'},d1Databases:['DB'],r2Buckets:['RECORDINGS'],durableObjects:{PASSWORDS:{className:'PasswordHasher',useSQLite:true}}}));
+const checks=[];
+try{
+  const db=await mf.getD1Database('DB');
+  for(const f of (await readdir('migrations')).filter(f=>f.endsWith('.sql')).sort())await db.batch(sqlStatements(await readFile(`migrations/${f}`,'utf8')).map(sql=>db.prepare(sql)));
+  const call=async(path,body,auth={},headers={})=>{
+    const r=await mf.dispatchFetch('http://localhost'+path,{method:body?'POST':'GET',headers:{Origin:'http://localhost',...(body?{'Content-Type':'application/json'}:{}),...headers,...auth},...(body?{body:JSON.stringify(body)}:{})});
+    const data=await r.json();return {status:r.status,data,headers:r.headers};
+  };
+  const start=performance.now();
+  const setup=await call('/api/setup',{setup_key:'runtime-test-key-only',password:'runtime-test-password-only'});assert.equal(setup.status,201,JSON.stringify(setup.data));checks.push('hash_scrypt_in_durable_object');
+  const login=await call('/api/login',{username:'Jefe de cuerda',password:'runtime-test-password-only'});assert.equal(login.status,200,JSON.stringify(login.data));checks.push('login_native_runtime');
+  const auth={Cookie:login.headers.get('Set-Cookie').split(';')[0],'X-CSRF-Token':login.data.csrf};
+  const users=await call('/api/admin/users',null,auth);assert.equal(users.status,200);checks.push('d1_sessions_and_admin_authorization');
+  const season=(await call('/api/public/seasons')).data.find(s=>s.year===2026).id;
+  const song=(await call(`/api/public/songs?season=${season}`)).data[0].id;
+  const created=await call('/api/admin/users',{username:'Héctor-runtime',display_name:'Cuenta efímera de prueba',password:'Runtime8',active:true},auth);assert.equal(created.status,200,JSON.stringify(created.data));checks.push('admin_create_account_native_hashing');
+  const unicodeLogin=await call('/api/login',{username:'HE\u0301CTOR-RUNTIME',password:'Runtime8'});assert.equal(unicodeLogin.status,200,JSON.stringify(unicodeLogin.data));assert.equal(unicodeLogin.data.user.username,'Héctor-runtime');
+  assert.equal((await call('/api/admin/users',{username:'HÉCTOR-RUNTIME',display_name:'Duplicado efímero',password:'Runtime8',active:true},auth)).status,409);checks.push('unicode_usernames_and_unique_keys_native_d1');
+  assert.equal((await call('/api/admin/memberships',{season_id:season,user_id:created.data.id,active:true},auth)).status,200);
+  assert.deepEqual((await call(`/api/admin/tenors/${created.data.id}?season=${season}`,null,auth)).data.seasons.map(s=>s.year),[2026]);checks.push('native_d1_tenor_available_seasons');
+  let live={id:crypto.randomUUID(),request_id:crypto.randomUUID(),season_id:season,rehearsal_date:'2026-07-17',starts_at:'08:00',ends_at:'12:00',status:'draft',is_live:true,version:0,attendance:[{user_id:created.data.id,attendance_status:'pending'}]};
+  assert.equal((await call('/api/admin/rehearsals',live,auth)).status,200);
+  assert.equal((await call(`/api/admin/active-rehearsal?season=${season}`,null,auth)).data.id,live.id);
+  const tenorAuth={Cookie:unicodeLogin.headers.get('Set-Cookie').split(';')[0],'X-CSRF-Token':unicodeLogin.data.csrf};
+  assert.equal((await call(`/api/my-progress?season=${season}`,null,tenorAuth)).data.attendance[0].attendance_status,'pending');
+  live={...live,is_live:false,version:1,request_id:crypto.randomUUID()};assert.equal((await call('/api/admin/rehearsals',live,auth)).status,200);assert.equal((await call(`/api/admin/active-rehearsal?season=${season}`,null,auth)).data,null);checks.push('native_live_rehearsal_pending_and_private_progress');
+  const presentation={id:crypto.randomUUID(),season_id:season,title:'Prueba efímera',presentation_date:'2026-11-20',starts_at:'17:00',call_at:'15:00',venue:'Teatro de prueba',notes:'Prueba local'};
+  assert.equal((await call('/api/admin/presentations',presentation,auth)).status,200);assert.equal((await call('/api/admin/presentations',presentation,auth)).status,200);assert.equal((await call(`/api/public/presentations?season=${season}`)).data.length,1);assert.equal((await call('/api/admin/presentations',presentation,tenorAuth)).status,403);checks.push('native_presentation_persistence_and_permissions');
+  let rehearsal={id:crypto.randomUUID(),request_id:crypto.randomUUID(),season_id:season,rehearsal_date:'2026-10-12',starts_at:'08:00',ends_at:'12:00',status:'final',version:0,attendance:[{user_id:created.data.id,attendance_status:'on_time'}]};
+  const saved=await call('/api/admin/rehearsals',rehearsal,auth);assert.equal(saved.status,200,JSON.stringify(saved.data));
+  rehearsal={...rehearsal,version:1,request_id:crypto.randomUUID(),attendance:[{user_id:created.data.id,attendance_status:'late',late_reason:'unjustified',arrival_at:'08:35'}]};
+  assert.equal((await call('/api/admin/rehearsals',rehearsal,auth)).status,200);assert.equal((await call('/api/admin/rehearsals',rehearsal,auth)).data.version,2);
+  const stats=await call('/api/public/stats?year=2026');assert.equal(stats.data.members.find(m=>m.id===created.data.id).minutes,205);assert(!JSON.stringify(stats.data).includes('unjustified'));checks.push('native_d1_atomic_rehearsal_update_and_replay');
+  const songMeta={id:crypto.randomUUID(),season_id:season,song_id:song,duration_seconds:2,file_size:8,mime_type:'audio/webm;codecs=opus'};
+  const reserve=await call('/api/recordings/reserve',songMeta,auth);assert.equal(reserve.status,201,JSON.stringify(reserve.data));
+  const audio=new Uint8Array([0x1a,0x45,0xdf,0xa3,1,2,3,4]);
+  const uploaded=await mf.dispatchFetch(`http://localhost/api/recordings/${songMeta.id}`,{method:'PUT',headers:{Origin:'http://localhost','Content-Type':songMeta.mime_type,...auth},body:audio});assert.equal(uploaded.status,200,await uploaded.text());
+  const replay=await mf.dispatchFetch(`http://localhost/api/recordings/${songMeta.id}/audio`,{headers:auth});assert.equal(replay.status,200);assert.deepEqual(new Uint8Array(await replay.arrayBuffer()),audio);checks.push('private_r2_put_get_native_bindings');
+  const ranged=await mf.dispatchFetch(`http://localhost/api/recordings/${songMeta.id}/audio`,{headers:{...auth,Range:'bytes=0-3'}});assert.equal(ranged.status,206);assert.equal((await ranged.arrayBuffer()).byteLength,4);checks.push('r2_range_playback');
+  const list=await call(`/api/recordings?season=${season}`,null,auth);assert.equal(list.data.items.length,1);
+  assert.equal((await call(`/api/recordings?season=${season}&song=${song}`,null,auth)).data.items.length,1);
+  const otherSong=await db.prepare('SELECT id FROM songs WHERE id!=? LIMIT 1').bind(song).first();
+  assert.equal((await call(`/api/recordings?season=${season}&song=${otherSong.id}`,null,auth)).data.items.length,0);
+  assert.equal((await call(`/api/admin/seasons/${season}/close`,{confirmation:'ELIMINAR AUDIOS 2026'},auth)).status,200);
+  await db.prepare("UPDATE recordings SET created_at='2026-01-01T00:00:00.000Z' WHERE season_id=?").bind(season).run();
+  assert.equal((await call(`/api/admin/seasons/${season}/cleanup`,{},auth)).data.status,'closed');
+  assert.equal((await call(`/api/recordings/${songMeta.id}/audio`,null,auth)).status,410);
+  assert.equal((await call('/api/public/stats?year=2026')).data.members.find(m=>m.id===created.data.id).minutes,205);
+  assert.equal((await call('/api/public/stats?year=2025')).data.members.length,9);checks.push('native_r2_season_cleanup_preserves_attendance');
+  const result={checks,passed:checks.length,hash_and_login_wall_ms:Math.round(performance.now()-start),note:'Recursos locales efímeros; no mide CPU ni cuotas en producción.'};
+  await mkdir('output',{recursive:true});await writeFile('output/runtime-result.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));
+}finally{await mf.dispose();}

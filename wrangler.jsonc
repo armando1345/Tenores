@@ -1,0 +1,13 @@
+{
+  "name": "tenores",
+  "main": "server/worker.mjs",
+  "compatibility_date": "2026-10-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": { "bindings": [{ "name": "PASSWORDS", "class_name": "PasswordHasher" }] },
+  "migrations": [{ "tag": "v1-passwords", "new_sqlite_classes": ["PasswordHasher"] }],
+  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  "d1_databases": [{ "binding": "DB", "database_name": "tenores", "database_id": "REEMPLAZAR_ID_D1", "migrations_dir": "migrations" }],
+  // Añadir r2_buckets SOLO después de autorizar la suscripción de R2 Standard.
+  // "r2_buckets": [{ "binding": "RECORDINGS", "bucket_name": "tenores-grabaciones" }],
+  "vars": {}
+}

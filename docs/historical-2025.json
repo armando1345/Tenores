@@ -1,0 +1,150 @@
+{
+  "overview": {
+    "totalMinutes": 2400,
+    "totalHours": 40,
+    "totalMembers": 9,
+    "averageMinutes": 1879,
+    "averageAttendance": 78.3,
+    "rehearsals": 11,
+    "timeframe": "6 de septiembre - 22 de noviembre",
+    "observations": [
+      "Asistencia promedio por tiempo: 78.3%, equivalente a 31.3 de 40 horas programadas por tenor.",
+      "Dos de los nueve tenores registraron 100% de asistencia.",
+      "Cuatro de los nueve tenores quedaron por debajo del promedio de asistencia.",
+      "Promedio de llegadas tarde entre los tenores: 28.2% de los ensayos asistidos.",
+      "Los porcentajes individuales de asistencia se situaron entre 49.4% y 100%."
+    ],
+    "levels": [
+      {
+        "label": "Nivel superior (100%)",
+        "members": [
+          "Carlos",
+          "Santiago"
+        ]
+      },
+      {
+        "label": "Nivel alto (84%-88%)",
+        "members": [
+          "Diego",
+          "Héctor",
+          "Marco"
+        ]
+      },
+      {
+        "label": "Nivel medio (69%-74%)",
+        "members": [
+          "Isaías",
+          "Mario"
+        ]
+      },
+      {
+        "label": "Nivel crítico (49%-51%)",
+        "members": [
+          "Caleb",
+          "Oswaldo"
+        ]
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "carlos",
+      "name": "Carlos",
+      "minutes": 2400,
+      "attendance": 100,
+      "minutesLost": 0,
+      "rehearsalsAttended": 11,
+      "tardyPct": 0,
+      "tardyCount": 0,
+      "tardyJustifiedPct": 0
+    },
+    {
+      "id": "santiago",
+      "name": "Santiago",
+      "minutes": 2400,
+      "attendance": 100,
+      "minutesLost": 0,
+      "rehearsalsAttended": 11,
+      "tardyPct": 18.2,
+      "tardyCount": 2,
+      "tardyJustifiedPct": null
+    },
+    {
+      "id": "hector",
+      "name": "Héctor",
+      "minutes": 2036.4,
+      "attendance": 84.85,
+      "minutesLost": 363.6,
+      "rehearsalsAttended": 9,
+      "tardyPct": 33.3,
+      "tardyCount": 3,
+      "tardyJustifiedPct": null
+    },
+    {
+      "id": "marco",
+      "name": "Marco",
+      "minutes": 2115,
+      "attendance": 88.13,
+      "minutesLost": 285,
+      "rehearsalsAttended": 10,
+      "tardyPct": 60,
+      "tardyCount": 6,
+      "tardyJustifiedPct": null
+    },
+    {
+      "id": "diego",
+      "name": "Diego",
+      "minutes": 2098.8,
+      "attendance": 87.45,
+      "minutesLost": 301.2,
+      "rehearsalsAttended": 10,
+      "tardyPct": 30,
+      "tardyCount": 3,
+      "tardyJustifiedPct": null
+    },
+    {
+      "id": "mario",
+      "name": "Mario",
+      "minutes": 1770,
+      "attendance": 73.75,
+      "minutesLost": 630,
+      "rehearsalsAttended": 8,
+      "tardyPct": 37.5,
+      "tardyCount": 3,
+      "tardyJustifiedPct": null
+    },
+    {
+      "id": "isaias",
+      "name": "Isaías",
+      "minutes": 1678.8,
+      "attendance": 69.95,
+      "minutesLost": 721.2,
+      "rehearsalsAttended": 8,
+      "tardyPct": 25,
+      "tardyCount": 2,
+      "tardyJustifiedPct": null
+    },
+    {
+      "id": "caleb",
+      "name": "Caleb",
+      "minutes": 1230,
+      "attendance": 51.25,
+      "minutesLost": 1170,
+      "rehearsalsAttended": 6,
+      "tardyPct": 33,
+      "tardyCount": 2,
+      "tardyJustifiedPct": 50
+    },
+    {
+      "id": "oswaldo",
+      "name": "Oswaldo",
+      "minutes": 1185,
+      "attendance": 49.38,
+      "minutesLost": 1215,
+      "rehearsalsAttended": 6,
+      "tardyPct": 16.7,
+      "tardyCount": 1,
+      "tardyJustifiedPct": null
+    }
+  ]
+}
