@@ -207,3 +207,17 @@ test('El paquete público incluye el motor de práctica',async()=>{
   for(const f of ['dist/practice/analyze.js','dist/practice/recorder-worklet.js','dist/practice/practice.css'])await access(f);
   for(const f of ['dist/tests','dist/server','dist/migrations'])await assert.rejects(access(f));
 });
+test('Las 12 curvas existentes se cargan íntegras',async()=>{
+  const DB=new LocalD1();await DB.migrate();
+  assert.equal(DB.sqlite.prepare('SELECT COUNT(*) n FROM song_references').get().n,12);
+  const rows=DB.sqlite.prepare('SELECT r.song_id,r.source,r.reference,s.reference_audio_key,s.legacy_key FROM song_references r JOIN songs s ON s.id=r.song_id').all();
+  assert.equal(rows.length,12);
+  for(const row of rows){const ref=JSON.parse(row.reference);assert(ref.phrases.length>0);assert.equal(ref.hopMs,10);assert.equal(ref.source,row.reference_audio_key);assert.equal(row.source,row.reference_audio_key);}
+  const fum=rows.find(r=>r.legacy_key==='fum');
+  assert.deepEqual(JSON.parse(fum.reference),JSON.parse(await readFile(new URL('./fixtures/fum-reference.json',import.meta.url),'utf8')));
+});
+test('Ninguna sentencia de la migración de curvas supera 100 000 bytes',async()=>{
+  const { sqlStatements }=await import('../scripts/sql-statements.mjs');
+  const sql=await readFile(new URL('../migrations/0007_song_references_data.sql',import.meta.url),'utf8');
+  for(const s of sqlStatements(sql))assert(Buffer.byteLength(s)<=100000);
+});
