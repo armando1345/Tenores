@@ -8,18 +8,22 @@ import { visibleNotes, createTrail, targetScale, stepScale, drawTrack, TRACK } f
 import { createTakeEncoder, BAD_TAKE } from './encoder.js';
 import { compactAnalysis } from './compact.js';
 import { analysisMarkup, esc } from './result-view.js';
+import { sendState, sendOutcome } from './send-state.js';
+import { incompleteTake } from './take-check.js';
 
 const LIVE_PITCH = true;
 const GUIDE_WARNING = 'Usa auriculares, mejor con cable: si el micrófono capta la guía, la puntuación no será fiable. Con Bluetooth, pulsa «Calibrar auriculares» antes.';
 const LATENCY_SOURCE = { calibrated: 'calibrado', browser: 'automático', default: 'estimado' };
 const GUIDE_TIMEOUT_MS = 3000; // si la guía no empieza a sonar en este tiempo, se avisa
 const NO_ENCODER = 'Este navegador no puede enviar audio.';
+const INCOMPLETE_TAKE = 'El audio llegó incompleto, así que la nota no sería fiable. Repite la toma; si usas auriculares Bluetooth y vuelve a pasar, prueba con auriculares con cable.';
 
 let panel = null, sheet = null, body = null, titleEl = null, opener = null;
 let s = null; // sesión de práctica abierta
 let seq = 0; // contador global: los tokens nunca se reutilizan entre sesiones
 
 const stale = token => !s || s.token !== token;
+const sending = () => s?.send?.state === 'sending';
 
 function ensurePanel() {
   if (panel) return;
@@ -84,7 +88,7 @@ export async function openPractice(song, hooks) {
   audio.preload = 'auto';
   s = {
     song, hooks, audio, token: ++seq, ref: null, recorder: null, encoder: null, timers: new Set(), raf: 0,
-    take: null, takeSource: null, refStop: null, finished: -1,
+    take: null, takeSource: null, refStop: null, finished: -1, takeStartedAt: 0,
     result: null, pending: null, send: null,
     settings: { range: 'full', phraseFrom: 1, phraseTo: 1 },
   };
@@ -97,9 +101,11 @@ export async function openPractice(song, hooks) {
 }
 
 // Con una toma pendiente, cerrar pide antes confirmación en el panel; con force (cerrar sesión) la descarta sin preguntar.
+// Durante el envío no se cierra (salvo con force): el envío terminaría igualmente.
 export function closePractice({ force = false } = {}) {
   if (!s) return;
   if (force) { endSession(); return; }
+  if (sending()) return;
   guardPending(endSession);
 }
 
@@ -221,7 +227,9 @@ function currentRange() {
 }
 
 // Con una toma pendiente, `action` solo se ejecuta tras confirmar el descarte en el panel.
+// Mientras se envía no hace nada: la práctica no puede descartarse a medio envío.
 function guardPending(action) {
+  if (sending()) return;
   if (!hasPendingTake()) { action(); return; }
   stopTake();
   stopRefSegment();
@@ -378,6 +386,7 @@ async function startTake() {
   if (stale(token)) return;
   // La grabación y el límite de tiempo cuentan desde que la guía suena.
   s.recorder.start();
+  s.takeStartedAt = performance.now();
   startEncoder();
   const limitSec = durSec + 1;
   renderRecording(limitSec, token, { mode: 'guide', from, to });
@@ -472,12 +481,32 @@ async function finishTake(token, take) {
   const rec = s.recorder.stop();
   const enc = s.encoder;
   s.encoder = null;
+  const wallSec = (performance.now() - s.takeStartedAt) / 1000;
+  if (incompleteTake(rec.samples.length / rec.sampleRate, wallSec)) {
+    enc?.stop().catch(() => {});
+    s.take = null;
+    s.result = null;
+    s.pending = null;
+    s.send = null;
+    renderIncomplete();
+    return;
+  }
   // Nunca se rechaza: un fallo del codificador solo impide el envío.
   const encoded = enc
     ? enc.stop().then(v => ({ ok: true, ...v }), err => ({ ok: false, message: err && err.message === BAD_TAKE ? BAD_TAKE : NO_ENCODER }))
     : Promise.resolve({ ok: false, message: NO_ENCODER });
   s.take = { ...rec, ...take, durationSeconds: rec.samples.length / rec.sampleRate, encoded };
   await analyzeTake(token);
+}
+
+// La grabación duró menos que el tiempo real (AudioContext ralentizado): no se analiza ni se envía.
+function renderIncomplete() {
+  body.innerHTML = `<div class="practice-error" role="alert"><p>${esc(INCOMPLETE_TAKE)}</p>
+    <div class="practice-actions"><button type="button" class="btn small" data-act="repeat">Repetir</button>
+    <button type="button" class="btn small quiet" data-act="setup">Cambiar ajustes</button></div></div>`;
+  body.querySelector('[data-act="repeat"]').addEventListener('click', () => startTake());
+  body.querySelector('[data-act="setup"]').addEventListener('click', renderSetup);
+  focusBody();
 }
 
 async function analyzeTake(token) {
@@ -503,9 +532,9 @@ function prepareSend(result, encoded) {
   s.result = result;
   s.pending = null;
   s.send = null;
-  if (!result.valid) return;
-  if (!(result.isFull && result.mode === 'guide')) { s.send = { state: 'fragment' }; return; }
-  if (!encoded.ok) { s.send = { state: 'unavailable', message: encoded.message }; return; }
+  const st = sendState(result, encoded);
+  if (st.state === 'invalid') return;
+  if (st.state !== 'ready') { s.send = st; return; }
   s.pending = {
     id: crypto.randomUUID(),
     blob: encoded.blob,
@@ -519,8 +548,7 @@ function prepareSend(result, encoded) {
 function sendStatusMarkup() {
   const st = s.send;
   if (!st) return '';
-  if (st.state === 'fragment') return '<p class="practice-send__note">Para enviar a jefatura, canta la canción completa.</p>';
-  if (st.state === 'unavailable') return `<p class="practice-send__note">${esc(st.message)}</p>`;
+  if (st.state === 'fragment' || st.state === 'no-encoder') return `<p class="practice-send__note">${esc(st.message)}</p>`;
   if (st.state === 'confirm') {
     return `<div class="practice-send__confirm"><p>Jefatura podrá escuchar esta práctica y ver su análisis.</p>
       <div class="practice-actions"><button type="button" class="btn small" data-act="send-confirm">Enviar</button>
@@ -556,15 +584,11 @@ async function sendTake() {
   if (!take || s.send?.state === 'sending') return;
   s.send = { state: 'sending' };
   updateSend();
-  try {
-    await session.hooks.send(take);
-    if (s !== session) return;
-    if (s.pending === take) s.pending = null;
-    s.send = { state: 'sent' };
-  } catch (err) {
-    if (s !== session) return;
-    s.send = { state: 'error', message: (err && err.message) || 'No se pudo enviar la práctica.' };
-  }
+  let error = null;
+  try { await session.hooks.send(take); }
+  catch (err) { error = err || {}; }
+  if (s !== session) return;
+  ({ pending: s.pending, send: s.send } = sendOutcome(s.pending, take, error));
   updateSend();
 }
 

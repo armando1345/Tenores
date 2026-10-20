@@ -83,3 +83,37 @@ test('analysisMarkup muestra nota, desglose, consejos escapados, gráfica y fras
   assert(!html.includes('90%'));
   assert(!analysisMarkup({ ...result, scores: { ...result.scores, total: 90 } }).includes('90%'));
 });
+
+import { sendState, sendOutcome } from '../practice/send-state.js';
+import { MIN_TAKE_RATIO, incompleteTake } from '../practice/take-check.js';
+const ENC_OK = { ok: true, blob: {}, mimeType: 'audio/webm' };
+test('sendState: inválida, fragmento, sin codificador y lista', () => {
+  assert.deepEqual(sendState({ valid: false, mode: 'guide', isFull: true }, ENC_OK), { state: 'invalid' });
+  const FRAG = { state: 'fragment', message: 'Para enviar a jefatura, canta la canción completa.' };
+  assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: false }, ENC_OK), FRAG); // fragmento válido
+  assert.deepEqual(sendState({ valid: true, mode: 'free', isFull: true }, ENC_OK), FRAG); // completa en otro modo
+  assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: true }, { ok: false, message: 'Este navegador no puede enviar audio.' }),
+    { state: 'no-encoder', message: 'Este navegador no puede enviar audio.' });
+  assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: true }, { ok: false, message: EMPTY_MSG }), { state: 'no-encoder', message: EMPTY_MSG });
+  assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: true }, ENC_OK), { state: 'ready' });
+});
+test('sendOutcome: un error conserva la toma pendiente con el mismo id; el éxito la retira', () => {
+  const take = { id: 'abc-123', blob: {} };
+  const failed = sendOutcome(take, take, new Error('Sin conexión.'));
+  assert.equal(failed.pending, take);
+  assert.equal(failed.pending.id, 'abc-123');
+  assert.deepEqual(failed.send, { state: 'error', message: 'Sin conexión.' });
+  assert.deepEqual(sendOutcome(take, take, {}).send, { state: 'error', message: 'No se pudo enviar la práctica.' });
+  const ok = sendOutcome(take, take, null);
+  assert.equal(ok.pending, null);
+  assert.deepEqual(ok.send, { state: 'sent' });
+  const other = { id: 'otra' };
+  assert.equal(sendOutcome(other, take, null).pending, other);
+});
+test('incompleteTake detecta audio comprimido y no avisa en tomas muy cortas', () => {
+  assert.equal(MIN_TAKE_RATIO, 0.9);
+  assert.equal(incompleteTake(17, 17), false);
+  assert.equal(incompleteTake(11, 17), true);
+  assert.equal(incompleteTake(15.4, 17), false);
+  assert.equal(incompleteTake(1, 1.5), false);
+});
