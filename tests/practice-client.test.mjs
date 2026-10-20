@@ -15,3 +15,71 @@ test('assertCloudinary exige res.cloudinary.com',()=>{
   assertCloudinary('https://res.cloudinary.com/x.wav');
   assert.throws(()=>assertCloudinary('https://example.com/x.wav'),{message:'Para generar la curva, la referencia debe estar en Cloudinary (res.cloudinary.com).'});
 });
+
+import { MIME_TYPES, pickMimeType, createTakeEncoder } from '../practice/encoder.js';
+import { analysisMarkup } from '../practice/result-view.js';
+const EMPTY_MSG = 'La grabación está vacía o supera el tamaño máximo. Vuelve a grabar.';
+test('pickMimeType respeta el orden de MIME_TYPES y devuelve vacío sin soporte', () => {
+  assert.deepEqual(MIME_TYPES, ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm']);
+  assert.equal(pickMimeType(() => true), 'audio/webm;codecs=opus');
+  assert.equal(pickMimeType(t => t.startsWith('audio/mp4')), 'audio/mp4;codecs=mp4a.40.2');
+  assert.equal(pickMimeType(t => t === 'audio/webm'), 'audio/webm');
+  assert.equal(pickMimeType(() => false), '');
+  assert.equal(pickMimeType(() => { throw new Error('x'); }), '');
+});
+function fakeRecorder(parts, supported = t => t === 'audio/ogg;codecs=opus') {
+  const made = [];
+  class R {
+    static isTypeSupported(t) { return supported(t); }
+    constructor(stream, options) { this.stream = stream; this.options = options; this.mimeType = options.mimeType || ''; this.state = 'inactive'; made.push(this); }
+    start(slice) { this.slice = slice; this.state = 'recording'; }
+    stop() {
+      this.state = 'inactive';
+      setTimeout(() => { for (const p of parts) this.ondataavailable?.({ data: new Blob([p], { type: this.mimeType }) }); this.onstop?.(); });
+    }
+  }
+  return { R, made };
+}
+test('createTakeEncoder devuelve el blob con su MIME y usa 64 000 bps', async () => {
+  const { R, made } = fakeRecorder(['abc', 'def']);
+  const stream = {};
+  const enc = createTakeEncoder(stream, { maxBytes: 100, Recorder: R });
+  enc.start();
+  assert.equal(made[0].stream, stream);
+  assert.equal(made[0].options.audioBitsPerSecond, 64000);
+  assert.equal(made[0].options.mimeType, 'audio/ogg;codecs=opus');
+  assert.equal(made[0].slice, 1000);
+  const { blob, mimeType } = await enc.stop();
+  assert.equal(blob.size, 6);
+  assert.equal(mimeType, 'audio/ogg;codecs=opus');
+  assert.equal(blob.type, 'audio/ogg;codecs=opus');
+});
+test('createTakeEncoder rechaza si la toma está vacía o supera maxBytes', async () => {
+  const empty = fakeRecorder([]);
+  const a = createTakeEncoder({}, { maxBytes: 100, Recorder: empty.R });
+  a.start();
+  await assert.rejects(a.stop(), { message: EMPTY_MSG });
+  const big = fakeRecorder(['0123456789', 'x']);
+  const b = createTakeEncoder({}, { maxBytes: 10, Recorder: big.R });
+  b.start();
+  await assert.rejects(b.stop(), { message: EMPTY_MSG });
+});
+const result = {
+  engineVersion: '1.1.0', songId: 'x', mode: 'guide', isFull: true, valid: true,
+  scores: { total: 73, pitch: 81, rhythm: 55, stability: null },
+  tips: [{ kind: 'pitch', phrase: 1, text: 'Frase 1: <b>"alto"</b> & más' }, { kind: 'praise', phrase: null, text: '¡Muy bien!' }],
+  phrases: [{ index: 1, start: 0, end: 2.5, pitch: 81 }, { index: 2, start: 2.5, end: 5, pitch: 40 }],
+  curves: { hopMs: 10, startSec: 0, ref: [60, 60.5, null, 62, 62], user: [59.8, null, 61, 62.2, 62] },
+};
+test('analysisMarkup muestra nota, desglose, consejos escapados, gráfica y frases', () => {
+  const html = analysisMarkup(result);
+  assert.match(html, /practice-score__value">73</);
+  assert(html.includes('No cuenta en la nota'));
+  assert(html.includes('Frase 1: &lt;b&gt;&quot;alto&quot;&lt;/b&gt; &amp; más'));
+  assert(html.includes('¡Muy bien!'));
+  assert(html.includes('<svg'));
+  assert(html.includes('Frase 2'));
+  assert(!html.includes('<button'));
+  assert(!html.includes('90%'));
+  assert(!analysisMarkup({ ...result, scores: { ...result.scores, total: 90 } }).includes('90%'));
+});
