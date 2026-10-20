@@ -201,3 +201,9 @@ test('Regresión de fuentes y paquete público',async()=>{
   for(const marker of ['audio-track','mini-toggle','fontUp','q','memories-view','presentationsPanel','dataPanel'])assert(html.includes(`id="${marker}"`));
 });
 
+test('El paquete público incluye el motor de práctica',async()=>{
+  const { execFileSync } = await import('node:child_process');const { access } = await import('node:fs/promises');
+  execFileSync(process.execPath,['scripts/build.mjs']);
+  for(const f of ['dist/practice/analyze.js','dist/practice/recorder-worklet.js','dist/practice/practice.css'])await access(f);
+  for(const f of ['dist/tests','dist/server','dist/migrations'])await assert.rejects(access(f));
+});
