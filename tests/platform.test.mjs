@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { runInNewContext } from 'node:vm';
 import worker from '../server/worker.mjs';
 import { LocalD1, LocalR2 } from '../scripts/local-adapters.mjs';
-import { attendance, recordingMetadata, sniffAudio } from '../server/domain.mjs';
+import { attendance, recordingMetadata, sniffAudio, practiceAnalysis, referencePayload } from '../server/domain.mjs';
 import { hashPassword, verifyPassword, digest } from '../server/security.mjs';
 const uid=randomUUID();
 test('Minutos de ensayo, tardanzas y salida anticipada',()=>{
@@ -220,4 +220,20 @@ test('Ninguna sentencia de la migración de curvas supera 100 000 bytes',async()
   const { sqlStatements }=await import('../scripts/sql-statements.mjs');
   const sql=await readFile(new URL('../migrations/0007_song_references_data.sql',import.meta.url),'utf8');
   for(const s of sqlStatements(sql))assert(Buffer.byteLength(s)<=100000);
+});
+test('Validación del análisis y de la curva',async()=>{
+  const ok={engineVersion:'1.0',songId:'fum',mode:'guide',isFull:true,valid:true,scores:{total:83,pitch:80,rhythm:85,stability:84},tips:[],phrases:[],curves:{ref:[1,null],user:[1,null],hopMs:10,startSec:0}};
+  const r=practiceAnalysis(ok,'fum');assert.equal(r.score,83);assert.equal(JSON.parse(r.json).songId,'fum');
+  const bad=(patch,status=400)=>assert.throws(()=>practiceAnalysis({...ok,...patch},'fum'),e=>e.status===status);
+  bad({mode:'test'});bad({isFull:false});bad({valid:false});bad({songId:'otra'});
+  bad({scores:{...ok.scores,total:101}});bad({scores:{...ok.scores,total:82.5}});
+  bad({curves:{...ok.curves,ref:new Array(70000).fill(1.23)}},413);
+  assert.throws(()=>practiceAnalysis(null,'fum'),e=>e.status===400);
+  const fx=JSON.parse(await readFile(new URL('./fixtures/fum-reference.json',import.meta.url),'utf8'));
+  const song={id:'song-1',reference_audio_key:fx.source};
+  assert.equal(JSON.parse(referencePayload(fx,song)).songId,'song-1');
+  assert.throws(()=>referencePayload({...fx,source:'https://x/y.wav'},song),e=>e.status===409);
+  assert.throws(()=>referencePayload({...fx,phrases:[]},song),e=>e.status===400);
+  assert.throws(()=>referencePayload({...fx,phrases:[{start:5,end:5}]},song),e=>e.status===400);
+  assert.throws(()=>referencePayload({...fx,hopMs:20},song),e=>e.status===400);
 });
