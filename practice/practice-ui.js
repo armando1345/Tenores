@@ -96,9 +96,10 @@ export async function openPractice(song, hooks) {
   await loadReference();
 }
 
-// Con una toma pendiente, cerrar pide antes confirmación en el panel.
-export function closePractice() {
+// Con una toma pendiente, cerrar pide antes confirmación en el panel; con force (cerrar sesión) la descarta sin preguntar.
+export function closePractice({ force = false } = {}) {
   if (!s) return;
+  if (force) { endSession(); return; }
   guardPending(endSession);
 }
 

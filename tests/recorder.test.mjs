@@ -30,7 +30,7 @@ class Element {
 async function client({role='tenor',hasReference=1,supported=true,reserveStatus=200}={}){
   rendered.length=0;
   const elements=new Map(),get=id=>{if(!elements.has(id))elements.set(id,new Element(id));return elements.get(id);};
-  const docListeners={},windowListeners={},requests=[],uploads=[],created=[],opened=[],pending={value:false};
+  const docListeners={},windowListeners={},requests=[],uploads=[],created=[],opened=[],closed=[],pending={value:false};
   const seasonId=randomUUID(),songs=[{id:randomUUID(),season_id:seasonId,legacy_key:'fum',title:'Fum Fum Fum',reference_audio_key:'https://res.cloudinary.com/demo/video/upload/fum.mp3',has_reference:hasReference},{id:randomUUID(),season_id:seasonId,legacy_key:'campanas',title:'Canto de las campanas',reference_audio_key:'https://res.cloudinary.com/demo/video/upload/campanas.mp3',has_reference:1}];
   const recordings=[{id:randomUUID(),song_id:songs[0].id,title:songs[0].title,uploaded_at:'2026-03-01T15:00:00Z',duration_seconds:30,score:80,has_analysis:1},{id:randomUUID(),song_id:songs[0].id,title:songs[0].title,uploaded_at:'2026-02-01T15:00:00Z',duration_seconds:20,score:null,has_analysis:0}];
   const location={protocol:'http:',hash:'#fum'};
@@ -50,7 +50,7 @@ async function client({role='tenor',hasReference=1,supported=true,reserveStatus=
     else if(path==='/api/recordings/reserve'){const b=JSON.parse(options.body);uploads.push(b);if(reserveStatus!==200)return Response.json({error:'El almacenamiento de audios aún no está configurado.'},{status:reserveStatus});data={id:b.id,status:'pending'};}
     return Response.json(data);
   };
-  const tenoresPractice={isSupported:()=>supported,open(song,hooks){opened.push({song,hooks});},close(){},hasPendingTake:()=>pending.value,analysisMarkup:a=>`<div class="stub-analysis">Detalle ${a.scores.total}</div>`};
+  const tenoresPractice={isSupported:()=>supported,open(song,hooks){opened.push({song,hooks});},close(options){closed.push(options);},hasPendingTake:()=>pending.value,analysisMarkup:a=>`<div class="stub-analysis">Detalle ${a.scores.total}</div>`};
   runInNewContext(await readFile('platform.js','utf8'),{
     document:{body:get('body'),readyState:'loading',getElementById:get,querySelectorAll:()=>[],createElement:tag=>{const e=new Element(tag);created.push(e);return e;},addEventListener:(name,fn)=>docListeners[name]=fn},
     window:{tenoresPractice,addEventListener:(name,fn)=>windowListeners[name]=fn,updateTenoresStats(){},updateTenoresSongs(){}},
@@ -58,7 +58,7 @@ async function client({role='tenor',hasReference=1,supported=true,reserveStatus=
   });
   await docListeners.DOMContentLoaded();
   const root=get('practiceCard'),node=key=>root.querySelector(`.${key}`);
-  return {get,node,root,requests,uploads,songs,recordings,created,opened,pending,location,navigate(key){location.hash=`#${key}`;windowListeners.hashchange();}};
+  return {get,node,root,requests,uploads,songs,recordings,created,opened,closed,pending,location,navigate(key){location.hash=`#${key}`;windowListeners.hashchange();}};
 }
 const take=()=>({id:randomUUID(),blob:new Blob([new Uint8Array([0x1a,0x45,0xdf,0xa3,1,2,3,4])],{type:'audio/webm;codecs=opus'}),mimeType:'audio/webm;codecs=opus',durationSeconds:4.2,analysis:{scores:{total:80}}});
 const no90=()=>assert(!rendered.some(html=>html.includes('90%')),'ningún HTML debe mostrar 90%');
@@ -109,4 +109,20 @@ test('La biblioteca del tenor muestra únicamente la temporada 2026, con nota o 
   await toggle.onclick();assert(!detail.hidden);assert(detail.innerHTML.includes('Detalle 80'));
   await toggle.onclick();assert(detail.hidden);await toggle.onclick();assert(!detail.hidden);
   assert.equal(c.requests.filter(r=>r.path===`/api/recordings/${c.recordings[0].id}/analysis`).length,1);no90();
+});
+
+test('El reproductor de práctica reproduce, pausa y permite avanzar sin duración WebM',async()=>{
+  const c=await client();await c.get('practiceOpen').onclick();
+  const item=c.created.find(e=>e.className==='audio-history'),find=key=>item.querySelector('.'+key);
+  assert.equal(find('preview-duration').textContent,'00:30');assert.equal(find('preview-seek').max,'30');
+  await find('preview-toggle').onclick();assert.equal(find('preview-toggle').attributes['aria-label'],'Pausar práctica');assert(!find('record-preview').paused);
+  find('preview-seek').value='2';find('preview-seek').oninput();assert.equal(find('record-preview').currentTime,2);assert.equal(find('preview-current').textContent,'00:02');
+  await find('preview-toggle').onclick();assert(find('record-preview').paused);assert.equal(find('preview-toggle').attributes['aria-label'],'Escuchar práctica');
+  find('record-preview').duration=45.5;find('record-preview').listeners.durationchange();assert.equal(find('preview-seek').max,'45.5');
+  find('preview-seek').value='80';find('preview-seek').oninput();assert.equal(find('record-preview').currentTime,45.5);
+});
+test('Cerrar sesión cierra la práctica a la fuerza y descarta la toma pendiente',async()=>{
+  const c=await client();c.pending.value=true;c.get('loginForm').elements.username=new Element();
+  await c.get('logoutButton').onclick({target:c.get('logoutButton')});
+  assert.deepEqual(c.closed.map(o=>({...o})),[{force:true}]);assert(c.get('accessGate').open);
 });
