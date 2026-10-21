@@ -74,7 +74,7 @@ const result = {
 test('analysisMarkup muestra nota, desglose, consejos escapados, gráfica y frases', () => {
   const html = analysisMarkup(result);
   assert.match(html, /practice-score__value">73</);
-  assert(html.includes('No cuenta en la nota'));
+  assert(html.includes('No cuenta en la nota total'));assert(html.includes('Entonación'));assert(!html.includes('Afinación'));assert(html.includes('practice-intonation__value">81<'));assert(html.includes('Similitud total'));
   assert(html.includes('Frase 1: &lt;b&gt;&quot;alto&quot;&lt;/b&gt; &amp; más'));
   assert(html.includes('¡Muy bien!'));
   assert(html.includes('<svg'));
@@ -92,9 +92,7 @@ test('sendState: inválida, fragmento, sin codificador y lista', () => {
   const FRAG = { state: 'fragment', message: 'Para enviar a jefatura, canta la canción completa.' };
   assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: false }, ENC_OK), FRAG); // fragmento válido
   assert.deepEqual(sendState({ valid: true, mode: 'free', isFull: true }, ENC_OK), FRAG); // completa en otro modo
-  assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: true }, { ok: false, message: 'Este navegador no puede enviar audio.' }),
-    { state: 'no-encoder', message: 'Este navegador no puede enviar audio.' });
-  assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: true }, { ok: false, message: EMPTY_MSG }), { state: 'no-encoder', message: EMPTY_MSG });
+  assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: true }), { state: 'ready' }); // No requiere codificar ni subir audio
   assert.deepEqual(sendState({ valid: true, mode: 'guide', isFull: true }, ENC_OK), { state: 'ready' });
 });
 test('sendOutcome: un error conserva la toma pendiente con el mismo id; el éxito la retira', () => {

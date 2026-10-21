@@ -418,8 +418,9 @@ body:has(dialog[open]){overflow:hidden}
 
 /* Práctica con guía: lanzador en la tarjeta, nota y detalle en las grabaciones, curvas en Repertorio. */
 .practice-launcher{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-.practice-launch{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-width:220px;min-height:52px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600;cursor:pointer}
-.practice-launch svg{width:20px;height:20px;flex-shrink:0}
+.practice-launch{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;width:min(300px,100%);min-height:200px;background:#212121;color:var(--fg);border:2px dashed #e8e8e8;border-radius:10px;padding:24px;box-shadow:0 48px 35px -48px var(--accent);font:inherit;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s}
+.practice-launch:hover{border-color:var(--accent);background:#19251f}
+.practice-launch svg{width:72px;height:72px;flex-shrink:0}
 .practice-launch:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .practice-launcher-note{max-width:420px;margin:0;color:var(--fg-muted);font-size:14px;line-height:1.6}
 .recording-score{margin-left:auto;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}

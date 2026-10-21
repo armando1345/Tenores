@@ -85,11 +85,72 @@ body.practice-panel-open { overflow: hidden; }
 .practice-phrase[aria-expanded="true"] { background: rgba(255, 255, 255, .08); }
 .practice-phrase-actions, .practice-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* El mismo lenguaje de Tenores durante la preparación, la prueba y la revisión. */
+.practice-panel__sheet{background:#101312;border-color:#28352e;padding:32px;scrollbar-width:thin;scrollbar-color:var(--accent,#0ffc7e) #171e1a;overscroll-behavior:contain}
+.practice-panel__sheet::-webkit-scrollbar{width:7px}
+.practice-panel__sheet::-webkit-scrollbar-thumb{background:var(--accent,#0ffc7e);border-radius:9px}
+.practice-panel__header{padding-bottom:22px;margin-bottom:26px;border-bottom:1px solid #29332d}
+.practice-panel__header h2{font-size:clamp(24px,4vw,34px);font-weight:750;letter-spacing:-.035em;line-height:1.2}
+.practice-panel__header .practice-eyebrow{font-size:11px;letter-spacing:.16em;margin-bottom:9px}
+.practice-close{display:grid;place-items:center;min-width:44px;min-height:44px;background:#1d2621;border:1px solid #314036;border-radius:50%;flex-shrink:0}
+.practice-panel .btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 22px;border:1px solid var(--accent,#0ffc7e);border-radius:999px;background:var(--accent,#0ffc7e);color:#041b0f;font:inherit;font-size:14px;font-weight:700;line-height:1.35;cursor:pointer;text-decoration:none}
+.practice-panel .btn.quiet,.practice-panel [data-act=repeat]{background:transparent;color:#eff8f2;border-color:#42554a}
+.practice-panel .btn:hover{filter:brightness(1.08)}
+.practice-panel .btn:disabled{opacity:.45;cursor:wait}
+.practice-panel [hidden]{display:none!important}
+.practice-setup-title{font-size:26px;letter-spacing:-.03em;margin:0 0 8px}
+.practice-setup-intro{color:#a9bbb0;line-height:1.6;margin:0 0 26px;max-width:42ch}
+.practice-warning{border:0;border-left:2px solid var(--accent,#0ffc7e);background:#14231a;border-radius:0 12px 12px 0;color:#c9ded2;font-size:13px;line-height:1.65;padding:16px 18px;margin:0 0 16px}
+.practice-latency{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;color:#94ab9d;font-size:12px;margin:0 0 30px}
+.practice-latency .btn{font-size:12px;min-height:38px;padding:8px 13px}
+.practice-setup legend{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#a9bbb0;margin-bottom:14px}
+.practice-choice{padding:17px 16px;gap:14px;border-color:#35453b;border-radius:14px;margin-bottom:12px;align-items:center}
+.practice-choice:has(input:checked){background:#14291d;border-color:var(--accent,#0ffc7e)}
+.practice-choice input{accent-color:var(--accent,#0ffc7e);width:19px;height:19px;flex-shrink:0;margin:0}
+.practice-choice strong{font-size:15px}
+.practice-choice small{font-size:12px;line-height:1.5;color:#adbbb2;margin-top:3px}
+.practice-range label{flex:1;min-width:130px;font-size:13px;color:#adbbb2}
+.practice-range select{display:block;width:100%;margin:8px 0 0;min-height:44px;padding:9px;border:1px solid #42554a;border-radius:10px;font:inherit;color:#eff8f2;background:#14231a;accent-color:var(--accent,#0ffc7e);color-scheme:dark}
+.practice-start{margin-top:14px}
+.practice-result-heading p{margin:0 0 6px}
+.practice-result-scale{font-size:11px;color:#94ab9d}
+.practice-result-lead{display:grid;grid-template-columns:1.15fr 1fr;gap:24px;padding:12px 0 24px;border-bottom:1px solid #2b3a31}
+.practice-intonation,.practice-score{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.practice-score__label{font-size:14px;color:#c3d2c9}
+.practice-intonation__value{font-size:clamp(72px,12vw,102px);line-height:1;letter-spacing:-.065em;color:var(--accent,#0ffc7e)}
+.practice-score{padding-left:24px;border-left:1px solid #2b3a31;justify-content:center}
+.practice-score__value{font-size:clamp(42px,8vw,60px);letter-spacing:-.04em}
+.practice-score small,.practice-result-unit{font-size:11px;color:#94ab9d;line-height:1.5}
+.practice-results{gap:22px}
+.practice-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;padding-bottom:22px;border-bottom:1px solid #2b3a31}
+.practice-metrics li{border:0;border-radius:0;padding:0;gap:8px}
+.practice-metrics li>span{font-size:13px;color:#c3d2c9}
+.practice-metrics strong{font-size:30px;line-height:1}
+.practice-chart-wrap{padding:16px 12px;background:#0a100c;border:1px solid #26392d}
+.practice-chart{height:190px}
+.practice-subtitle{font-size:12px;color:#a9bbb0;letter-spacing:.1em}
+.practice-tips{padding-left:18px;font-size:14px;line-height:1.65;color:#d0ded5;gap:12px}
+.practice-phrase{min-height:52px;background:#142019;border-color:#354b3e;font-size:13px}
+.practice-phrase small{font-size:11px}
+.practice-actions{gap:10px;padding-top:8px}
+.practice-send__confirm{border:1px solid #355642;background:#11271a;border-radius:16px;padding:20px;font-size:14px;line-height:1.65}
+.practice-send__confirm p{margin:0 0 14px}
+.practice-send__ok{color:var(--accent,#0ffc7e);font-size:14px;line-height:1.6}
+.result-card-scores{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:22px 0}
+.result-card-scores div{display:flex;flex-direction:column;gap:9px}
+.result-card-scores span{font-size:12px;color:#a9bbb0}
+.result-card-scores strong{font-size:26px;font-weight:650;color:var(--accent,#0ffc7e)}
+.recording-detail{margin-top:24px;padding-top:24px;border-top:1px solid #293b30}
+
 @media (max-width: 640px) {
   .practice-panel { padding: 0; }
   .practice-panel__sheet { border-radius: 0; height: 100vh; max-height: 100vh; height: 100dvh; max-height: 100dvh; padding: 20px 16px; }
-  .practice-metrics { grid-template-columns: 1fr; }
-  .practice-score__value { font-size: 44px; }
+  .practice-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .practice-result-lead{gap:14px}
+  .practice-score{padding-left:14px}
+  .practice-score__value { font-size: 46px; }
+  .practice-panel .practice-actions .btn{flex:1 1 140px}
+  .result-card-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
 }
 
 /* ---------- Diálogos de cuenta, progreso y administración ---------- */

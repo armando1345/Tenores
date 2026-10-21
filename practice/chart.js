@@ -39,5 +39,5 @@ export function renderChart(curves, phrases = []) {
     return `<rect class="chart-phrase" x="${a.toFixed(1)}" y="0" width="${Math.max(0, b - a).toFixed(1)}" height="${H}" style="fill:${fill(p.pitch)}"/>`;
   }).join('');
 
-  return `<svg class="practice-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Curva de afinación: referencia y tu voz">${bands}${lines(ref, 'chart-ref')}${user ? lines(user, 'chart-user') : ''}</svg>`;
+  return `<svg class="practice-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Curva de entonación: referencia y tu voz">${bands}${lines(ref, 'chart-ref')}${user ? lines(user, 'chart-user') : ''}</svg>`;
 }

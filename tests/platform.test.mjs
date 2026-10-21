@@ -169,67 +169,51 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
     assert.equal(query('SELECT COUNT(*) n FROM legacy_attendance').n,9);assert.equal(query('SELECT SUM(minutes) n FROM legacy_attendance').n,16914);
   });
   let uploaded=[];
-  await t.test('Grabaciones privadas, reintentos, límites y audios anteriores',async()=>{
+  await t.test('Resultados sin audio: autorización, reintentos y datos privados',async()=>{
     assert((await call('/api/public/stats?year=2026')).data.members.every(m=>m.similarity===null));
-    const bytes=new Uint8Array([0x1a,0x45,0xdf,0xa3,1,2,3,4]);
+    const originalPut=R2.put;R2.put=()=>{throw Error('Nunca debe guardar audio');};
     for(let i=0;i<2;i++){
-      const meta={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,file_size:bytes.length,mime_type:'audio/webm;codecs=opus',analysis:analysisFor(song)};
-      const reserved=await call('/api/recordings/reserve',{method:'POST',...tenor,body:meta});assert.equal(reserved.status,201);uploaded.push(meta.id);
-      const summary=await call(`/api/admin/summary?season=${season}`,admin);assert.equal(summary.data.season_storage.submitted_count,uploaded.length-1);assert.equal(summary.data.season_storage.count,uploaded.length);
-      assert.equal((await call(`/api/recordings/${meta.id}`,{method:'PUT',...tenor,body:bytes,headers:{'Content-Type':meta.mime_type}})).status,200);
-      assert.equal((await call('/api/recordings/reserve',{method:'POST',...tenor,body:meta})).status,200);
-      assert.equal((await call(`/api/recordings/${meta.id}`,{method:'PUT',...tenor,body:bytes,headers:{'Content-Type':meta.mime_type}})).status,200);
-      assert.deepEqual((await call(`/api/recordings/${meta.id}/audio`,tenor)).data,bytes);
-      assert.equal((await call(`/api/recordings/${meta.id}/audio`,other)).status,404);assert.equal((await call(`/api/recordings/${meta.id}/audio`)).status,401);assert.equal((await call(`/api/recordings/${meta.id}/audio`,admin)).status,200);
+      const meta={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,analysis:analysisFor(song)};
+      const saved=await call('/api/practice-results',{method:'POST',...tenor,body:meta});assert.equal(saved.status,201,JSON.stringify(saved.data));uploaded.push(meta.id);
+      assert.equal((await call('/api/practice-results',{method:'POST',...tenor,body:meta})).status,200);
+      assert.equal((await call('/api/practice-results',{method:'POST',...tenor,body:{...meta,analysis:analysisFor(song,75)}})).status,409);
+      assert.equal((await call('/api/recordings/reserve',{method:'POST',...tenor,body:meta})).status,410);
+      assert.equal((await call(`/api/recordings/${meta.id}`,{method:'PUT',...tenor,body:new Uint8Array([1]),headers:{'Content-Type':'audio/webm'}})).status,410);
+      assert.equal((await call(`/api/practice-results/${meta.id}/analysis`,other)).status,404);
+      assert.equal((await call(`/api/practice-results/${meta.id}/analysis`,admin)).data.scores.pitch,80);
     }
-    const list=(await call(`/api/recordings?season=${season}`,tenor)).data;assert.equal(list.items.length,2);assert(!JSON.stringify(list).includes('r2_object_key'));
-    const similarity=(await call('/api/public/stats?year=2026')).data.members;
-    assert.equal(similarity.find(m=>m.id===tenorIds[0]).similarity,80);assert.equal(similarity.find(m=>m.id===tenorIds[1]).similarity,null);
-    assert.equal((await call(`/api/recordings?season=${season}&song=${song}`,tenor)).data.items.length,2);
-    const anotherSong=query('SELECT id FROM songs WHERE id!=? LIMIT 1',song).id;
-    assert.equal((await call(`/api/recordings?season=${season}&song=${anotherSong}`,tenor)).data.items.length,0);
-    assert.equal((await call(`/api/recordings?season=${season}&user=${tenorIds[0]}`,other)).data.items.length,0);
-    const base={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,file_size:20000001,mime_type:'audio/webm',analysis:analysisFor(song)};
-    assert.equal((await call('/api/recordings/reserve',{method:'POST',...tenor,body:base})).status,413);
-    const corrupt={...base,id:randomUUID(),file_size:8};await call('/api/recordings/reserve',{method:'POST',...tenor,body:corrupt});assert.equal((await call(`/api/recordings/${corrupt.id}`,{method:'PUT',...tenor,body:new TextEncoder().encode('<html />'),headers:{'Content-Type':'audio/webm'}})).status,415);
-    assert.equal((await R2.head(query('SELECT r2_object_key FROM recordings WHERE id=?',corrupt.id).r2_object_key)),null);
-    // Reservas y archivos pendientes siguen contándose: no se libera cuota si el proveedor falla.
-    const retry={...corrupt,id:randomUUID(),mime_type:'audio/webm;codecs=opus'};await call('/api/recordings/reserve',{method:'POST',...tenor,body:retry});const put=R2.put.bind(R2);R2.put=async()=>{throw new Error('test network failure');};assert.equal((await call(`/api/recordings/${retry.id}`,{method:'PUT',...tenor,body:bytes,headers:{'Content-Type':retry.mime_type}})).status,503);R2.put=put;
-    assert.equal(query('SELECT status FROM recordings WHERE id=?',retry.id).status,'pending');assert.equal((await call(`/api/recordings/${retry.id}`,{method:'PUT',...tenor,body:bytes,headers:{'Content-Type':retry.mime_type}})).status,200);
-    sql('UPDATE app_limits SET total_bytes=24');assert.equal((await call('/api/recordings/reserve',{method:'POST',...tenor,body:{...retry,id:randomUUID()}})).status,429);sql('UPDATE app_limits SET total_bytes=8000000000');
+    R2.put=originalPut;assert.equal(R2.memory.size,0);
+    const list=(await call(`/api/practice-results?season=${season}`,tenor)).data;assert.equal(list.items.length,2);assert(!/r2_object_key|audio_url|mime_type/.test(JSON.stringify(list)));
+    assert.equal((await call('/api/public/stats?year=2026')).data.members.find(m=>m.id===tenorIds[0]).similarity,80);
+    assert.equal((await call(`/api/practice-results?season=${season}&user=${tenorIds[0]}`,other)).data.items.length,0);
+    const base={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,analysis:analysisFor(song)};
+    assert.equal((await call('/api/practice-results',{method:'POST',...tenor,body:{...base,audio:'data:audio'}})).status,400);
+    assert.equal((await call('/api/practice-results',{method:'POST',...tenor,body:{...base,duration_seconds:NaN}})).status,400);
+    const analytics=(await call(`/api/admin/analytics?season=${season}`,admin)).data.members.find(m=>m.id===tenorIds[0]);assert.equal(analytics.pitchSum,160);assert.equal(analytics.pitchCount,2);
   });
-  await t.test('Actividad privada y cierre por lotes con reanudación',async()=>{
-    const event={event_type:'reference_start',song_id:song};await call('/api/events',{method:'POST',...tenor,body:event});await call('/api/events',{method:'POST',...tenor,body:event});assert.equal(query("SELECT COUNT(*) n FROM activity_events WHERE user_id=? AND event_type='reference_start'",tenorIds[0]).n,1);
-    assert.equal((await call('/api/admin/activity',tenor)).status,403);assert.equal((await call('/api/admin/activity',admin)).status,200);
-    const exportResult=await call(`/api/admin/seasons/${season}/export`,admin);assert.equal(exportResult.data.items.length,3);assert(!JSON.stringify(exportResult.data).includes('r2_object_key'));
+  await t.test('Cierre conserva resultados y asistencia histórica',async()=>{
+    const exported=await call(`/api/admin/seasons/${season}/export`,admin);assert.equal(exported.data.items.length,2);assert(!JSON.stringify(exported.data).includes('audio_url'));
     assert.equal((await call(`/api/admin/seasons/${season}/close`,{method:'POST',...admin,body:{confirmation:'yes'}})).status,400);
     assert.equal((await call(`/api/admin/seasons/${season}/close`,{method:'POST',...admin,body:{confirmation:'ELIMINAR AUDIOS 2026'}})).status,200);
-    assert.equal((await call(`/api/admin/seasons/${season}/cleanup`,{method:'POST',...admin,body:{}})).data.waiting,true);
-    sql("UPDATE recordings SET created_at='2026-01-01T00:00:00.000Z' WHERE season_id=?",season);
-    const deletion=R2.delete.bind(R2);let once=true;R2.delete=async key=>{if(once){once=false;throw new Error('test failed delete');}return deletion(key);};assert.equal((await call(`/api/admin/seasons/${season}/cleanup`,{method:'POST',...admin,body:{}})).status,503);assert.equal(query("SELECT COUNT(*) n FROM recordings WHERE status!='deleted'").n,4);R2.delete=deletion;
-    const done=await call(`/api/admin/seasons/${season}/cleanup`,{method:'POST',...admin,body:{}});assert.equal(done.data.status,'closed');assert.equal(R2.memory.size,0);assert.equal(query('SELECT COUNT(*) n FROM rehearsal_attendance').n,2);assert.equal(query('SELECT COUNT(*) n FROM legacy_attendance WHERE season_id=?',oldSeason).n,9);
-    assert.equal((await call(`/api/recordings/${uploaded[0]}/audio`,tenor)).status,410);
+    assert.equal((await call(`/api/admin/seasons/${season}/cleanup`,{method:'POST',...admin,body:{}})).data.status,'closed');
+    assert.equal(query('SELECT COUNT(*) n FROM practice_results').n,2);assert.equal(query('SELECT COUNT(*) n FROM legacy_attendance').n,9);
+    assert.equal((await call(`/api/practice-results/${uploaded[0]}/analysis`,tenor)).data.scores.total,80);
+    sql('DELETE FROM practice_results');
   });
   await t.test('Prácticas con análisis y curvas',async()=>{
     sql("UPDATE seasons SET status='active' WHERE id=?",season);
     const fumSong=query("SELECT * FROM songs WHERE legacy_key='fum'"),bytes=new Uint8Array([0x1a,0x45,0xdf,0xa3,5,6,7,8]);
-    const meta={id:randomUUID(),song_id:fumSong.id,season_id:season,duration_seconds:3,file_size:bytes.length,mime_type:'audio/webm;codecs=opus'};
-    const reserve=body=>call('/api/recordings/reserve',{method:'POST',...tenor,body});
+    const meta={id:randomUUID(),song_id:fumSong.id,season_id:season,duration_seconds:3};
+    const reserve=body=>call('/api/practice-results',{method:'POST',...tenor,body});
     assert.equal((await reserve(meta)).status,400);
     assert.equal((await reserve({...meta,analysis:{...analysisFor(fumSong.id),isFull:false}})).status,400);
     const created=await reserve({...meta,analysis:analysisFor(fumSong.id)});assert.equal(created.status,201);
     const again=await reserve({...meta,analysis:analysisFor(fumSong.id)});assert.equal(again.status,200);assert.equal(again.data.id,meta.id);
     assert.equal((await reserve({...meta,analysis:analysisFor(fumSong.id,75)})).status,409);
-    assert.equal((await call(`/api/recordings/${meta.id}/analysis`,tenor)).status,409);
-    assert.equal((await call(`/api/recordings/${meta.id}`,{method:'PUT',...tenor,body:bytes,headers:{'Content-Type':meta.mime_type}})).status,200);
-    const analysis=await call(`/api/recordings/${meta.id}/analysis`,tenor);assert.equal(analysis.status,200);assert.equal(analysis.data.scores.total,80);
-    assert.equal((await call(`/api/recordings/${meta.id}/analysis`,other)).status,404);assert.equal((await call(`/api/recordings/${meta.id}/analysis`,admin)).status,200);
-    const legacyId=randomUUID();sql("INSERT INTO recordings(id,user_id,song_id,season_id,r2_object_key,duration_seconds,file_size,mime_type,status,recorded_at,uploaded_at,created_at) VALUES(?,?,?,?,?,?,?,?,'ready',?,?,?)",legacyId,tenorIds[0],fumSong.id,season,`${season}/${tenorIds[0]}/${legacyId}`,3,8,'audio/webm','2026-01-01T00:00:00.000Z','2026-01-01T00:00:00.000Z','2026-01-01T00:00:00.000Z');
-    const list=(await call(`/api/recordings?season=${season}`,tenor)).data.items;
-    const fresh=list.find(r=>r.id===meta.id),legacy=list.find(r=>r.id===legacyId);
-    assert.equal(fresh.score,80);assert.equal(fresh.has_analysis,1);assert(list.every(r=>!('analysis' in r)));
-    assert.equal(legacy.score,null);assert.equal(legacy.has_analysis,0);
-    const missing=await call(`/api/recordings/${legacyId}/analysis`,tenor);assert.equal(missing.status,404);assert.equal(missing.data.error,'Esta práctica no tiene análisis.');
+    const analysis=await call(`/api/practice-results/${meta.id}/analysis`,tenor);assert.equal(analysis.status,200);assert.equal(analysis.data.scores.total,80);
+    assert.equal((await call(`/api/practice-results/${meta.id}/analysis`,other)).status,404);assert.equal((await call(`/api/practice-results/${meta.id}/analysis`,admin)).status,200);
+    const list=(await call(`/api/practice-results?season=${season}`,tenor)).data.items;
+    assert.equal(list.find(r=>r.id===meta.id).score,80);assert(list.every(r=>!('analysis' in r)));
     const ref=await call(`/api/songs/${fumSong.id}/reference`,tenor);assert.equal(ref.status,200);assert.equal(ref.data.songId,fumSong.id);assert(ref.data.midi.length>0);
     assert.equal((await call('/api/public/songs?season='+season)).data.find(s=>s.id===fumSong.id).has_reference,1);
     const newSource='https://res.cloudinary.com/dcwx23x5o/video/upload/v2/fum_nueva.wav';
@@ -237,7 +221,7 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
     const gone=await call(`/api/songs/${fumSong.id}/reference`,tenor);assert.equal(gone.status,404);assert.equal(gone.data.error,'Esta canción aún no tiene curva de referencia.');
     assert.equal((await call('/api/public/songs?season='+season)).data.find(s=>s.id===fumSong.id).has_reference,0);
     assert.equal((await call(`/api/admin/songs?season=${season}`,admin)).data.find(s=>s.id===fumSong.id).has_reference,0);
-    assert.equal((await call(`/api/recordings/${meta.id}/analysis`,tenor)).data.scores.total,80);
+    assert.equal((await call(`/api/practice-results/${meta.id}/analysis`,tenor)).data.scores.total,80);
     const fixture=JSON.parse(await readFile(new URL('./fixtures/fum-reference.json',import.meta.url),'utf8'));
     const path=`/api/admin/songs/${fumSong.id}/reference`;
     assert.equal((await call(path,{method:'POST',...tenor,body:{reference:{...fixture,source:newSource}}})).status,403);
@@ -248,7 +232,7 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
     assert.equal((await call(`/api/songs/${fumSong.id}/reference`,tenor)).data.songId,fumSong.id);
     assert.equal(query("SELECT COUNT(*) n FROM admin_audit WHERE action='reference_generated' AND entity_id=?",fumSong.id).n,1);
     assert.equal((await call(`/api/admin/practice-scores?season=${season}`,tenor)).status,403);
-    assert.deepEqual((await call(`/api/admin/practice-scores?season=${season}`,admin)).data,[{user_id:tenorIds[0],average:80,count:1}]);
+    assert.deepEqual((await call(`/api/admin/practice-scores?season=${season}`,admin)).data,[{user_id:tenorIds[0],average:80,count:1,pitch:80,rhythm:80,stability:80}]);
   });
   await t.test('Rate limiting distribuido con D1',async()=>{for(let i=0;i<240;i++)await call('/api/session',{ip:'test-rate'});assert.equal((await call('/api/session',{ip:'test-rate'})).status,429);});
   DB.sqlite.close();

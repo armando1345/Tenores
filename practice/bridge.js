@@ -8,7 +8,7 @@ import { formatTime } from './util.js';
 
 // Punto de entrada de la práctica para platform.js (script clásico): expone la API en window.
 function isSupported() {
-  try { return isRecordingSupported() && !!window.MediaRecorder; } catch { return false; }
+  try { return isRecordingSupported(); } catch { return false; }
 }
 
 async function generateReference(song) {

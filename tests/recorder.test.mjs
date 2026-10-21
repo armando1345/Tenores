@@ -32,7 +32,7 @@ async function client({role='tenor',hasReference=1,supported=true,reserveStatus=
   const elements=new Map(),get=id=>{if(!elements.has(id))elements.set(id,new Element(id));return elements.get(id);};
   const docListeners={},windowListeners={},requests=[],uploads=[],created=[],opened=[],closed=[],pending={value:false};
   const seasonId=randomUUID(),songs=[{id:randomUUID(),season_id:seasonId,legacy_key:'fum',title:'Fum Fum Fum',reference_audio_key:'https://res.cloudinary.com/demo/video/upload/fum.mp3',has_reference:hasReference},{id:randomUUID(),season_id:seasonId,legacy_key:'campanas',title:'Canto de las campanas',reference_audio_key:'https://res.cloudinary.com/demo/video/upload/campanas.mp3',has_reference:1}];
-  const recordings=[{id:randomUUID(),song_id:songs[0].id,title:songs[0].title,uploaded_at:'2026-03-01T15:00:00Z',duration_seconds:30,score:80,has_analysis:1},{id:randomUUID(),song_id:songs[0].id,title:songs[0].title,uploaded_at:'2026-02-01T15:00:00Z',duration_seconds:20,score:null,has_analysis:0}];
+  const recordings=[{id:randomUUID(),song_id:songs[0].id,title:songs[0].title,submitted_at:'2026-03-01T15:00:00Z',duration_seconds:30,pitch:85,rhythm:72,stability:80,score:80,has_analysis:1},{id:randomUUID(),song_id:songs[0].id,title:songs[0].title,submitted_at:'2026-02-01T15:00:00Z',duration_seconds:20,score:null,has_analysis:0}];
   const location={protocol:'http:',hash:'#fum'};
   const fetch=async(path,options={})=>{
     requests.push({path,options});let data={ok:true};
@@ -45,9 +45,9 @@ async function client({role='tenor',hasReference=1,supported=true,reserveStatus=
     else if(path.startsWith('/api/admin/practice-scores'))data=[];
     else if(path.startsWith('/api/admin/active-rehearsal'))data=null;
     else if(path.startsWith('/api/admin/summary'))data={users:{active:1,total:8},storage:{bytes:0,count:0},season_storage:{bytes:0,count:0},limits:{total_bytes:8000000000,season_bytes:2000000000},storage_configured:true};
-    else if(path.startsWith('/api/recordings?'))data={items:recordings,next_offset:null};
-    else if(/^\/api\/recordings\/[^/]+\/analysis$/.test(path))data={scores:{total:80}};
-    else if(path==='/api/recordings/reserve'){const b=JSON.parse(options.body);uploads.push(b);if(reserveStatus!==200)return Response.json({error:'El almacenamiento de audios aún no está configurado.'},{status:reserveStatus});data={id:b.id,status:'pending'};}
+    else if(path.startsWith('/api/practice-results?'))data={items:recordings,next_offset:null};
+    else if(/^\/api\/practice-results\/[^/]+\/analysis$/.test(path))data={scores:{total:80}};
+    else if(path==='/api/practice-results'){const b=JSON.parse(options.body);uploads.push(b);if(reserveStatus!==200)return Response.json({error:'No se pudo guardar el resultado.'},{status:reserveStatus});data={id:b.id,status:'pending'};}
     return Response.json(data);
   };
   const tenoresPractice={isSupported:()=>supported,open(song,hooks){opened.push({song,hooks});},close(options){closed.push(options);},hasPendingTake:()=>pending.value,analysisMarkup:a=>`<div class="stub-analysis">Detalle ${a.scores.total}</div>`};
@@ -63,8 +63,8 @@ async function client({role='tenor',hasReference=1,supported=true,reserveStatus=
 const take=()=>({id:randomUUID(),blob:new Blob([new Uint8Array([0x1a,0x45,0xdf,0xa3,1,2,3,4])],{type:'audio/webm;codecs=opus'}),mimeType:'audio/webm;codecs=opus',durationSeconds:4.2,analysis:{scores:{total:80}}});
 const no90=()=>assert(!rendered.some(html=>html.includes('90%')),'ningún HTML debe mostrar 90%');
 
-test('Con curva, la tarjeta ofrece «Practicar con guía» y abre la práctica con canción y límites',async()=>{
-  const c=await client();assert(!c.root.hidden);assert(c.root.innerHTML.includes('Practicar con guía'));assert.equal(c.opened.length,0);
+test('Con curva, la tarjeta ofrece «Subir mi práctica» y abre la práctica con canción y límites',async()=>{
+  const c=await client();assert(!c.root.hidden);assert(c.root.innerHTML.includes('Subir mi práctica'));assert.equal(c.opened.length,0);
   await c.node('practice-launch').onclick();
   assert.equal(c.opened.length,1);const {song,hooks}=c.opened[0];
   assert.deepEqual({...song},{id:c.songs[0].id,title:'Fum Fum Fum',track:c.songs[0].reference_audio_key});
@@ -72,31 +72,28 @@ test('Con curva, la tarjeta ofrece «Practicar con guía» y abre la práctica c
   await hooks.loadReference();assert(c.requests.some(r=>r.path===`/api/songs/${c.songs[0].id}/reference`));no90();
 });
 test('Sin curva se avisa y no se abre la práctica',async()=>{
-  const c=await client({hasReference:0});assert(c.root.innerHTML.includes('Esta canción aún no tiene curva de referencia; jefatura debe generarla.'));assert(!c.root.innerHTML.includes('Practicar con guía'));assert.equal(c.node('practice-launch'),null);assert.equal(c.opened.length,0);
+  const c=await client({hasReference:0});assert(c.root.innerHTML.includes('Esta canción aún no tiene curva de referencia; jefatura debe generarla.'));assert(!c.root.innerHTML.includes('Subir mi práctica'));assert.equal(c.node('practice-launch'),null);assert.equal(c.opened.length,0);
 });
 test('Sin soporte de grabación se avisa en la tarjeta',async()=>{
   const c=await client({supported:false});assert(c.root.innerHTML.includes('Tu navegador no permite grabar.'));assert.equal(c.node('practice-launch'),null);
 });
-test('Enviar reserva una vez con el análisis y sube el audio con PUT',async()=>{
-  const c=await client();await c.node('practice-launch').onclick();const t=take();await c.opened[0].hooks.send(t);
-  assert.equal(c.uploads.length,1);const b=c.uploads[0];
-  assert.deepEqual({id:b.id,song_id:b.song_id,season_id:b.season_id,duration_seconds:b.duration_seconds,file_size:b.file_size,mime_type:b.mime_type},{id:t.id,song_id:c.songs[0].id,season_id:c.songs[0].season_id,duration_seconds:4.2,file_size:t.blob.size,mime_type:'audio/webm;codecs=opus'});
-  assert.deepEqual(b.analysis,{scores:{total:80}});
-  const puts=c.requests.filter(r=>r.options.method==='PUT');assert.equal(puts.length,1);assert.equal(puts[0].path,`/api/recordings/${t.id}`);assert.equal(puts[0].options.body,t.blob);assert.equal(puts[0].options.headers['Content-Type'],'audio/webm;codecs=opus');
+test('Enviar solo transmite JSON con análisis, sin Blob ni PUT',async()=>{
+ const c=await client();await c.node('practice-launch').onclick();const t=take();delete t.blob;delete t.mimeType;await c.opened[0].hooks.send(t);
+ assert.equal(c.uploads.length,1);const b=c.uploads[0];assert.deepEqual(b.analysis,{scores:{total:80}});assert.equal(b.id,t.id);assert.equal(b.duration_seconds,4.2);assert(!('file_size' in b));assert(!('mime_type' in b));assert.equal(c.requests.filter(r=>r.options.method==='PUT').length,0);
 });
 test('Si la reserva falla (503) se rechaza con el mensaje del servidor y no hay PUT',async()=>{
   const c=await client({reserveStatus:503});await c.node('practice-launch').onclick();
-  await assert.rejects(c.opened[0].hooks.send(take()),{message:'El almacenamiento de audios aún no está configurado.'});
+  await assert.rejects(c.opened[0].hooks.send(take()),{message:'No se pudo guardar el resultado.'});
   assert.equal(c.uploads.length,1);assert.equal(c.requests.filter(r=>r.options.method==='PUT').length,0);
 });
 test('Con una toma pendiente, cambiar de canción conserva la canción de la práctica',async()=>{
   const c=await client();c.pending.value=true;c.navigate('campanas');
   assert.equal(c.location.hash.replace('#',''),'fum');assert(c.node('platform-feedback').textContent.includes('Conservamos la práctica de Fum Fum Fum'));
-  c.pending.value=false;c.navigate('campanas');assert(c.root.innerHTML.includes('Practicar con guía'));await c.node('practice-launch').onclick();assert.equal(c.opened.at(-1).song.id,c.songs[1].id);
+  c.pending.value=false;c.navigate('campanas');assert(c.root.innerHTML.includes('Subir mi práctica'));await c.node('practice-launch').onclick();assert.equal(c.opened.at(-1).song.id,c.songs[1].id);
 });
 
 test('Jefatura abre Inicio con dos gráficas y al salir restaura el espacio del tenor',async()=>{
-  const c=await client({role:'admin'});assert(c.get('body').classes.has('is-admin'));assert(c.get('body').classes.has('is-admin-home'));assert(!c.get('adminDashboard').hidden);assert.equal(c.get('platformWorkspace').parent,c.get('adminWorkspace'));assert.equal(c.get('platformNav').parent,c.get('adminNavigation'));assert(!c.get('adminNavigation').hidden);assert(!c.get('platformPanel').open);assert(c.root.hidden);assert(c.get('platformContent').innerHTML.includes('Nota de práctica del equipo'));assert(c.get('platformContent').innerHTML.includes('Aún no hay prácticas enviadas.'));assert(!c.get('platformContent').innerHTML.includes('Similitud'));assert(c.get('platformContent').innerHTML.includes('Progreso del equipo'));assert(!c.get('platformContent').innerHTML.includes('Grupos de desempeño'));assert(c.get('platformSeason').hidden);assert(!c.get('seasonPicker').hidden);no90();
+  const c=await client({role:'admin'});assert(c.get('body').classes.has('is-admin'));assert(c.get('body').classes.has('is-admin-home'));assert(!c.get('adminDashboard').hidden);assert.equal(c.get('platformWorkspace').parent,c.get('adminWorkspace'));assert.equal(c.get('platformNav').parent,c.get('adminNavigation'));assert(!c.get('adminNavigation').hidden);assert(!c.get('platformPanel').open);assert(c.root.hidden);assert(c.get('platformContent').innerHTML.includes('Similitud total del equipo'));assert(c.get('platformContent').innerHTML.includes('Aún no hay prácticas enviadas.'));assert(c.get('platformContent').innerHTML.includes('Progreso del equipo'));assert(!c.get('platformContent').innerHTML.includes('Grupos de desempeño'));assert(c.get('platformSeason').hidden);assert(!c.get('seasonPicker').hidden);no90();
   c.get('body').classes.add('is-rehearsal');c.get('loginForm').elements.username=new Element();await c.get('logoutButton').onclick({target:c.get('logoutButton')});assert(!c.get('body').classes.has('is-admin'));assert(!c.get('body').classes.has('is-rehearsal'));assert(c.get('adminDashboard').hidden);assert.equal(c.get('platformWorkspace').parent,c.get('platformPanel'));assert(c.get('accessGate').open);
 });
 
@@ -104,23 +101,13 @@ test('La biblioteca del tenor muestra únicamente la temporada 2026, con nota o 
   const c=await client();assert(c.get('platformSeason').hidden);assert(!c.get('personalSeason').hidden);assert(c.get('platformSeason').innerHTML.includes('2026'));assert(!c.get('platformSeason').innerHTML.includes('2025'));assert.equal(c.get('platformNav').parent,c.get('platformWorkspace'));
   await c.get('practiceOpen').onclick();
   const items=c.created.filter(e=>e.className==='audio-history');assert.equal(items.length,2);
-  const [scored,legacy]=items;assert(scored.innerHTML.includes('Nota: 80'));assert(scored.innerHTML.includes('Ver detalle'));assert(legacy.innerHTML.includes('Sin análisis'));assert(!legacy.innerHTML.includes('Ver detalle'));
+  const [scored]=items;assert(scored.innerHTML.includes('Entonación'));assert(scored.innerHTML.includes('Similitud total'));assert(scored.innerHTML.includes('Ver análisis completo'));assert(!scored.innerHTML.includes('<audio'));
   const toggle=scored.querySelector('.recording-detail-toggle'),detail=scored.querySelector('.recording-detail');assert(detail.hidden);
   await toggle.onclick();assert(!detail.hidden);assert(detail.innerHTML.includes('Detalle 80'));
   await toggle.onclick();assert(detail.hidden);await toggle.onclick();assert(!detail.hidden);
-  assert.equal(c.requests.filter(r=>r.path===`/api/recordings/${c.recordings[0].id}/analysis`).length,1);no90();
+  assert.equal(c.requests.filter(r=>r.path===`/api/practice-results/${c.recordings[0].id}/analysis`).length,1);no90();
 });
 
-test('El reproductor de práctica reproduce, pausa y permite avanzar sin duración WebM',async()=>{
-  const c=await client();await c.get('practiceOpen').onclick();
-  const item=c.created.find(e=>e.className==='audio-history'),find=key=>item.querySelector('.'+key);
-  assert.equal(find('preview-duration').textContent,'00:30');assert.equal(find('preview-seek').max,'30');
-  await find('preview-toggle').onclick();assert.equal(find('preview-toggle').attributes['aria-label'],'Pausar práctica');assert(!find('record-preview').paused);
-  find('preview-seek').value='2';find('preview-seek').oninput();assert.equal(find('record-preview').currentTime,2);assert.equal(find('preview-current').textContent,'00:02');
-  await find('preview-toggle').onclick();assert(find('record-preview').paused);assert.equal(find('preview-toggle').attributes['aria-label'],'Escuchar práctica');
-  find('record-preview').duration=45.5;find('record-preview').listeners.durationchange();assert.equal(find('preview-seek').max,'45.5');
-  find('preview-seek').value='80';find('preview-seek').oninput();assert.equal(find('record-preview').currentTime,45.5);
-});
 test('Cerrar sesión cierra la práctica a la fuerza y descarta la toma pendiente',async()=>{
   const c=await client();c.pending.value=true;c.get('loginForm').elements.username=new Element();
   await c.get('logoutButton').onclick({target:c.get('logoutButton')});

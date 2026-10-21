@@ -1,4 +1,4 @@
-import { HttpError, ensure, text, uuid, date, clock, attendance, canReadRecording, recordingMetadata, sniffAudio, practiceAnalysis, referencePayload } from './domain.mjs';
+import { HttpError, ensure, text, uuid, date, clock, attendance, canReadRecording, practiceAnalysis, referencePayload } from './domain.mjs';
 import { digest, token } from './security.mjs';
 import { passwordHash, passwordVerify } from './password-service.mjs';
 import { analyticsData } from './analytics.mjs';
@@ -68,7 +68,7 @@ async function publicStats(env,year) {
   const season=await one(env,'SELECT * FROM seasons WHERE year=?',year); ensure(season,'Temporada no encontrada.',404);
   // Solo agregados permitidos. No devolver late_reason, activity ni credenciales.
   let members=await rows(env,`SELECT u.id,u.display_name AS name,u.legacy_key,m.active AS membership_active,
-    (SELECT AVG(p.score) FROM recordings p WHERE p.user_id=u.id AND p.season_id=m.season_id AND p.status='ready' AND p.score IS NOT NULL) AS similarity,
+    (SELECT AVG(p.score) FROM practice_results p WHERE p.user_id=u.id AND p.season_id=m.season_id) AS similarity,
     COALESCE(SUM(CASE WHEN r.status='final' THEN a.effective_minutes END),0) AS minutes,
     COALESCE(SUM(CASE WHEN r.status='final' THEN r.duration_minutes END),0) AS scheduled_minutes,
     COUNT(CASE WHEN r.status='final' THEN 1 END) AS rehearsals,
@@ -165,8 +165,8 @@ async function api(request,env) {
   if(tenorDetail && method==='GET'){
     const season=await checkSeason(env,url.searchParams.get('season')),person=await one(env,"SELECT * FROM users WHERE id=? AND role='tenor'",tenorDetail[1]);ensure(person,'Tenor no encontrado.',404);
     const stats=await publicStats(env,season.year);
-    const personSeasons=await rows(env,`SELECT s.id,s.year FROM seasons s WHERE EXISTS (SELECT 1 FROM season_memberships m WHERE m.season_id=s.id AND m.user_id=?) OR EXISTS (SELECT 1 FROM legacy_attendance l WHERE l.season_id=s.id AND l.user_id=?) OR EXISTS (SELECT 1 FROM rehearsal_attendance a JOIN rehearsals r ON r.id=a.rehearsal_id WHERE r.season_id=s.id AND a.user_id=?) OR EXISTS (SELECT 1 FROM recordings r WHERE r.season_id=s.id AND r.user_id=? AND r.status='ready') ORDER BY s.year DESC`,person.id,person.id,person.id,person.id);
-    return json({user:safeUser(person),seasons:personSeasons,stats:stats.members.find(m=>m.id===person.id)||null,attendance:await rows(env,'SELECT r.id,r.rehearsal_date,r.starts_at,r.ends_at,r.status,r.is_live,a.attendance_status,a.late_reason,a.arrival_at,a.effective_minutes FROM rehearsal_attendance a JOIN rehearsals r ON r.id=a.rehearsal_id WHERE a.user_id=? AND r.season_id=? ORDER BY r.rehearsal_date DESC,r.starts_at DESC LIMIT 100',person.id,season.id),recordings:await one(env,"SELECT COUNT(*) AS total FROM recordings WHERE user_id=? AND season_id=? AND status='ready'",person.id,season.id)});
+    const personSeasons=await rows(env,`SELECT s.id,s.year FROM seasons s WHERE EXISTS (SELECT 1 FROM season_memberships m WHERE m.season_id=s.id AND m.user_id=?) OR EXISTS (SELECT 1 FROM legacy_attendance l WHERE l.season_id=s.id AND l.user_id=?) OR EXISTS (SELECT 1 FROM rehearsal_attendance a JOIN rehearsals r ON r.id=a.rehearsal_id WHERE r.season_id=s.id AND a.user_id=?) OR EXISTS (SELECT 1 FROM practice_results r WHERE r.season_id=s.id AND r.user_id=?) ORDER BY s.year DESC`,person.id,person.id,person.id,person.id);
+    return json({user:safeUser(person),seasons:personSeasons,stats:stats.members.find(m=>m.id===person.id)||null,attendance:await rows(env,'SELECT r.id,r.rehearsal_date,r.starts_at,r.ends_at,r.status,r.is_live,a.attendance_status,a.late_reason,a.arrival_at,a.effective_minutes FROM rehearsal_attendance a JOIN rehearsals r ON r.id=a.rehearsal_id WHERE a.user_id=? AND r.season_id=? ORDER BY r.rehearsal_date DESC,r.starts_at DESC LIMIT 100',person.id,season.id),recordings:await one(env,"SELECT COUNT(*) AS total FROM practice_results WHERE user_id=? AND season_id=?",person.id,season.id)});
   }
   if(p==='/api/admin/presentations' && method==='POST'){
     const b=await body(request),season=await checkSeason(env,b.season_id),presentationId=b.id?uuid(b.id):id();
@@ -191,73 +191,39 @@ async function api(request,env) {
     if(b.song_id){const s=await one(env,'SELECT * FROM songs WHERE id=?',uuid(b.song_id));ensure(s,'Canción no encontrada.',404);await checkMember(env,user,s.season_id);}
     ensure(b.event_type!=='reference_start'||b.song_id,'Canción requerida.');await event(env,user,b.event_type,b.song_id||null);return json({ok:true});
   }
-  if(p==='/api/recordings' && method==='GET'){
+  // Solo datos del análisis: no se reciben ni se crean archivos de audio.
+  if(p==='/api/practice-results' && method==='GET'){
     const offset=Math.max(0,Math.min(100000,Number(url.searchParams.get('offset'))||0)),season=uuid(url.searchParams.get('season'));
     const owner=user.role==='admin'?(url.searchParams.get('user')||null):user.id;
-    const songFilter=url.searchParams.has('song')?uuid(url.searchParams.get('song')):null;
-    const result=await rows(env,'SELECT r.id,r.user_id,r.song_id,r.season_id,r.recorded_at,r.uploaded_at,r.duration_seconds,r.file_size,r.mime_type,r.codec,r.score,r.analysis IS NOT NULL AS has_analysis,s.title,u.display_name FROM recordings r JOIN songs s ON s.id=r.song_id JOIN users u ON u.id=r.user_id WHERE r.season_id=? AND r.status=\'ready\' AND (? IS NULL OR r.user_id=?) AND (? IS NULL OR r.song_id=?) ORDER BY s.title,r.uploaded_at DESC,r.id LIMIT 30 OFFSET ?',season,owner,owner,songFilter,songFilter,offset);
+    const song=url.searchParams.has('song')?uuid(url.searchParams.get('song')):null;
+    const result=await rows(env,`SELECT r.id,r.user_id,r.song_id,r.season_id,r.submitted_at,r.duration_seconds,r.score,json_extract(r.analysis,'$.scores.pitch') AS pitch,json_extract(r.analysis,'$.scores.rhythm') AS rhythm,json_extract(r.analysis,'$.scores.stability') AS stability,s.title,u.display_name FROM practice_results r JOIN songs s ON s.id=r.song_id JOIN users u ON u.id=r.user_id WHERE r.season_id=? AND (? IS NULL OR r.user_id=?) AND (? IS NULL OR r.song_id=?) ORDER BY s.title,r.submitted_at DESC,r.id LIMIT 30 OFFSET ?`,season,owner,owner,song,song,offset);
     return json({items:result,next_offset:result.length===30?offset+30:null});
   }
-  if(p==='/api/recordings/reserve' && method==='POST'){
-    ensure(env.RECORDINGS,'Almacenamiento privado pendiente de configurar.',503);
-    const l=await limits(env), b=recordingMetadata(await body(request,300000),{bytes:l.audio_bytes,seconds:l.audio_seconds}), a=practiceAnalysis(b.analysis,b.song_id);
-    await checkMember(env,user,b.season_id);
-    const old=await one(env,'SELECT * FROM recordings WHERE id=?',b.id);
-    if(old){ensure(old.user_id===user.id && old.song_id===b.song_id && old.file_size===b.file_size && old.mime_type===b.mime_type && old.duration_seconds===b.duration_seconds && old.score===a.score,'Identificador de grabación en uso.',409);ensure(old.status!=='deleted','La grabación fue eliminada.',410);return json({id:old.id,status:old.status});}
-    await run(env,'INSERT INTO recordings(id,user_id,song_id,season_id,r2_object_key,duration_seconds,file_size,mime_type,codec,analysis,score,recorded_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',b.id,user.id,b.song_id,b.season_id,`${b.season_id}/${user.id}/${b.id}`,b.duration_seconds,b.file_size,b.mime_type,b.codec,a.json,a.score,now(),now());
-    return json({id:b.id,status:'pending'},201);
+  if(p==='/api/practice-results' && method==='POST'){
+    ensure(user.role==='tenor','Las pruebas pertenecen a los tenores.',403);
+    const b=await body(request,300000),resultId=uuid(b.id),season=await checkSeason(env,b.season_id),song=await one(env,'SELECT * FROM songs WHERE id=?',uuid(b.song_id));
+    ensure(song&&song.season_id===season.id,'La canción no pertenece a esta temporada.');
+    await checkMember(env,user,season.id);
+    ensure(!('audio' in b)&&!('blob' in b)&&!('file_size' in b)&&!('mime_type' in b),'Solo se reciben datos del análisis.');
+    ensure(Number.isFinite(b.duration_seconds)&&b.duration_seconds>0&&b.duration_seconds<=601,'Duración inválida.');
+    const a=practiceAnalysis(b.analysis,song.id),old=await one(env,'SELECT * FROM practice_results WHERE id=?',resultId);
+    // Reintentar el mismo envío no lo duplica, incluso si se cerró la temporada después.
+    if(old){ensure(old.user_id===user.id&&old.song_id===song.id&&old.season_id===season.id&&old.duration_seconds===b.duration_seconds&&old.analysis===a.json,'Identificador de resultado en uso.',409);return json({id:old.id,status:'saved'});}
+    ensure(season.status==='active'&&song.active===1,'La canción o la temporada ya no admite pruebas.',409);
+    await rate(env,'practice-results:'+user.id,20,86400);
+    await run(env,'INSERT INTO practice_results(id,user_id,song_id,season_id,duration_seconds,score,analysis,submitted_at) VALUES(?,?,?,?,?,?,?,?)',resultId,user.id,song.id,season.id,b.duration_seconds,a.score,a.json,now());
+    await event(env,user,'recording_sent',song.id);return json({id:resultId,status:'saved'},201);
   }
+  const resultMatch=/^\/api\/practice-results\/([a-f0-9-]{36})\/analysis$/.exec(p);
+  if(resultMatch&&method==='GET'){
+    const r=await one(env,'SELECT * FROM practice_results WHERE id=?',resultMatch[1]);ensure(r&&canReadRecording(user,r),'Resultado no encontrado.',404);return json(JSON.parse(r.analysis));
+  }
+  if(p==='/api/recordings'||p.startsWith('/api/recordings/'))throw new HttpError(410,'Los audios ya no se guardan. Actualiza la página para enviar solo los resultados.');
   const songReference=/^\/api\/songs\/([a-f0-9-]{36})\/reference$/.exec(p);
   if(songReference && method==='GET'){
     const s=await one(env,'SELECT * FROM songs WHERE id=?',songReference[1]);ensure(s,'Canción no encontrada.',404);await checkMember(env,user,s.season_id);
     const r=await one(env,'SELECT reference FROM song_references WHERE song_id=? AND source=?',s.id,s.reference_audio_key);ensure(r,'Esta canción aún no tiene curva de referencia.',404);
     return json({...JSON.parse(r.reference),songId:s.id});
-  }
-  const recordingMatch=/^\/api\/recordings\/([a-f0-9-]{36})(\/audio|\/analysis)?$/.exec(p);
-  if(recordingMatch){
-    const r=await one(env,'SELECT * FROM recordings WHERE id=?',recordingMatch[1]);ensure(r && canReadRecording(user,r),'Grabación no encontrada.',404);
-    ensure(r.status!=='deleted','Grabación eliminada.',410);ensure(env.RECORDINGS,'Almacenamiento no configurado.',503);
-    if(method==='PUT' && !recordingMatch[2]){
-      ensure(r.user_id===user.id,'Solo el autor puede subir este audio.',403);
-      if(r.status==='ready')return json({id:r.id,status:'ready'});
-      const season=await checkSeason(env,r.season_id);ensure(season.status==='active','La temporada está cerrándose.',409);
-      ensure(request.headers.get('Content-Type')?.toLowerCase()===r.mime_type,'El formato no coincide.',415);
-      const bytes=await limitedBody(request,r.file_size);ensure(bytes.length===r.file_size,'Tamaño de archivo incompleto.');ensure(sniffAudio(bytes,r.mime_type),'El contenido no coincide con el formato declarado.',415);
-      // PUT condicional: un reintento nunca reemplaza un archivo ya recibido.
-      // Tomar una reserva temporal DESPUÉS de leer el cuerpo: un cliente lento no
-      // puede escribir una vez iniciada la limpieza. Se serializan PUT concurrentes.
-      const uploadStarted=now(),oldLease=new Date(Date.now()-15*60000).toISOString();
-      const lease=await run(env,"UPDATE recordings SET upload_started_at=? WHERE id=? AND status='pending' AND (upload_started_at IS NULL OR upload_started_at<?) AND EXISTS(SELECT 1 FROM seasons WHERE id=? AND status='active')",uploadStarted,r.id,oldLease,r.season_id);
-      ensure(lease.meta.changes>0,'Hay otra subida en curso o la temporada comenzó a cerrarse. Reintenta más tarde.',409);
-      try{await env.RECORDINGS.put(r.r2_object_key,bytes,{httpMetadata:{contentType:r.mime_type},onlyIf:{etagDoesNotMatch:'*'},customMetadata:{recordingId:r.id}});}
-      catch(error){await run(env,"UPDATE recordings SET upload_started_at=NULL WHERE id=? AND status='pending' AND upload_started_at=?",r.id,uploadStarted);throw error;}
-      const stored=await env.RECORDINGS.head(r.r2_object_key);ensure(stored && stored.size===r.file_size,'No se pudo confirmar la subida.',503);
-      // Cierre concurrente: no liberar reserva ni perder trazabilidad; cierre reanudable borrará el objeto.
-      const updated=await run(env,"UPDATE recordings SET status='ready',uploaded_at=?,upload_started_at=NULL WHERE id=? AND status='pending' AND EXISTS(SELECT 1 FROM seasons WHERE id=? AND status='active')",now(),r.id,r.season_id);
-      if(updated.meta.changes===0){
-        // Si se confirmó cierre durante PUT, borrar el objeto recién recibido;
-        // ante fallo, su metadata sigue reservada para la limpieza reanudable.
-        await env.RECORDINGS.delete(r.r2_object_key);
-        await run(env,"UPDATE recordings SET status='deleted',upload_started_at=NULL WHERE id=?",r.id);
-        throw new HttpError(409,'La temporada comenzó a cerrarse. El audio no se guardó.');
-      }
-      await event(env,user,'recording_sent',r.song_id);return json({id:r.id,status:'ready'});
-    }
-    if(method==='GET' && recordingMatch[2]==='/analysis'){
-      ensure(r.status==='ready','La grabación aún no está disponible.',409);ensure(r.analysis,'Esta práctica no tiene análisis.',404);
-      return json(JSON.parse(r.analysis));
-    }
-    if(method==='GET' && recordingMatch[2]==='/audio'){
-      ensure(r.status==='ready','La grabación aún no está disponible.',409);
-      const range=request.headers.get('Range');
-      if(range){const match=/^bytes=(\d*)-(\d*)$/.exec(range);ensure(match&&(match[1]||match[2]),'Rango inválido.',416);if(match[1])ensure(Number(match[1])<r.file_size&&(!match[2]||Number(match[2])>=Number(match[1])),'Rango fuera del audio.',416);else ensure(Number(match[2])>0,'Rango inválido.',416);}
-      const object=await env.RECORDINGS.get(r.r2_object_key,{range:request.headers});ensure(object,'Audio no disponible.',404);
-      const headers=new Headers({'Content-Type':r.mime_type,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Accept-Ranges':'bytes','Content-Disposition':'inline'});
-      let status=200;
-      if(range && object.range){status=206;headers.set('Content-Range',`bytes ${object.range.offset}-${object.range.offset+object.range.length-1}/${object.size}`);headers.set('Content-Length',String(object.range.length));}
-      else headers.set('Content-Length',String(object.size));
-      return new Response(object.body,{status,headers});
-    }
   }
   if(p==='/api/admin/users' && method==='GET') return json(await rows(env,'SELECT id,username,display_name,role,active,last_login_at,legacy_key FROM users ORDER BY display_name'));
   if(p==='/api/admin/users' && method==='POST'){
@@ -312,15 +278,15 @@ async function api(request,env) {
   }
   if(p==='/api/admin/practice-scores' && method==='GET'){
     const season=await checkSeason(env,url.searchParams.get('season'));
-    return json(await rows(env,"SELECT user_id,AVG(score) AS average,COUNT(*) AS count FROM recordings WHERE season_id=? AND status='ready' AND score IS NOT NULL GROUP BY user_id ORDER BY user_id",season.id));
+    return json(await rows(env,"SELECT user_id,AVG(score) AS average,COUNT(*) AS count,AVG(json_extract(analysis,'$.scores.pitch')) AS pitch,AVG(json_extract(analysis,'$.scores.rhythm')) AS rhythm,AVG(json_extract(analysis,'$.scores.stability')) AS stability FROM practice_results WHERE season_id=? GROUP BY user_id ORDER BY user_id",season.id));
   }
   if(p==='/api/admin/activity' && method==='GET'){
     const since=new Date(Date.now()-90*86400000).toISOString().slice(0,10);
-    return json({period_days:90,users:await rows(env,`SELECT u.id,u.display_name,u.last_login_at,(SELECT COUNT(*) FROM recordings r WHERE r.user_id=u.id AND r.uploaded_at>=?) AS recordings_sent,COUNT(CASE WHEN a.event_type='login' THEN 1 END) AS logins,COUNT(CASE WHEN a.event_type='active_day' THEN 1 END) AS active_days,COUNT(CASE WHEN a.event_type='recording_sent' THEN 1 END) AS song_submission_days,COUNT(CASE WHEN a.event_type='reference_start' THEN 1 END) AS reference_song_days FROM users u LEFT JOIN activity_events a ON a.user_id=u.id AND a.event_day>=? WHERE u.role='tenor' GROUP BY u.id`,since,since),songs:await rows(env,`SELECT s.title,u.display_name,a.event_type,COUNT(*) AS days FROM activity_events a JOIN songs s ON s.id=a.song_id JOIN users u ON u.id=a.user_id WHERE a.event_day>=? GROUP BY a.user_id,a.song_id,a.event_type LIMIT 300`,since)});
+    return json({period_days:90,users:await rows(env,`SELECT u.id,u.display_name,u.last_login_at,(SELECT COUNT(*) FROM practice_results r WHERE r.user_id=u.id AND r.submitted_at>=?) AS recordings_sent,COUNT(CASE WHEN a.event_type='login' THEN 1 END) AS logins,COUNT(CASE WHEN a.event_type='active_day' THEN 1 END) AS active_days,COUNT(CASE WHEN a.event_type='recording_sent' THEN 1 END) AS song_submission_days,COUNT(CASE WHEN a.event_type='reference_start' THEN 1 END) AS reference_song_days FROM users u LEFT JOIN activity_events a ON a.user_id=u.id AND a.event_day>=? WHERE u.role='tenor' GROUP BY u.id`,since,since),songs:await rows(env,`SELECT s.title,u.display_name,a.event_type,COUNT(*) AS days FROM activity_events a JOIN songs s ON s.id=a.song_id JOIN users u ON u.id=a.user_id WHERE a.event_day>=? GROUP BY a.user_id,a.song_id,a.event_type LIMIT 300`,since)});
   }
   if(p==='/api/admin/summary' && method==='GET') {
     await env.DB.batch([stmt(env,'DELETE FROM rate_limits WHERE key IN (SELECT key FROM rate_limits WHERE expires_at<? LIMIT 500)',Math.floor(Date.now()/1000)),stmt(env,'DELETE FROM sessions WHERE id IN (SELECT id FROM sessions WHERE expires_at<? LIMIT 100)',new Date(Date.now()-30*86400000).toISOString())]);
-    return json({users:await one(env,"SELECT COUNT(*) AS total,SUM(active) AS active FROM users WHERE role='tenor'"),storage:await one(env,"SELECT COUNT(*) AS count,COALESCE(SUM(CASE WHEN status='ready' THEN 1 ELSE 0 END),0) AS submitted_count,COALESCE(SUM(file_size),0) AS bytes FROM recordings WHERE status!='deleted'"),season_storage:url.searchParams.has('season')?await one(env,"SELECT COUNT(*) AS count,COALESCE(SUM(CASE WHEN status='ready' THEN 1 ELSE 0 END),0) AS submitted_count,COALESCE(SUM(file_size),0) AS bytes FROM recordings WHERE status!='deleted' AND season_id=?",uuid(url.searchParams.get('season'))):null,limits:await limits(env),storage_configured:!!env.RECORDINGS});
+    return json({results:await one(env,'SELECT COUNT(*) AS count FROM practice_results WHERE season_id=?',uuid(url.searchParams.get('season'))),users:await one(env,"SELECT COUNT(*) AS total,SUM(active) AS active FROM users WHERE role='tenor'"),storage:await one(env,"SELECT COUNT(*) AS count,COALESCE(SUM(CASE WHEN status='ready' THEN 1 ELSE 0 END),0) AS submitted_count,COALESCE(SUM(file_size),0) AS bytes FROM recordings WHERE status!='deleted'"),season_storage:url.searchParams.has('season')?await one(env,"SELECT COUNT(*) AS count,COALESCE(SUM(CASE WHEN status='ready' THEN 1 ELSE 0 END),0) AS submitted_count,COALESCE(SUM(file_size),0) AS bytes FROM recordings WHERE status!='deleted' AND season_id=?",uuid(url.searchParams.get('season'))):null,limits:await limits(env),storage_configured:!!env.RECORDINGS});
   }
   if(p==='/api/admin/limits' && method==='POST'){
     const b=await body(request);for(const k of ['audio_bytes','audio_seconds','daily_recordings','season_bytes','total_bytes'])ensure(Number.isInteger(b[k])&&b[k]>0,`Límite inválido: ${k}.`);
@@ -333,11 +299,11 @@ async function api(request,env) {
     if(action==='storage'&&method==='GET')return json(await one(env,"SELECT COUNT(*) AS count,COALESCE(SUM(file_size),0) AS bytes,SUM(status='pending') AS pending FROM recordings WHERE season_id=? AND status!='deleted'",season.id));
     if(action==='export'&&method==='GET'){
       const offset=Math.max(0,Number(url.searchParams.get('offset'))||0);
-      const items=await rows(env,"SELECT r.id,r.recorded_at,r.mime_type,r.file_size,u.display_name,s.title FROM recordings r JOIN users u ON u.id=r.user_id JOIN songs s ON s.id=r.song_id WHERE r.season_id=? AND r.status='ready' ORDER BY r.id LIMIT 30 OFFSET ?",season.id,offset);
-      return json({items:items.map(r=>({...r,audio_url:`/api/recordings/${r.id}/audio`})),next_offset:items.length===30?offset+30:null});
+      const items=await rows(env,"SELECT r.id,r.submitted_at,r.score,r.analysis,u.display_name,s.title FROM practice_results r JOIN users u ON u.id=r.user_id JOIN songs s ON s.id=r.song_id WHERE r.season_id=? ORDER BY r.id LIMIT 30 OFFSET ?",season.id,offset);
+      return json({items:items.map(r=>({...r,analysis:JSON.parse(r.analysis)})),next_offset:items.length===30?offset+30:null});
     }
     if(action==='close'&&method==='POST'){
-      const b=await body(request);ensure(b.confirmation===`ELIMINAR AUDIOS ${season.year}`,'Escribe la confirmación exacta.');ensure(env.RECORDINGS,'Almacenamiento no configurado.',503);
+      const b=await body(request);if(b.confirmation===`CERRAR TEMPORADA ${season.year}`){ensure(season.status==='active','La temporada no está activa.',409);await env.DB.batch([stmt(env,"UPDATE seasons SET status='closed' WHERE id=?",season.id),audit(env,user,'season_closed',season.id,null,{year:season.year})]);return json({status:'closed'});}ensure(b.confirmation===`ELIMINAR AUDIOS ${season.year}`,'Escribe la confirmación exacta.');ensure(env.RECORDINGS,'Almacenamiento no configurado.',503);
       await env.DB.batch([stmt(env,"UPDATE seasons SET status='closing' WHERE id=? AND status='active'",season.id),audit(env,user,'season_closing',season.id,null,{year:season.year})]);return json({status:'closing'});
     }
     if(action==='cleanup'&&method==='POST'){

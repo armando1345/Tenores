@@ -6,11 +6,14 @@
   const ratio=(a,b)=>b>0?a/b*100:null;
   const metrics={
     attendance:{label:'Asistencia',unit:'%',value:a=>ratio(sum(a,'minutes'),sum(a,'scheduled')),description:'Minutos presenciales / minutos programados. Solo ensayos finalizados.'},
-    similarity:{label:'Nota de práctica',unit:'puntos',max:100,value:a=>sum(a,'scoredPractices')?sum(a,'scoreSum')/sum(a,'scoredPractices'):null,description:'Media de las puntuaciones reales del motor (0–100), ponderada por las prácticas enviadas con análisis. Los audios anteriores sin análisis no cuentan como cero.'},
+    similarity:{label:'Similitud total',unit:'puntos',max:100,value:a=>sum(a,'scoredPractices')?sum(a,'scoreSum')/sum(a,'scoredPractices'):null,description:'Media de las puntuaciones reales del motor (0–100), ponderada por las prácticas enviadas con análisis. Los audios anteriores sin análisis no cuentan como cero.'},
+    pitch:{label:'Entonación',unit:'puntos',max:100,value:a=>sum(a,'pitchCount')?sum(a,'pitchSum')/sum(a,'pitchCount'):null,description:'Media de los puntajes de entonación enviados. Escala de 0 a 100.'},
+    stability:{label:'Estabilidad',unit:'puntos',max:100,value:a=>sum(a,'stabilityCount')?sum(a,'stabilitySum')/sum(a,'stabilityCount'):null,description:'Media de los puntajes de estabilidad enviados. Escala de 0 a 100.'},
+    rhythm:{label:'Ritmo y entradas',unit:'puntos',max:100,value:a=>sum(a,'rhythmCount')?sum(a,'rhythmSum')/sum(a,'rhythmCount'):null,description:'Media de los puntajes de ritmo y entradas enviados. No forma parte de la similitud total.'},
     coverage:{label:'Ensayos asistidos',unit:'%',value:a=>ratio(sum(a,'attended'),sum(a,'rehearsals')),description:'Participaciones con llegada a tiempo o tarde / participaciones programadas.'},
     punctuality:{label:'Puntualidad',unit:'%',value:a=>ratio(sum(a,'attended')-sum(a,'late'),sum(a,'attended')),description:'Llegadas a tiempo / ensayos asistidos. Las ausencias no entran en este denominador.'},
     hours:{label:'Tiempo presencial',unit:'h',value:a=>sum(a,'scheduled')?sum(a,'minutes')/60:null,description:'Suma de horas presenciales del grupo. Solo ensayos finalizados.'},
-    practices:{label:'Prácticas enviadas',unit:'audios',value:a=>sum(a,'practices'),description:'Audios enviados y disponibles en el período. Respeta el filtro de canción.'},
+    practices:{label:'Prácticas enviadas',unit:'pruebas',value:a=>sum(a,'practices'),description:'Resultados enviados en el período. Respeta el filtro de canción.'},
     logins:{label:'Inicios de sesión',unit:'accesos',web:true,value:a=>sum(a,'logins'),description:'Accesos registrados. No representa tiempo de práctica.'},
     activeDays:{label:'Días de actividad',unit:'días-persona',web:true,value:a=>sum(a,'activeDays'),description:'Días con actividad registrada por tenor. En un grupo se suman días-persona.'},
     referenceDays:{label:'Días con escucha',unit:'días-persona',web:true,value:a=>sum(a,'referenceDays'),description:'Días por tenor con inicio de una pista de referencia. Respeta el filtro de canción; no mide escucha completa.'}

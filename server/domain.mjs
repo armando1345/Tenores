@@ -57,6 +57,9 @@ export function practiceAnalysis(raw, songId) {
   const total = raw.scores?.total;
   ensure(Number.isInteger(total) && total >= 0 && total <= 100, 'Puntuación inválida.');
   ensure(Array.isArray(raw.tips) && Array.isArray(raw.phrases) && Array.isArray(raw.curves?.ref), 'Análisis incompleto.');
+  for (const key of ['pitch','rhythm','stability']) ensure(raw.scores[key] == null || (Number.isFinite(raw.scores[key]) && raw.scores[key] >= 0 && raw.scores[key] <= 100), 'Métrica inválida.');
+  const allowed = ['engineVersion','songId','mode','isFull','valid','scores','tips','phrases','curves','phraseFrom','phraseTo','coverage'];
+  ensure(Object.keys(raw).every(key => allowed.includes(key)), 'El análisis contiene campos no admitidos.');
   const json = JSON.stringify(raw);
   ensure(json.length <= 262144, 'El análisis es demasiado grande.', 413);
   return { json, score: total };

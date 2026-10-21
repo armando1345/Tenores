@@ -5,7 +5,6 @@ import { formatTime } from './util.js';
 import { LIVE, noteName, targetFor, livePitch, deviationCents, tuningState } from './live-pitch.js';
 import { LATENCY, effectiveLatency, saveLatency, detectOnsets, measureLatency } from './latency.js';
 import { visibleNotes, createTrail, targetScale, stepScale, drawTrack, TRACK } from './live-track.js';
-import { createTakeEncoder, BAD_TAKE } from './encoder.js';
 import { compactAnalysis } from './compact.js';
 import { analysisMarkup, esc } from './result-view.js';
 import { sendState, sendOutcome } from './send-state.js';
@@ -15,7 +14,6 @@ const LIVE_PITCH = true;
 const GUIDE_WARNING = 'Usa auriculares, mejor con cable: si el micrófono capta la guía, la puntuación no será fiable. Con Bluetooth, pulsa «Calibrar auriculares» antes.';
 const LATENCY_SOURCE = { calibrated: 'calibrado', browser: 'automático', default: 'estimado' };
 const GUIDE_TIMEOUT_MS = 3000; // si la guía no empieza a sonar en este tiempo, se avisa
-const NO_ENCODER = 'Este navegador no puede enviar audio.';
 const INCOMPLETE_TAKE = 'El audio llegó incompleto, así que la nota no sería fiable. Repite la toma; si usas auriculares Bluetooth y vuelve a pasar, prueba con auriculares con cable.';
 
 let panel = null, sheet = null, body = null, titleEl = null, opener = null;
@@ -87,7 +85,7 @@ export async function openPractice(song, hooks) {
   const audio = new Audio(song.track);
   audio.preload = 'auto';
   s = {
-    song, hooks, audio, token: ++seq, ref: null, recorder: null, encoder: null, timers: new Set(), raf: 0,
+    song, hooks, audio, token: ++seq, ref: null, recorder: null, timers: new Set(), raf: 0,
     take: null, takeSource: null, refStop: null, finished: -1, takeStartedAt: 0,
     result: null, pending: null, send: null,
     settings: { range: 'full', phraseFrom: 1, phraseTo: 1 },
@@ -129,7 +127,6 @@ function cancelFlow() {
   for (const t of s.timers) clearTimeout(t);
   s.timers.clear();
   cancelAnimationFrame(s.raf);
-  if (s.encoder) { s.encoder.stop().catch(() => {}); s.encoder = null; }
   stopTake();
   stopRefSegment();
   s.audio.pause();
@@ -253,21 +250,21 @@ function renderSetup() {
   const options = selected => s.ref.phrases
     .map(p => `<option value="${p.index}"${p.index === selected ? ' selected' : ''}>Frase ${p.index} · ${formatTime(p.start * hop)}</option>`)
     .join('');
-  body.innerHTML = `<form class="practice-setup">
+  body.innerHTML = `<form class="practice-setup"><h3 class="practice-setup-title">Prepara tu prueba</h3><p class="practice-setup-intro">Escucha la guía, canta y descubre cómo mejorar tu entonación</p>
     <p class="practice-warning">${GUIDE_WARNING}</p>
     <p class="practice-latency"><span data-latency></span>
       <button type="button" class="btn small quiet" data-calibrate>Calibrar auriculares</button></p>
     <fieldset><legend>Qué cantar</legend>
       <label class="practice-choice"><input type="radio" name="range" value="full"${range === 'full' ? ' checked' : ''}>
-        <span><strong>Canción completa</strong></span></label>
+        <span><strong>Canción completa</strong><small>Analiza tu prueba y envía los resultados a jefatura</small></span></label>
       <label class="practice-choice"><input type="radio" name="range" value="phrases"${range === 'phrases' ? ' checked' : ''}>
-        <span><strong>Un fragmento</strong></span></label>
+        <span><strong>Un fragmento</strong><small>Perfecciona una parte antes de la prueba completa</small></span></label>
       <div class="practice-range" data-range${range === 'phrases' ? '' : ' hidden'}>
         <label>Desde <select name="from">${options(phraseFrom)}</select></label>
         <label>Hasta <select name="to">${options(phraseTo)}</select></label>
       </div>
     </fieldset>
-    <button type="submit" class="btn practice-start">Empezar</button>
+    <button type="submit" class="btn practice-start">Comenzar prueba</button>
   </form>`;
   const form = body.querySelector('form');
   form.addEventListener('change', () => {
@@ -344,16 +341,6 @@ function renderCountdown(big, hint) {
   focusBody();
 }
 
-// Codificador para el envío; si no se puede crear, la toma se analiza igual pero no se envía.
-function startEncoder() {
-  s.encoder = null;
-  try {
-    const enc = createTakeEncoder(s.recorder.stream, { maxBytes: s.hooks.limits?.audio_bytes });
-    enc.start();
-    s.encoder = enc;
-  } catch { /* sin codificador */ }
-}
-
 async function startTake() {
   cancelFlow();
   const token = s.token;
@@ -387,7 +374,6 @@ async function startTake() {
   // La grabación y el límite de tiempo cuentan desde que la guía suena.
   s.recorder.start();
   s.takeStartedAt = performance.now();
-  startEncoder();
   const limitSec = durSec + 1;
   renderRecording(limitSec, token, { mode: 'guide', from, to });
 }
@@ -479,11 +465,8 @@ async function finishTake(token, take) {
   cancelAnimationFrame(s.raf);
   s.audio.pause();
   const rec = s.recorder.stop();
-  const enc = s.encoder;
-  s.encoder = null;
   const wallSec = (performance.now() - s.takeStartedAt) / 1000;
   if (incompleteTake(rec.samples.length / rec.sampleRate, wallSec)) {
-    enc?.stop().catch(() => {});
     s.take = null;
     s.result = null;
     s.pending = null;
@@ -491,18 +474,14 @@ async function finishTake(token, take) {
     renderIncomplete();
     return;
   }
-  // Nunca se rechaza: un fallo del codificador solo impide el envío.
-  const encoded = enc
-    ? enc.stop().then(v => ({ ok: true, ...v }), err => ({ ok: false, message: err && err.message === BAD_TAKE ? BAD_TAKE : NO_ENCODER }))
-    : Promise.resolve({ ok: false, message: NO_ENCODER });
-  s.take = { ...rec, ...take, durationSeconds: rec.samples.length / rec.sampleRate, encoded };
+  s.take = { ...rec, ...take, durationSeconds: rec.samples.length / rec.sampleRate };
   await analyzeTake(token);
 }
 
 // La grabación duró menos que el tiempo real (AudioContext ralentizado): no se analiza ni se envía.
 function renderIncomplete() {
   body.innerHTML = `<div class="practice-error" role="alert"><p>${esc(INCOMPLETE_TAKE)}</p>
-    <div class="practice-actions"><button type="button" class="btn small" data-act="repeat">Repetir</button>
+    <div class="practice-actions"><button type="button" class="btn small" data-act="repeat">Volver a grabar</button>
     <button type="button" class="btn small quiet" data-act="setup">Cambiar ajustes</button></div></div>`;
   body.querySelector('[data-act="repeat"]').addEventListener('click', () => startTake());
   body.querySelector('[data-act="setup"]').addEventListener('click', renderSetup);
@@ -512,33 +491,28 @@ function renderIncomplete() {
 async function analyzeTake(token) {
   renderMessage('Analizando tu toma…');
   const { samples, sampleRate, mode, from, to } = s.take;
-  let result, encoded;
+  let result;
   try {
-    [result, encoded] = await Promise.all([
-      runAnalysis({ samples: samples.slice(), sampleRate, refData: s.ref, mode, phraseFrom: from, phraseTo: to }),
-      s.take.encoded,
-    ]);
+    result = await runAnalysis({ samples: samples.slice(), sampleRate, refData: s.ref, mode, phraseFrom: from, phraseTo: to });
   } catch {
     if (!stale(token)) renderError('No se pudo analizar la toma.', () => analyzeTake(s.token));
     return;
   }
   if (stale(token)) return;
-  prepareSend(result, encoded);
+  prepareSend(result);
   renderResults(result);
 }
 
 // Decide si la toma se puede enviar y, si es así, la deja pendiente con un id fijo para los reintentos.
-function prepareSend(result, encoded) {
+function prepareSend(result) {
   s.result = result;
   s.pending = null;
   s.send = null;
-  const st = sendState(result, encoded);
+  const st = sendState(result);
   if (st.state === 'invalid') return;
   if (st.state !== 'ready') { s.send = st; return; }
   s.pending = {
     id: crypto.randomUUID(),
-    blob: encoded.blob,
-    mimeType: encoded.mimeType,
     durationSeconds: s.take.durationSeconds,
     analysis: compactAnalysis(result),
   };
@@ -548,14 +522,14 @@ function prepareSend(result, encoded) {
 function sendStatusMarkup() {
   const st = s.send;
   if (!st) return '';
-  if (st.state === 'fragment' || st.state === 'no-encoder') return `<p class="practice-send__note">${esc(st.message)}</p>`;
+  if (st.state === 'fragment') return `<p class="practice-send__note">${esc(st.message)}</p>`;
   if (st.state === 'confirm') {
-    return `<div class="practice-send__confirm"><p>Jefatura podrá escuchar esta práctica y ver su análisis.</p>
+    return `<div class="practice-send__confirm"><p>¿Enviar estos resultados a jefatura? Recibirá tus puntajes, las curvas de entonación y las recomendaciones. Tu audio no se guarda ni se envía.</p>
       <div class="practice-actions"><button type="button" class="btn small" data-act="send-confirm">Enviar</button>
       <button type="button" class="btn small quiet" data-act="send-cancel">Cancelar</button></div></div>`;
   }
   if (st.state === 'sending') return '<p class="practice-send__note">Enviando tu práctica…</p>';
-  if (st.state === 'sent') return '<p class="practice-send__ok">Práctica enviada. Ya aparece en Mis grabaciones.</p>';
+  if (st.state === 'sent') return '<p class="practice-send__ok">Resultados enviados. Ya aparecen en Mis resultados.</p>';
   if (st.state === 'error') {
     return `<div class="practice-send__err" role="alert"><p>${esc(`${st.message} Tu práctica se conserva; pulsa Enviar para reintentar.`)}</p>
       <button type="button" class="btn small" data-act="send-confirm">Enviar</button></div>`;
@@ -609,7 +583,7 @@ function renderResults(r) {
       </div>
       <div class="practice-send" data-send aria-live="polite" hidden></div>
       <div class="practice-actions">
-        <button type="button" class="btn small" data-act="send" hidden>Enviar a jefatura</button>
+        <button type="button" class="btn small" data-act="send" hidden>Enviar resultados</button>
         <button type="button" class="btn small quiet" data-act="take">Escuchar mi toma</button>
         <button type="button" class="btn small" data-act="repeat">Repetir</button>
         <button type="button" class="btn small quiet" data-act="setup">Cambiar ajustes</button>
@@ -628,7 +602,7 @@ function renderResults(r) {
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const act = btn.dataset.act;
-    if (act === 'repeat') guardPending(startTake);
+    if (act === 'repeat') guardPending(renderSetup);
     else if (act === 'setup') guardPending(renderSetup);
     else if (act === 'take') toggleTake(btn);
     else if (act === 'listen' && selected) playRefPhrase(selected);

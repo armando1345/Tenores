@@ -2,10 +2,9 @@ export const FRAGMENT_MESSAGE = 'Para enviar a jefatura, canta la canción compl
 const SEND_FAILED = 'No se pudo enviar la práctica.';
 
 // Decide si una toma analizada se puede enviar a jefatura.
-export function sendState(result, encoded) {
+export function sendState(result) {
   if (result.valid !== true) return { state: 'invalid' };
   if (result.mode !== 'guide' || result.isFull !== true) return { state: 'fragment', message: FRAGMENT_MESSAGE };
-  if (encoded.ok !== true) return { state: 'no-encoder', message: encoded.message };
   return { state: 'ready' };
 }
 
