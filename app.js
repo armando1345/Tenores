@@ -754,6 +754,29 @@ function applySpeedAll(){
     btn.setAttribute('aria-pressed',String(active));
   });
 }
+function positionTrackSpeedMenu(){
+  const menu=document.querySelector('.speed-menu[data-for="trk"]'),button=document.querySelector('.dots[data-menu="trk"]');
+  if(!menu||menu.hidden||!button)return;
+  const viewport=window.visualViewport,gap=12,space=8,left=(viewport?.offsetLeft||0)+gap,top=(viewport?.offsetTop||0)+gap;
+  const right=left+(viewport?.width||window.innerWidth)-gap*2,bottom=top+(viewport?.height||window.innerHeight)-gap*2;
+  const trigger=button.getBoundingClientRect(),anchor=button.closest('.more').getBoundingClientRect();
+  if(trigger.bottom<top||trigger.top>bottom){menu.hidden=true;button.setAttribute('aria-expanded','false');return;}
+  menu.style.maxWidth=`${Math.max(1,right-left)}px`;menu.style.maxHeight='none';
+  const fullHeight=menu.getBoundingClientRect().height,below=Math.max(0,bottom-trigger.bottom-space),above=Math.max(0,trigger.top-top-space);
+  const useBelow=fullHeight<=below||below>=above;
+  menu.style.maxHeight=`${Math.max(1,useBelow?below:above)}px`;
+  const bounds=menu.getBoundingClientRect(),x=Math.max(left,Math.min(trigger.right-bounds.width,right-bounds.width));
+  const y=Math.max(top,Math.min(useBelow?trigger.bottom+space:trigger.top-space-bounds.height,bottom-bounds.height));
+  menu.style.right='auto';menu.style.left=`${x-anchor.left}px`;menu.style.top=`${y-anchor.top}px`;
+}
+window.addEventListener('resize',positionTrackSpeedMenu);
+window.addEventListener('scroll',positionTrackSpeedMenu,{passive:true});
+window.visualViewport?.addEventListener('resize',positionTrackSpeedMenu);
+window.visualViewport?.addEventListener('scroll',positionTrackSpeedMenu);
+document.addEventListener('keydown',e=>{
+  const menu=document.querySelector('.speed-menu[data-for="trk"]');
+  if(e.key==='Escape'&&menu&&!menu.hidden){menu.hidden=true;const button=document.querySelector('.dots[data-menu="trk"]');button.setAttribute('aria-expanded','false');button.focus();}
+});
 document.addEventListener('click',e=>{
   const t=e.target;
   const dots=t.closest('.dots');
@@ -764,7 +787,7 @@ document.addEventListener('click',e=>{
     document.querySelectorAll('.speed-menu').forEach(m=>m.hidden=true);
     document.querySelectorAll('.dots').forEach(b=>b.setAttribute('aria-expanded','false'));
     const menu=document.querySelector(`.speed-menu[data-for="${key}"]`);
-    if(menu&&!wasOpen){menu.hidden=false;dots.setAttribute('aria-expanded','true')}
+    if(menu&&!wasOpen){menu.hidden=false;dots.setAttribute('aria-expanded','true');if(key==='trk')positionTrackSpeedMenu();}
   }else if(speed){
     const selected=parseFloat(speed.dataset.speed);
     if(SPEEDS.includes(selected)){gSpeed=selected;applySpeedAll()}
@@ -1233,7 +1256,7 @@ function openPresentationsPanel(year=2025){
 window.openTenoresPresentations=openPresentationsPanel;
 window.updateTenoresPresentations=function(year,events){
   livePresentationEvents=livePresentationEvents.filter(event=>!event.date.startsWith(String(year)));
-  livePresentationEvents.push(...events.map(event=>({id:event.id,date:event.presentation_date,title:escapeHtml(event.title),startTime:event.starts_at,callTime:event.call_at,venue:escapeHtml(event.venue),city:escapeHtml(event.city||''),summary:escapeHtml(event.notes||''),instructions:escapeHtml(event.notes||''),tag:'Presentación'})));
+  livePresentationEvents.push(...events.map(event=>({id:event.id,date:event.presentation_date,title:escapeHtml(event.title),startTime:event.starts_at||'Por confirmar',callTime:event.call_at||'Por confirmar',venue:escapeHtml(event.venue||'Lugar por confirmar'),city:escapeHtml(event.city||''),summary:escapeHtml(event.notes||''),instructions:escapeHtml(event.notes||''),tag:'Presentación'})));
   if(!$presentationsPanel.hidden && currentPresentationSeason===year)renderPresentations();
 };
 function closePresentationsPanel(){

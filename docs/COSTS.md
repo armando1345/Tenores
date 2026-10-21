@@ -1,6 +1,6 @@
 # Costo objetivo y controles · Verificación 12 de octubre de 2026
 
-No se activaron servicios, tarjetas ni suscripciones. El costo previsto para 7–11 tenores, máximo 15 más jefatura, es **$0 mensual mientras se mantengan las cuotas gratuitas**. Las cuotas son de cuenta/producto y pueden compartirse con otros proyectos. No hay garantía perpetua.
+El propietario activó la suscripción de R2 en la cuenta Tenores. Worker, D1 y R2 Standard privado están conectados; no se solicitó un cambio a Workers Paid. El costo previsto para 7–11 tenores, máximo 15 más jefatura, es **$0 mensual mientras se mantengan las cuotas gratuitas**. Las cuotas son de cuenta/producto y pueden compartirse con otros proyectos. No hay garantía perpetua.
 
 | Recurso | Cuota gratuita verificada | Uso de Tenores |
 | --- | --- | --- |

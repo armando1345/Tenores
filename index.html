@@ -4,7 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tenores</title>
-  <meta name="description" content="La nueva plataforma para que el equipo de tenores desarrolle todo su potencial." />
+  <meta name="description" content="la nueva plataforma para el equipo de tenores." />
+  <meta property="og:description" content="la nueva plataforma para el equipo de tenores." />
+  <meta name="twitter:description" content="la nueva plataforma para el equipo de tenores." />
   <link rel="icon" type="image/svg+xml" href="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="platform.css" />
@@ -14,8 +16,8 @@
   <dialog id="accessGate" class="platform-dialog access-dialog" aria-labelledby="accessTitle">
     <div class="access-brand"><div class="logo-wrap access-logo"><img src="https://res.cloudinary.com/dcwx23x5o/image/upload/v1760049941/logo_tenores_oeotg5.svg" alt="Logo Tenores" width="92" height="92"></div><h2 id="accessTitle">Tenores</h2><p class="access-message">Si hacemos las cosas bien, 2026 será el mejor año de nuestra historia.</p></div>
     <form id="loginForm" class="platform-form">
-      <label>Usuario<input name="username" autocomplete="username" required maxlength="50"></label>
-      <div class="access-password-group"><label for="loginPassword">Contraseña</label><div class="access-password-field"><input id="loginPassword" name="password" type="password" autocomplete="current-password" required maxlength="128"><button id="toggleLoginPassword" class="access-password-toggle" type="button" aria-label="Mostrar contraseña" aria-controls="loginPassword" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18" hidden/></svg></button></div></div>
+      <label>Usuario<input id="loginUsername" name="username" autocomplete="username" required maxlength="50"></label>
+      <div class="access-password-group"><label id="loginCredentialLabel" for="loginPassword">PIN</label><div class="access-password-field"><input id="loginPassword" name="password" type="password" inputmode="numeric" autocomplete="current-password" required maxlength="128"><button id="toggleLoginPassword" class="access-password-toggle" type="button" aria-label="Mostrar PIN" aria-controls="loginPassword" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18" hidden/></svg></button></div></div>
       <button class="btn access-submit" type="submit">Iniciar sesión</button>
     </form>
     <button id="guestEntry" class="access-guest" type="button"><span>Entrar como invitado</span><span aria-hidden="true">→</span></button>
@@ -72,7 +74,7 @@
 
     <main>
       <section id="adminDashboard" class="admin-dashboard" aria-label="Dashboard de jefatura" hidden>
-        <div class="admin-hero"><h1>Tu misión es servir al equipo de tenores. <span>Dentro de tus posibilidades, encárgate ahora mismo de que cada miembro del equipo sea al menos un poco mejor</span></h1><button id="adminRegister" class="btn admin-register" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Registrar ensayo</button></div>
+        <div class="admin-hero"><div class="admin-mission"><h1>Tu misión es servir al equipo de tenores</h1><p class="admin-subtitle">Dentro de tus posibilidades, encárgate de que cada miembro del equipo sea al menos un poco mejor para sí mismo y para todos</p></div><button id="adminRegister" class="btn admin-register" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Registrar ensayo</button></div>
         <div id="adminWorkspace"></div>
       </section>
       <section id="home" aria-labelledby="canciones-titulo">
@@ -215,6 +217,7 @@
   </div>
 
   <button id="auBtn" class="fab" aria-label="Celebrar Aú Aú"><span class="fab-line">Aú</span><span class="fab-line">Aú</span></button>
+  <button id="advancedToggle" class="fab advanced-fab" type="button" hidden aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 4v16h16M8 16v-4m5 4V7m5 9v-6"/></svg><span>Modo avanzado</span></button>
   <div id="auCelebration" class="au-celebration" hidden role="status" aria-live="polite">
     <div class="au-celebration__message"><strong>2026</strong><span>¡Sé el buen tenor!</span></div>
     <div id="auFireworks" class="au-fireworks" aria-hidden="true"></div>
@@ -324,6 +327,7 @@
     </article>
   </div>
   <script src="app.js" defer></script>
+  <script src="advanced.js" defer></script>
   <script src="platform.js" defer></script>
   <script type="module" src="practice/bridge.js"></script>
 </body>

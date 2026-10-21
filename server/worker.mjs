@@ -1,6 +1,7 @@
 import { HttpError, ensure, text, uuid, date, clock, attendance, canReadRecording, recordingMetadata, sniffAudio, practiceAnalysis, referencePayload } from './domain.mjs';
 import { digest, token } from './security.mjs';
 import { passwordHash, passwordVerify } from './password-service.mjs';
+import { analyticsData } from './analytics.mjs';
 export { PasswordHasher } from './password-object.mjs';
 
 const now = () => new Date().toISOString();
@@ -67,6 +68,7 @@ async function publicStats(env,year) {
   const season=await one(env,'SELECT * FROM seasons WHERE year=?',year); ensure(season,'Temporada no encontrada.',404);
   // Solo agregados permitidos. No devolver late_reason, activity ni credenciales.
   let members=await rows(env,`SELECT u.id,u.display_name AS name,u.legacy_key,m.active AS membership_active,
+    (SELECT AVG(p.score) FROM recordings p WHERE p.user_id=u.id AND p.season_id=m.season_id AND p.status='ready' AND p.score IS NOT NULL) AS similarity,
     COALESCE(SUM(CASE WHEN r.status='final' THEN a.effective_minutes END),0) AS minutes,
     COALESCE(SUM(CASE WHEN r.status='final' THEN r.duration_minutes END),0) AS scheduled_minutes,
     COUNT(CASE WHEN r.status='final' THEN 1 END) AS rehearsals,
@@ -141,7 +143,7 @@ async function api(request,env) {
     const user=await one(env,'SELECT * FROM users WHERE username_key=? OR (username_key IS NULL AND username=?)',username,username);
     const dummy='scrypt$32768$8$3$00000000000000000000000000000000$0000000000000000000000000000000000000000000000000000000000000000';
     const valid=await passwordVerify(env,b.password,user?.password_hash||dummy);
-    ensure(valid && user?.active,'Usuario o contraseña incorrectos.',401);
+    ensure(valid && user?.active,user?.role==='admin'?'Usuario o contraseña incorrectos.':'Usuario o PIN incorrectos.',401);
     const value=token(), csrf=token(), expiry=new Date(Date.now()+7*86400000).toISOString();
     await env.DB.batch([stmt(env,'INSERT INTO sessions(id,user_id,token_hash,csrf_token,expires_at) VALUES(?,?,?,?,?)',id(),user.id,digest(value),csrf,expiry),stmt(env,'UPDATE users SET last_login_at=? WHERE id=?',now(),user.id),stmt(env,"INSERT INTO activity_events(id,user_id,event_type,event_day) VALUES(?,?,'login',?)",id(),user.id,day())]);
     await event(env,user,'active_day');
@@ -152,6 +154,7 @@ async function api(request,env) {
   if(p==='/api/public/songs' && method==='GET') return json(await rows(env,`SELECT id,season_id,legacy_key,title,reference_audio_key,lyrics,${HAS_REFERENCE} FROM songs WHERE season_id=? AND active=1 ORDER BY title`,uuid(url.searchParams.get('season'))));
   if(p==='/api/public/presentations' && method==='GET') return json(await rows(env,'SELECT id,season_id,title,presentation_date,starts_at,call_at,venue,city,notes FROM presentations WHERE season_id=? ORDER BY presentation_date,starts_at',uuid(url.searchParams.get('season'))));
   const user=await requireUser(request,env,p.startsWith('/api/admin/'));
+  if(p==='/api/admin/analytics' && method==='GET')return json(await analyticsData(env,url));
   if(p==='/api/my-progress' && method==='GET'){
     const season=await checkSeason(env,url.searchParams.get('season'));await checkMember(env,user,season.id);
     const stats=await publicStats(env,season.year);
@@ -167,18 +170,20 @@ async function api(request,env) {
   }
   if(p==='/api/admin/presentations' && method==='POST'){
     const b=await body(request),season=await checkSeason(env,b.season_id),presentationId=b.id?uuid(b.id):id();
-    ensure(season.status==='active','La temporada está cerrada.',409);date(b.presentation_date);clock(b.starts_at);clock(b.call_at);
+    ensure(season.status==='active','La temporada está cerrada.',409);date(b.presentation_date);
+    const optional=(value,max)=>{if(value==null)return '';ensure(typeof value==='string','Texto inválido.');const clean=value.trim();ensure(clean.length<=max,'Texto demasiado largo.');return clean;};
+    const starts=optional(b.starts_at,5),call=optional(b.call_at,5);if(starts)clock(starts);if(call)clock(call);
     ensure(b.presentation_date>=season.starts_on && b.presentation_date<=season.ends_on,'La fecha no pertenece a la temporada.');
     const old=await one(env,'SELECT * FROM presentations WHERE id=?',presentationId);ensure(!old || old.season_id===season.id,'No se puede mover una presentación entre temporadas.');
-    const title=text(b.title,150),venue=text(b.venue,150),city=typeof b.city==='string'?b.city.trim():'',notes=typeof b.notes==='string'?b.notes.trim():'';
+    const title=optional(b.title,150)||'Presentación',venue=optional(b.venue,150),city=optional(b.city,100),notes=optional(b.notes,2000);
     ensure(city.length<=100 && notes.length<=2000,'Texto demasiado largo.');
-    await env.DB.batch([stmt(env,"INSERT INTO presentations(id,season_id,title,presentation_date,starts_at,call_at,venue,city,notes,created_by,updated_by) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,presentation_date=excluded.presentation_date,starts_at=excluded.starts_at,call_at=excluded.call_at,venue=excluded.venue,city=excluded.city,notes=excluded.notes,updated_by=excluded.updated_by,updated_at=datetime('now')",presentationId,season.id,title,b.presentation_date,b.starts_at,b.call_at,venue,city,notes,user.id,user.id),audit(env,user,old?'presentation_updated':'presentation_created',presentationId,old,{title,presentation_date:b.presentation_date,starts_at:b.starts_at,call_at:b.call_at,venue,city,notes})]);
+    await env.DB.batch([stmt(env,"INSERT INTO presentations(id,season_id,title,presentation_date,starts_at,call_at,venue,city,notes,created_by,updated_by) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,presentation_date=excluded.presentation_date,starts_at=excluded.starts_at,call_at=excluded.call_at,venue=excluded.venue,city=excluded.city,notes=excluded.notes,updated_by=excluded.updated_by,updated_at=datetime('now')",presentationId,season.id,title,b.presentation_date,starts,call,venue,city,notes,user.id,user.id),audit(env,user,old?'presentation_updated':'presentation_created',presentationId,old,{title,presentation_date:b.presentation_date,starts_at:starts,call_at:call,venue,city,notes})]);
     return json({id:presentationId});
   }
   if(p==='/api/logout' && method==='POST'){await run(env,'UPDATE sessions SET revoked_at=? WHERE id=?',now(),user.session_id);return json({ok:true},200,{'Set-Cookie':cookie(request,'',0)});}
   if(p==='/api/password' && method==='POST'){
-    const b=await body(request);await rate(env,`password:${user.id}`,3,900);ensure(await passwordVerify(env,b.current_password,user.password_hash),'Contraseña actual incorrecta.',403);
-    const hash=await passwordHash(env,b.password,user.role==='tenor'?8:12);
+    const b=await body(request);await rate(env,`password:${user.id}`,3,900);ensure(await passwordVerify(env,b.current_password,user.password_hash),user.role==='tenor'?'PIN actual incorrecto.':'Contraseña actual incorrecta.',403);
+    const hash=await passwordHash(env,b.password,user.role==='tenor'?4:12);
     await env.DB.batch([stmt(env,'UPDATE users SET password_hash=?,updated_at=? WHERE id=?',hash,now(),user.id),stmt(env,'UPDATE sessions SET revoked_at=? WHERE user_id=?',now(),user.id)]);return json({ok:true},200,{'Set-Cookie':cookie(request,'',0)});
   }
   if(p==='/api/events' && method==='POST'){
@@ -263,8 +268,8 @@ async function api(request,env) {
     ensure(!duplicate || duplicate.id===userId,'Ya existe un usuario con ese nombre.',409);
     const name=text(b.display_name,80), active=b.active===true||b.active===1?1:0;
     ensure(!(old?.role==='admin' && !active),'No se puede desactivar jefatura desde este panel.');
-    const hash=b.password?await passwordHash(env,b.password,old?.role==='admin'?12:8):old?.password_hash;
-    ensure(hash,'Establece una contraseña inicial.');
+    const hash=b.password?await passwordHash(env,b.password,old?.role==='admin'?12:4):old?.password_hash;
+    ensure(hash,old?.role==='admin'?'Establece una contraseña inicial.':'Establece un PIN inicial de cuatro números.');
     const statements=[stmt(env,'INSERT INTO users(id,username,username_key,display_name,password_hash,role,active) VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET username=excluded.username,username_key=excluded.username_key,display_name=excluded.display_name,password_hash=excluded.password_hash,active=excluded.active,updated_at=datetime(\'now\')',userId,username,usernameKey,name,hash,old?.role||'tenor',active),audit(env,user,old?'user_updated':'user_created',userId,safeUser(old),{username,display_name:name,active,password_reset:!!b.password})];
     if(b.password || !active)statements.push(stmt(env,'UPDATE sessions SET revoked_at=? WHERE user_id=?',now(),userId));
     await env.DB.batch(statements);return json({id:userId});
@@ -307,7 +312,7 @@ async function api(request,env) {
   }
   if(p==='/api/admin/practice-scores' && method==='GET'){
     const season=await checkSeason(env,url.searchParams.get('season'));
-    return json(await rows(env,"SELECT user_id,ROUND(AVG(score)) AS average,COUNT(*) AS count FROM recordings WHERE season_id=? AND status='ready' AND score IS NOT NULL GROUP BY user_id ORDER BY user_id",season.id));
+    return json(await rows(env,"SELECT user_id,AVG(score) AS average,COUNT(*) AS count FROM recordings WHERE season_id=? AND status='ready' AND score IS NOT NULL GROUP BY user_id ORDER BY user_id",season.id));
   }
   if(p==='/api/admin/activity' && method==='GET'){
     const since=new Date(Date.now()-90*86400000).toISOString().slice(0,10);

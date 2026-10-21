@@ -13,7 +13,8 @@ if(testMode){
   const hash=await hashPassword('test-only-admin-password');
   DB.sqlite.prepare("INSERT INTO users(id,username,display_name,password_hash,role,active) VALUES(?,'prueba-jefatura','Jefatura · prueba local',?,'admin',1)").run(crypto.randomUUID(),hash);
   const members=DB.sqlite.prepare('SELECT user_id FROM season_memberships WHERE season_id=(SELECT id FROM seasons WHERE year=2026) ORDER BY user_id LIMIT 2').all();
-  for(const [i,m] of members.entries())DB.sqlite.prepare('UPDATE users SET username=?,password_hash=?,active=1 WHERE id=?').run(`prueba-tenor-${i}`,hash,m.user_id);
+  const pinHash=await hashPassword('1357',4);
+  for(const [i,m] of members.entries())DB.sqlite.prepare('UPDATE users SET username=?,password_hash=?,active=1 WHERE id=?').run(`prueba-tenor-${i}`,pinHash,m.user_id);
 }
 let setupKey=process.env.BOOTSTRAP_SECRET;
 if(!setupKey){try{setupKey=(await readFile('.local/setup-key.txt','utf8')).trim();}catch{setupKey=randomBytes(32).toString('base64url');await writeFile('.local/setup-key.txt',setupKey);}}

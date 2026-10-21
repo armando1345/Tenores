@@ -22,6 +22,23 @@ test('Hash adaptativo con sal individual y verificación',async()=>{
   const a=await hashPassword('password-test-only-123'),b=await hashPassword('password-test-only-123');assert.notEqual(a,b);assert(!a.includes('password-test-only'));
   assert(await verifyPassword('password-test-only-123',a));assert(!await verifyPassword('incorrect',a));await assert.rejects(()=>hashPassword('short'));
   const nameHash=await hashPassword('Name2026',8);assert(await verifyPassword('Name2026',nameHash));await assert.rejects(()=>hashPassword('Name2026'));
+  const pinHash=await hashPassword('0007',4);assert(await verifyPassword('0007',pinHash));assert(!await verifyPassword('0008',pinHash));
+  for(const value of ['007','00007','abcd',1234])await assert.rejects(()=>hashPassword(value,4),/cuatro números/);
+});
+test('PIN de tenor: restablecimiento revoca sesiones y conserva jefatura',async()=>{
+  const DB=new LocalD1();await DB.migrate();const env={LOCAL:true,DB,BOOTSTRAP_SECRET:'pin-test-key'};let n=0;
+  const call=async(path,body,auth={})=>{const response=await worker.fetch(new Request('https://tenores.test'+path,{method:body?'POST':'GET',headers:{Origin:'https://tenores.test','CF-Connecting-IP':`pin-test-${++n}`,...(body?{'Content-Type':'application/json'}:{}),...auth},...(body?{body:JSON.stringify(body)}:{})}),env);return {status:response.status,data:await response.json(),headers:response.headers};};
+  try{
+    await call('/api/setup',{setup_key:env.BOOTSTRAP_SECRET,password:'pin-test-admin-password'});
+    const admin=await call('/api/login',{username:'Jefe de cuerda',password:'pin-test-admin-password'}),adminAuth={Cookie:admin.headers.get('Set-Cookie').split(';')[0],'X-CSRF-Token':admin.data.csrf};
+    for(const password of ['123','12345','abcd'])assert.equal((await call('/api/admin/users',{username:'Prueba PIN',display_name:'Prueba PIN',active:true,password},adminAuth)).status,400);
+    const created=await call('/api/admin/users',{username:'Prueba PIN',display_name:'Prueba PIN',active:true,password:'0007'},adminAuth);assert.equal(created.status,200);
+    const login=await call('/api/login',{username:'Prueba PIN',password:'0007'});assert.equal(login.status,200);const cookie={Cookie:login.headers.get('Set-Cookie').split(';')[0]};
+    assert.equal((await call('/api/admin/users',{id:created.data.id,username:'Prueba PIN',display_name:'Prueba PIN',active:true,password:'2468'},adminAuth)).status,200);
+    assert.equal((await call('/api/session',null,cookie)).data.user,null);assert.equal((await call('/api/login',{username:'Prueba PIN',password:'0007'})).status,401);assert.equal((await call('/api/login',{username:'Prueba PIN',password:'2468'})).status,200);
+    assert.equal((await call('/api/admin/users',{id:admin.data.user.id,username:'Jefe de cuerda',display_name:'Jefe de cuerda',active:true,password:'2468'},adminAuth)).status,400);
+    assert.equal((await call('/api/session',null,adminAuth)).data.user.role,'admin');
+  }finally{DB.sqlite.close();}
 });
 test('Restricción de tamaño, formatos y firma del contenido',()=>{
   const b={id:randomUUID(),song_id:randomUUID(),season_id:randomUUID(),file_size:10,duration_seconds:5,mime_type:'audio/webm;codecs=opus'};
@@ -41,21 +58,21 @@ test('Usuarios con mayúsculas y tildes: acceso Unicode, duplicados y cambio sin
   const admin=await call('/api/login',{username:'Jefe de cuerda',password:'username-test-admin-password'});
   assert.equal(admin.status,200);
   const auth={Cookie:admin.headers.get('Set-Cookie').split(';')[0],'X-CSRF-Token':admin.data.csrf};
-  const created=await call('/api/admin/users',{username:'He\u0301ctor',display_name:'Héctor',password:'Prúeba-solo-test-2026',active:true},auth);
+  const created=await call('/api/admin/users',{username:'He\u0301ctor',display_name:'Héctor',password:'1357',active:true},auth);
   assert.equal(created.status,200);
   const saved=DB.sqlite.prepare('SELECT * FROM users WHERE id=?').get(created.data.id);
   assert.equal(saved.username,'Héctor');assert.equal(saved.username_key,'héctor');
   for(const username of ['Héctor','HÉCTOR','He\u0301ctor']){
-    const login=await call('/api/login',{username,password:'Prúeba-solo-test-2026'});
+    const login=await call('/api/login',{username,password:'1357'});
     assert.equal(login.status,200);assert.equal(login.data.user.username,'Héctor');assert.equal(login.data.user.id,saved.id);
   }
-  assert.equal((await call('/api/login',{username:'Hector',password:'Prúeba-solo-test-2026'})).status,401);
-  assert.equal((await call('/api/admin/users',{username:'HÉCTOR',display_name:'Duplicado',password:'Prúeba-solo-test-2026',active:true},auth)).status,409);
+  assert.equal((await call('/api/login',{username:'Hector',password:'1357'})).status,401);
+  assert.equal((await call('/api/admin/users',{username:'HÉCTOR',display_name:'Duplicado',password:'1357',active:true},auth)).status,409);
   assert.equal((await call('/api/admin/users',{username:'Nombre <script>',display_name:'Inválido',password:'Nombre2026',active:true},auth)).status,400);
   assert.equal((await call('/api/admin/users',{id:saved.id,username:'HÉCTOR',display_name:'Héctor',active:true},auth)).status,200);
   const updated=DB.sqlite.prepare('SELECT * FROM users WHERE id=?').get(saved.id);
   assert.equal(updated.password_hash,saved.password_hash);
-  assert.equal((await call('/api/login',{username:'héctor',password:'Prúeba-solo-test-2026'})).data.user.id,saved.id);
+  assert.equal((await call('/api/login',{username:'héctor',password:'1357'})).data.user.id,saved.id);
   assert.equal((await call('/api/admin/users',{id:admin.data.user.id,username:'Jefe de cuerda',display_name:'Jefe de cuerda',active:true},auth)).status,200);
   const chief=await call('/api/login',{username:'Jefe de cuerda',password:'username-test-admin-password'});
   assert.equal(chief.status,200);assert.equal(chief.data.user.role,'admin');assert.equal(chief.data.user.username,'Jefe de cuerda');
@@ -69,8 +86,8 @@ test('Ensayo activo con pendientes, actualización de llegadas, progreso privado
   const admin=await call('/api/login',{username:'Jefe de cuerda',password:'live-admin-password'}),auth={Cookie:admin.headers.get('Set-Cookie').split(';')[0],'X-CSRF-Token':admin.data.csrf};
   const season=DB.sqlite.prepare('SELECT id FROM seasons WHERE year=2026').get().id;
   const ids=DB.sqlite.prepare('SELECT user_id FROM season_memberships WHERE season_id=? LIMIT 2').all(season).map(m=>m.user_id);
-  for(const [i,userId] of ids.entries())assert.equal((await call('/api/admin/users',{id:userId,username:`Live tenor ${i}`,display_name:`Tenor ${i}`,password:'Tenor2026',active:true},auth)).status,200);
-  const tenor=await call('/api/login',{username:'Live tenor 0',password:'Tenor2026'}),tenorAuth={Cookie:tenor.headers.get('Set-Cookie').split(';')[0],'X-CSRF-Token':tenor.data.csrf};
+  for(const [i,userId] of ids.entries())assert.equal((await call('/api/admin/users',{id:userId,username:`Live tenor ${i}`,display_name:`Tenor ${i}`,password:'2468',active:true},auth)).status,200);
+  const tenor=await call('/api/login',{username:'Live tenor 0',password:'2468'}),tenorAuth={Cookie:tenor.headers.get('Set-Cookie').split(';')[0],'X-CSRF-Token':tenor.data.csrf};
   let rehearsal={id:randomUUID(),request_id:randomUUID(),season_id:season,rehearsal_date:'2026-07-17',starts_at:'08:00',ends_at:'12:00',status:'draft',is_live:true,version:0,attendance:[{user_id:ids[0],attendance_status:'on_time'},{user_id:ids[1],attendance_status:'pending'}]};
   assert.equal((await call('/api/admin/rehearsals',rehearsal,auth)).status,200);
   assert.equal((await call(`/api/admin/active-rehearsal?season=${season}`,null,auth)).data.id,rehearsal.id);
@@ -153,6 +170,7 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
   });
   let uploaded=[];
   await t.test('Grabaciones privadas, reintentos, límites y audios anteriores',async()=>{
+    assert((await call('/api/public/stats?year=2026')).data.members.every(m=>m.similarity===null));
     const bytes=new Uint8Array([0x1a,0x45,0xdf,0xa3,1,2,3,4]);
     for(let i=0;i<2;i++){
       const meta={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,file_size:bytes.length,mime_type:'audio/webm;codecs=opus',analysis:analysisFor(song)};
@@ -165,6 +183,8 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
       assert.equal((await call(`/api/recordings/${meta.id}/audio`,other)).status,404);assert.equal((await call(`/api/recordings/${meta.id}/audio`)).status,401);assert.equal((await call(`/api/recordings/${meta.id}/audio`,admin)).status,200);
     }
     const list=(await call(`/api/recordings?season=${season}`,tenor)).data;assert.equal(list.items.length,2);assert(!JSON.stringify(list).includes('r2_object_key'));
+    const similarity=(await call('/api/public/stats?year=2026')).data.members;
+    assert.equal(similarity.find(m=>m.id===tenorIds[0]).similarity,80);assert.equal(similarity.find(m=>m.id===tenorIds[1]).similarity,null);
     assert.equal((await call(`/api/recordings?season=${season}&song=${song}`,tenor)).data.items.length,2);
     const anotherSong=query('SELECT id FROM songs WHERE id!=? LIMIT 1',song).id;
     assert.equal((await call(`/api/recordings?season=${season}&song=${anotherSong}`,tenor)).data.items.length,0);

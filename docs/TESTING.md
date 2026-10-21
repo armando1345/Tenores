@@ -1,6 +1,22 @@
 # Pruebas y verificación · 13 de octubre de 2026
 
+## Publicación Cloudflare comprobada
+
+El 13 de octubre se ejecutaron **10 comprobaciones correctas** contra https://tenores.tenores-au-6e09.workers.dev: web HTTPS y cabeceras, D1 conectado, cuentas reales de jefatura y tenor, roles, acceso privado y CSRF. Las sesiones y los eventos temporales de acceso se retiraron al terminar.
+
+Se verificaron ocho integrantes de 2026 sin ensayos ni grabaciones, asistencia vacía y similitud —. El archivo de 2025 conserva nueve integrantes, once ensayos y cuarenta horas; sus datos se compararon exactamente antes y después de retirar las muestras locales y remotas. Después de la activación de R2 por el propietario se ejecutaron ocho comprobaciones adicionales correctas: bucket Standard privado, descripción corta, binding RECORDINGS, reserva/subida/historial, GET y HTTP Range íntegros, permisos del autor/jefatura, rechazo de terceros/invitados, reintentos sin duplicados y CSRF. Se retiraron los bytes sintéticos, metadatos, eventos y sesiones de prueba; las estadísticas previas y 2025 permanecen idénticos. Estas comprobaciones de transporte usan bytes con cabecera WebM de prueba y no certifican decodificación ni micrófono en un dispositivo físico.
+
+La similitud de 2026 permanece vacía hasta una práctica ready; entonces usa el 90% fijo solicitado como demostración. Las pruebas de integración comprueban ambos estados. No existe análisis real de audio.
+
+Los apartados de navegador siguientes documentan revisiones realizadas durante el desarrollo; sus datos ficticios y cifras de pruebas anteriores no describen el estado actual de producción.
+
 ## Resultados ejecutados
+
+La actualización a PIN pasa **21 pruebas de unidad/integración** y **12 comprobaciones nativas**. Se verifican cuatro dígitos exactos, ceros iniciales, rechazo de longitud/formato incorrectos, acceso con usuario Unicode, cambio de PIN que revoca sesiones y conservación de la política administrativa. Una revisión de navegador con sesiones independientes comprueba mostrar/ocultar PIN, login de tenor, contraseña de jefatura, cambio de límites del formulario por rol y el titular de Inicio en escritorio/móvil: 80 px para el titular y 36 px para el subtitular en escritorio, sin puntos finales y con Registrar ensayo debajo. La rotación de cuentas reales conserva los datos estadísticos y 2025; las listas de PIN y respaldos permanecen privados.
+
+La revisión más reciente de gestión usa `node scripts/browser-management-check.mjs` contra un servidor **nuevo** `scripts/dev.mjs --test` en el puerto 8789 (`PORT=8789`). Pasan siete recorridos: selector de año centrado; Inicio sin fondos, bordes ni sombras de tarjetas; checklist de canciones persistente y reversión ante fallo; creación/edición/cancelación de canciones; creación e inscripción de integrante; presentación con detalles opcionales y calendario plegable; creación de temporada y revisión móvil sin desbordamiento. No hay errores JavaScript. Toda escritura usa SQLite efímero; no cambia datos de Cloudflare. Capturas en `output/playwright/jefatura-*-lista*`, `jefatura-repertorio-checklist*`, `jefatura-inicio-sin-cajas.png` y `jefatura-presentacion-formulario.png`; resultado `management-result.json`.
+
+Después se comprobaron los botones verdes de añadir/guardar y la selección de fecha para un año nuevo mediante el calendario propio, sin guardar datos. Las veinte pruebas de unidad/integración siguen pasando.
 
 `node --test tests/*.test.mjs`: **20 pruebas pasan, cero fallos**. Incluye subpruebas del mismo Worker con SQLite real y un adaptador local de almacenamiento; no responde mediante un backend de demostración.
 
@@ -43,6 +59,10 @@ Los casos de `tests/practice-client.test.mjs` prueban las piezas puras del panel
 
 ## Navegador comprobado
 
+El flotante de escritorio se amplió a 600 px de ancho y menos de 130 px de alto, con una barra de más de 550 px, controles mayores y tiempos de 12 px. La comprobación existente del flotante pasa sus cinco recorridos: un clic al 60% lleva una pista sintética de 60 segundos a 36 segundos; continúan funcionando teclado, velocidad, loop, volumen y cierre. La versión móvil conserva su ancho completo y avance táctil. Resultado actualizado: `output/playwright/floating-result.json`; captura `flotante-tenores.png`.
+
+El menú de velocidad del reproductor principal se comprobó en 1280 × 900, 390 × 844, 320 × 568, 740 × 360 y 1440 × 400. Sus límites permanecen dentro de la pantalla y todas las velocidades son alcanzables, también al acercar el botón al borde inferior; cambia de dirección cuando falta espacio y admite scroll interno en pantallas bajas. Se verificaron selección de 0.75x/2x, reajuste tras cambiar el ancho, Escape y clic exterior, sin errores JavaScript. Resultado: `output/playwright/inline-speed-result.json`; capturas `velocidad-principal-movil.png` y `velocidad-principal-escritorio.png`. Acceso de invitado contra el servidor efímero, sin grabaciones ni cambios de cuentas.
+
 `node scripts/browser-navigation-check.mjs`: **9 comprobaciones** de la navegación de jefatura en escritorio y móvil (390 × 844). Inicio presenta misión, registro de ensayo, dos gráficas y tabla del equipo; Estadísticas muestra el desglose ampliado sin esos elementos de portada. Las fichas individuales conservan el tenor al cambiar de temporada y muestran únicamente sus temporadas disponibles. El selector de temporada usa el verde de Tenores, centra el año y admite teclado/Escape; ambos desplegables se cierran al clicar fuera. Grabaciones abre una lista de tenores y luego sus prácticas, con mensajes vacíos personalizados y reproductores brandeados. Dos archivos sintéticos enviados por la API aparecen en la biblioteca correcta y no en la de Liam. Presentaciones, integrantes, repertorio y temporadas no muestran la misión ni el registro de ensayo. Resultado: `output/playwright/navigation-result.json`; capturas `jefatura-inicio-separado`, `jefatura-estadisticas-separadas` y `ficha-liam-limpia` (también en móvil). Todos los envíos se realizan contra la base efímera de `scripts/dev.mjs --test`, sin alterar grabaciones reales.
 
 Revisión de la web real con el mismo Worker y adaptadores locales, en navegador Chromium del entorno:
@@ -79,7 +99,7 @@ La asistencia es ahora una checklist: la casilla marca A tiempo, desmarcar devue
 
 Las secciones administrativas se trasladan al menú desplegable; los botones cierran el menú al navegar. El tenor ve únicamente Temporada 2026 en su biblioteca, con una sola opción interna y sin selector visible. Los datos públicos históricos de 2025 se mantienen en su sección original. Una prueba de cliente verifica esta separación; los integrantes retirados de una temporada abierta dejan de aparecer en el equipo actual, pero conservan sus registros y vuelven a estar incluidos en el informe de la temporada cerrada.
 
-Se activaron las ocho identidades existentes de 2026 en la base persistente local, sin crear personas duplicadas. Se comprobaron sus credenciales y se desactivó la cuenta de prueba y su inscripción actual. Sus dos ensayos, dos filas de asistencia y dos registros de grabación se conservaron; las nueve filas históricas también. Hay un respaldo privado previo en .local. Las contraseñas se almacenan como hashes; no se publican listas de credenciales ni scripts con contraseñas reales. El mínimo de tenor se ajustó a ocho caracteres por instrucción del propietario; jefatura mantiene doce y el costo scrypt no cambió. La prueba nativa de Durable Object crea una cuenta con contraseña de ocho caracteres.
+Se activaron las ocho identidades existentes de 2026 en la base persistente local, sin crear personas duplicadas. Se comprobaron sus credenciales y se desactivó la cuenta de prueba y su inscripción actual. En esa revisión inicial se conservaron las muestras. Posteriormente, por instrucción del propietario, todos los ensayos y grabaciones de muestra de 2026 se retiraron del entorno local y remoto; las nueve filas históricas de 2025 permanecen idénticas. Hay un respaldo privado previo en .local. Las contraseñas se almacenan como hashes; no se publican listas de credenciales ni scripts con contraseñas reales. El mínimo de tenor se ajustó a ocho caracteres por instrucción del propietario; jefatura mantiene doce y el costo scrypt no cambió. La prueba nativa de Durable Object crea una cuenta con contraseña de ocho caracteres.
 
 La revisión de la web persistente comprobó los ocho nombres, el menú, la biblioteca de 2026 y el inicio de sesión de una cuenta real; no creó ensayos ni grabaciones. Capturas: `output/playwright/asistencia-checklist-real.png`, `asistencia-checklist-movil.png`, `jefatura-sin-barra.png`, `jefatura-menu.png` y `mis-grabaciones-2026.png`. Las casillas de la captura son una vista sin guardar. Las 18 pruebas de unidad/integración, las 8 comprobaciones nativas y las 9 comprobaciones del navegador pasan.
 
@@ -108,5 +128,5 @@ En Android/Chrome, iPhone/Safari y escritorio:
 8. En una temporada de prueba remota, exportar archivos, verificar descargas, confirmar cierre y continuar lotes tras una interrupción. Nunca usar datos reales para una prueba de borrado.
 9. Comprobar que la cuenta permanece Free, el bucket es Standard y privado, las cuotas se comparten como se esperaba y no hay nuevos productos facturables.
 
-La publicación depende de configurar Cloudflare y autorizar la suscripción R2. Identificar y conservar el alojamiento público anterior antes de cambiar dominio/enlaces. El runtime local correcto no certifica cuotas o facturación de una cuenta remota.
+La plataforma está publicada con D1 y autenticación comprobados. R2 está conectado y el transporte privado de archivos está comprobado. Falta validar micrófono y reproducción en teléfonos físicos. GitHub Pages permanece disponible como publicación anterior. Las pruebas de funcionamiento no certifican cuotas ni facturación de la cuenta.
 

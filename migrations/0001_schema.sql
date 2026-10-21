@@ -70,10 +70,10 @@ CREATE TABLE rate_limits (key TEXT PRIMARY KEY, window INTEGER NOT NULL, count I
 CREATE TABLE app_limits (id INTEGER PRIMARY KEY CHECK(id=1), audio_bytes INTEGER NOT NULL, audio_seconds INTEGER NOT NULL, daily_recordings INTEGER NOT NULL, season_bytes INTEGER NOT NULL, total_bytes INTEGER NOT NULL);
 INSERT INTO app_limits VALUES(1,20000000,600,10,3000000000,8000000000);
 CREATE TRIGGER recording_guard BEFORE INSERT ON recordings BEGIN
- SELECT CASE WHEN (SELECT status FROM seasons WHERE id=NEW.season_id)!='active' THEN RAISE(ABORT,'season_closed') END;
- SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM songs WHERE id=NEW.song_id AND season_id=NEW.season_id AND active=1) THEN RAISE(ABORT,'invalid_song') END;
- SELECT CASE WHEN NEW.file_size>(SELECT audio_bytes FROM app_limits) OR NEW.duration_seconds>(SELECT audio_seconds FROM app_limits) THEN RAISE(ABORT,'audio_limit') END;
- SELECT CASE WHEN (SELECT COUNT(*) FROM recordings WHERE user_id=NEW.user_id AND substr(created_at,1,10)=substr(NEW.created_at,1,10)) >= (SELECT daily_recordings FROM app_limits) THEN RAISE(ABORT,'daily_limit') END;
- SELECT CASE WHEN (SELECT COALESCE(SUM(file_size),0) FROM recordings WHERE status!='deleted' AND season_id=NEW.season_id)+NEW.file_size>(SELECT season_bytes FROM app_limits) THEN RAISE(ABORT,'storage_limit') END;
- SELECT CASE WHEN (SELECT COALESCE(SUM(file_size),0) FROM recordings WHERE status!='deleted')+NEW.file_size>(SELECT total_bytes FROM app_limits) THEN RAISE(ABORT,'storage_limit') END;
+ SELECT RAISE(ABORT,'season_closed') WHERE (SELECT status FROM seasons WHERE id=NEW.season_id)!='active';
+ SELECT RAISE(ABORT,'invalid_song') WHERE NOT EXISTS(SELECT 1 FROM songs WHERE id=NEW.song_id AND season_id=NEW.season_id AND active=1);
+ SELECT RAISE(ABORT,'audio_limit') WHERE NEW.file_size>(SELECT audio_bytes FROM app_limits) OR NEW.duration_seconds>(SELECT audio_seconds FROM app_limits);
+ SELECT RAISE(ABORT,'daily_limit') WHERE (SELECT COUNT(*) FROM recordings WHERE user_id=NEW.user_id AND substr(created_at,1,10)=substr(NEW.created_at,1,10)) >= (SELECT daily_recordings FROM app_limits);
+ SELECT RAISE(ABORT,'storage_limit') WHERE (SELECT COALESCE(SUM(file_size),0) FROM recordings WHERE status!='deleted' AND season_id=NEW.season_id)+NEW.file_size>(SELECT season_bytes FROM app_limits);
+ SELECT RAISE(ABORT,'storage_limit') WHERE (SELECT COALESCE(SUM(file_size),0) FROM recordings WHERE status!='deleted')+NEW.file_size>(SELECT total_bytes FROM app_limits);
 END;

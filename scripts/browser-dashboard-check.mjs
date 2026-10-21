@@ -12,7 +12,7 @@ const menu=async view=>{await page.getByRole('button',{name:'Abrir menú de opci
 const chooseSeason=async year=>{await page.locator('#seasonPickerToggle').click();await page.locator('#seasonPickerMenu').getByRole('option',{name:String(year),exact:true}).click();};
 try{
   await mkdir('output/playwright',{recursive:true});await page.goto(base);
-  await page.getByLabel('Usuario',{exact:true}).fill('prueba-jefatura');await page.getByLabel('Contraseña',{exact:true}).fill('test-only-admin-password');await page.getByRole('button',{name:'Iniciar sesión',exact:true}).click();await page.getByRole('heading',{name:'Progreso del equipo',exact:true}).waitFor();
+  await page.getByLabel('Usuario',{exact:true}).fill('prueba-jefatura');await page.locator('#loginPassword').fill('test-only-admin-password');await page.getByRole('button',{name:'Iniciar sesión',exact:true}).click();await page.getByRole('heading',{name:'Progreso del equipo',exact:true}).waitFor();
   await page.waitForFunction(()=>document.getElementById('loginStatus').textContent==='');
   const mission=await page.locator('.admin-hero h1').innerText();assert(mission.includes('Tu misión es servir al equipo de tenores.'));assert(mission.includes('Dentro de tus posibilidades, encárgate ahora mismo de que cada miembro del equipo sea al menos un poco mejor'));
   assert.deepEqual(await page.locator('#platformSeason option').allTextContents(),['2026','2025']);

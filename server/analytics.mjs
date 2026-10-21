@@ -1,0 +1,27 @@
+import {ensure,date,uuid} from './domain.mjs';
+const rows=async(env,sql,...params)=>(await env.DB.prepare(sql).bind(...params).all()).results;
+export async function analyticsData(env,url){
+  const seasonId=uuid(url.searchParams.get('season'));
+  const season=(await rows(env,'SELECT * FROM seasons WHERE id=?',seasonId))[0];ensure(season,'Temporada no encontrada.',404);
+  const from=url.searchParams.get('from')||season.starts_on,to=url.searchParams.get('to')||season.ends_on;
+  date(from);date(to);ensure(from<=to&&from>=season.starts_on&&to<=season.ends_on,'El período debe estar dentro de la temporada.');
+  const song=url.searchParams.get('song')?uuid(url.searchParams.get('song')):null;
+  if(song)ensure((await rows(env,'SELECT id FROM songs WHERE id=? AND season_id=?',song,seasonId)).length,'La canción no pertenece a esta temporada.');
+  const [members,attendance,practices,activity,legacy,songs]=await Promise.all([
+    rows(env,`SELECT u.id,u.display_name AS name,u.last_login_at FROM season_memberships m JOIN users u ON u.id=m.user_id WHERE m.season_id=? AND u.role='tenor' AND (m.active=1 OR ?='closed' OR EXISTS(SELECT 1 FROM legacy_attendance l WHERE l.user_id=u.id AND l.season_id=m.season_id)) ORDER BY u.display_name`,seasonId,season.status),
+    rows(env,`SELECT a.user_id,r.rehearsal_date AS day,SUM(a.effective_minutes) AS minutes,SUM(r.duration_minutes) AS scheduled,COUNT(*) AS rehearsals,SUM(CASE WHEN a.attendance_status IN ('on_time','late') THEN 1 ELSE 0 END) AS attended,SUM(CASE WHEN a.attendance_status='late' THEN 1 ELSE 0 END) AS late FROM rehearsal_attendance a JOIN rehearsals r ON r.id=a.rehearsal_id WHERE r.season_id=? AND r.status='final' AND r.rehearsal_date BETWEEN ? AND ? GROUP BY a.user_id,r.rehearsal_date ORDER BY r.rehearsal_date`,seasonId,from,to),
+    // uploaded_at usa UTC; convertir a la fecha local del equipo (UTC-6).
+    rows(env,`SELECT user_id,date(uploaded_at,'-6 hours') AS day,COUNT(*) AS practices,COALESCE(SUM(score),0) AS scoreSum,COUNT(score) AS scoredPractices FROM recordings WHERE season_id=? AND status='ready' AND date(uploaded_at,'-6 hours') BETWEEN ? AND ? AND (? IS NULL OR song_id=?) GROUP BY user_id,day ORDER BY day`,seasonId,from,to,song,song),
+    rows(env,`SELECT user_id,event_day AS day,SUM(CASE WHEN event_type='login' THEN 1 ELSE 0 END) AS logins,MAX(CASE WHEN event_type='active_day' THEN 1 ELSE 0 END) AS activeDays,MAX(CASE WHEN event_type='reference_start' AND EXISTS(SELECT 1 FROM songs s WHERE s.id=activity_events.song_id AND s.season_id=?) AND (? IS NULL OR song_id=?) THEN 1 ELSE 0 END) AS referenceDays FROM activity_events WHERE event_day BETWEEN ? AND ? GROUP BY user_id,event_day ORDER BY event_day`,seasonId,song,song,from,to),
+    rows(env,'SELECT user_id,minutes,scheduled_minutes,rehearsals,rehearsals_attended,tardy_count FROM legacy_attendance WHERE season_id=?',seasonId),
+    rows(env,'SELECT id,title FROM songs WHERE season_id=? ORDER BY title',seasonId)
+  ]);
+  const isFullSeason=from===season.starts_on&&to===season.ends_on,hasLegacy=legacy.length>0;
+  const included=new Set(members.map(member=>member.id)),daily=new Map();
+  function entry(userId,day){const key=userId+':'+day;if(!daily.has(key))daily.set(key,{user_id:userId,day,minutes:0,scheduled:0,rehearsals:0,attended:0,late:0,practices:0,scoreSum:0,scoredPractices:0,logins:0,activeDays:0,referenceDays:0});return daily.get(key);}
+  for(const [records,fields] of [[attendance,['minutes','scheduled','rehearsals','attended','late']],[practices,['practices','scoreSum','scoredPractices']],[activity,['logins','activeDays','referenceDays']]])for(const record of records){if(!included.has(record.user_id))continue;const target=entry(record.user_id,record.day);for(const field of fields)target[field]+=Number(record[field]||0);}
+  const totals=new Map(members.map(member=>[member.id,{...member,minutes:0,scheduled:0,rehearsals:0,attended:0,late:0,practices:0,scoreSum:0,scoredPractices:0,logins:0,activeDays:0,referenceDays:0}]));
+  for(const record of daily.values()){const target=totals.get(record.user_id);for(const field of ['minutes','scheduled','rehearsals','attended','late','practices','scoreSum','scoredPractices','logins','activeDays','referenceDays'])target[field]+=record[field];}
+  if(isFullSeason)for(const record of legacy){const target=totals.get(record.user_id);if(!target)continue;for(const [field,key] of [['minutes','minutes'],['scheduled','scheduled_minutes'],['rehearsals','rehearsals'],['attended','rehearsals_attended'],['late','tardy_count']])target[field]+=Number(record[key]||0);}
+  return {season,range:{from,to},members:[...totals.values()],daily:[...daily.values()],songs,meta:{generated_at:new Date().toISOString(),timezone:'America/El_Salvador',legacy:hasLegacy,legacyIncluded:hasLegacy&&isFullSeason,legacyPeriodUnavailable:hasLegacy&&!isFullSeason,webAvailable:season.year>=2026,similarityMode:'analysis',sources:['season_memberships','users','rehearsals','rehearsal_attendance','legacy_attendance','recordings','activity_events','songs']}};
+}

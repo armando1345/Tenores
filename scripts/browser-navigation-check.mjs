@@ -13,7 +13,7 @@ const noHome=async()=>{assert(!await page.locator('.admin-hero').isVisible());as
 const screenshot=async name=>page.screenshot({path:`output/playwright/${name}.png`,animations:'disabled',fullPage:true});
 try{
   await mkdir('output/playwright',{recursive:true});await page.goto(base);
-  await page.getByLabel('Usuario',{exact:true}).fill('prueba-jefatura');await page.getByLabel('Contraseña',{exact:true}).fill('test-only-admin-password');await page.getByRole('button',{name:'Iniciar sesión',exact:true}).click();await page.getByRole('heading',{name:'Progreso del equipo',exact:true}).waitFor();
+  await page.getByLabel('Usuario',{exact:true}).fill('prueba-jefatura');await page.locator('#loginPassword').fill('test-only-admin-password');await page.getByRole('button',{name:'Iniciar sesión',exact:true}).click();await page.getByRole('heading',{name:'Progreso del equipo',exact:true}).waitFor();
   assert(await page.locator('.admin-hero').isVisible());assert(await page.locator('#adminRegister').isVisible());assert.equal(await page.locator('#homeInsights .dashboard-chart').count(),2);assert.equal(await page.locator('#platformContent .dashboard-insight-columns').count(),0);assert.equal(await page.locator('.dashboard-team-table tr[data-tenor]').count(),8);assert(!await page.locator('#platformSeason').isVisible());
   await screenshot('jefatura-inicio-separado');checks.push('Inicio contiene la misión, registro de ensayo, dos gráficas y ocho tenores');
   await page.locator('#seasonPickerToggle').click();assert(await page.locator('#seasonPickerMenu').isVisible());await page.getByRole('heading',{name:'Nota de práctica del equipo',exact:true}).click();assert(!await page.locator('#seasonPickerMenu').isVisible());
@@ -38,7 +38,7 @@ try{
   await page.locator('.dashboard-team-table tr[data-tenor]').filter({hasText:'Liam'}).locator('td').first().click();await page.getByRole('heading',{name:'Liam',exact:true}).waitFor();await screenshot('ficha-liam-limpia-movil');await noHome();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);checks.push('Inicio y ficha individual comprobados en móvil');
   const uploader=await browser.newContext();
   try{
-    const login=await uploader.request.post(base+'/api/login',{headers:{Origin:base},data:{username:'prueba-tenor-0',password:'test-only-admin-password'}});assert(login.ok());const auth=await login.json(),headers={Origin:base,'X-CSRF-Token':auth.csrf};
+    const login=await uploader.request.post(base+'/api/login',{headers:{Origin:base},data:{username:'prueba-tenor-0',password:'1357'}});assert(login.ok());const auth=await login.json(),headers={Origin:base,'X-CSRF-Token':auth.csrf};
     const currentSeason=(await (await uploader.request.get(base+'/api/public/seasons')).json()).find(s=>s.year===2026),songs=await (await uploader.request.get(`${base}/api/public/songs?season=${currentSeason.id}`)).json(),ids=[];
     for(const song of songs.slice(0,2)){
       const meta={id:crypto.randomUUID(),season_id:currentSeason.id,song_id:song.id,duration_seconds:3,file_size:8,mime_type:'audio/webm;codecs=opus'};ids.push(meta.id);

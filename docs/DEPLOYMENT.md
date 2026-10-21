@@ -1,49 +1,63 @@
-# Preparación y publicación
+# Publicación y operación
 
-No se realizó despliegue. Esta carpeta no tiene `.git`, remoto GitHub ni evidencia verificable de la URL publicada. La encuesta documenta GitHub Pages, pero no confirma el alojamiento actual. Antes de cambiar dominio o enlaces, identificar esa publicación y conservarla operativa durante una vista previa de Workers.
+## Estado comprobado · 13 de octubre de 2026
 
-## Estado de los datos y GitHub Pages
+La plataforma está publicada en https://tenores.tenores-au-6e09.workers.dev. Frontend y API comparten origen HTTPS. Se usa exclusivamente la cuenta Cloudflare **Tenores**, separada del sitio personal de Armando.
 
-La vista previa normal usa `.local/tenores.sqlite` para usuarios, hashes, sesiones, asistencia, temporadas y metadatos de grabaciones, y `.local/recordings/` para archivos de audio. La cuenta de jefatura y las ocho cuentas de tenor de 2026 están activadas en esa base local; no están creadas todavía en una base remota. No se borraron los registros de la cuenta de prueba al desactivarla. Antes de Enviar, la toma existe únicamente en memoria del navegador.
+- Worker: tenores. Cuenta: 6e09b3b147d9e2a7234b301a21903494.
+- D1: tenores, identificador 6a4ae822-7c3b-4e82-bb99-bd3d0ea333b8. Las cinco migraciones están aplicadas.
+- PASSWORDS: Durable Object PasswordHasher; calcula hashes y no almacena las cuentas.
+- La lista vigente tiene nueve tenores activos de 2026, incluido Carlos, con PIN únicos de cuatro números. Los PIN se restablecieron de forma privada y sus sesiones anteriores se revocaron. Jefatura conserva su contraseña. No se publican PIN ni hashes reales en GitHub.
+- 2026 no contiene ensayos, asistencia, presentaciones ni grabaciones de muestra. También se retiraron esas muestras del entorno local. Los datos de 2025 se compararon antes y después y permanecen idénticos: nueve integrantes, once ensayos y 2400 minutos programados.
+- R2 está activado por Armando. El bucket tenores-grabaciones usa Standard, acceso privado y binding RECORDINGS. No tiene r2.dev ni dominios públicos. Se comprobaron PUT, GET, HTTP Range, reintentos y permisos; la muestra temporal y sus sesiones se retiraron.
+- GitHub conserva el repositorio armando1345/Tenores. Armando sube las fuentes a plataforma-2026. GitHub Pages y main no se modificaron desde esta configuración. No hay despliegue automático desde GitHub.
 
-La configuración de producción espera Cloudflare D1 y R2 privado detrás del Worker. `database_id` sigue sin configurar y `r2_buckets` está comentado; por tanto todavía no hay almacenamiento remoto conectado. El Durable Object calcula hashes, pero no guarda las cuentas.
+Diez comprobaciones en la publicación verificaron HTTPS, D1, los accesos de jefatura y tenor, restricciones de rol, CSRF y datos de ambas temporadas. Se retiraron las sesiones y los eventos temporales de esa verificación. La prueba no creó ensayos ni grabaciones.
 
-Los usuarios conservan mayúsculas y tildes al mostrarse. La migración `0004_username_key.sql` añade una clave única para comparar accesos sin distinguir mayúsculas; la API normaliza Unicode sin quitar tildes. Actualizar un usuario conserva su identificador, contraseña e historial si no se indica una contraseña nueva.
+## Datos y comportamiento
+
+En producción, D1 guarda usuarios, hashes, sesiones, temporadas, ensayos, asistencia y metadatos de grabaciones. R2 privado guarda los archivos de audio enviados. Antes de Enviar, la toma está únicamente en memoria del navegador. Los respaldos locales y SQL de transferencia están en .local/, fuera de Git y de Static Assets.
 
 `0005_presentations_live_rehearsals.sql` añade presentaciones y la marca `is_live` de ensayos. El ensayo activo conserva estado interno `draft`, permite pendientes y no entra en porcentajes consolidados hasta finalizarse. Solo puede haber uno activo por temporada. Los cambios se guardan con Guardar llegadas y se consultan cada 10 segundos mientras la pestaña está visible; no hay conexión WebSocket. El detalle privado de cada tenor se restringe a su propietario o jefatura. La muestra fija del 90% fue sustituida por el análisis real de la práctica (ver 0006 y 0007).
 
 `0006_practice_analysis.sql` añade el esquema del análisis (curva de referencia por canción y nota/detalle por grabación). `0007_song_references_data.sql` carga las 12 curvas de referencia; se genera con `node scripts/build-reference-migration.mjs <carpeta-de-curvas>`. Ambas deben aplicarse (`pnpm exec wrangler d1 migrations apply tenores`, primero `--local`) antes de publicar el Worker.
 
-GitHub Pages publica archivos estáticos, no ejecuta esta API. Las peticiones actuales a `/api/` usan el mismo origen y cookies de sesión; subir el frontend a Pages por sí solo no habilita login, registro de ensayos ni guardado de audios. La opción preparada es publicar frontend y API juntos en Workers. Mantener el frontend en GitHub Pages requeriría definir y probar otra integración de dominio, rutas y sesiones antes de habilitar el acceso privado.
+Los usuarios conservan mayúsculas y tildes. La API normaliza Unicode sin quitar tildes y compara el acceso sin distinguir mayúsculas. Cambiar un nombre conserva identificador, contraseña e historial si no se indica una contraseña nueva.
 
-Publicar solo archivos públicos del build; excluir `.local/`, sus respaldos y sus grabaciones. Para llevar las cuentas reales a producción se necesita una transferencia privada de los datos o activar sus identidades en la API remota una vez configurada. No poner contraseñas ni hashes de cuentas reales en migraciones públicas ni en JavaScript.
+La pantalla de acceso muestra Usuario y PIN; al escribir Jefe de cuerda, el campo usa Contraseña y teclado de texto. La edición de integrantes valida cuatro dígitos para tenores y doce caracteres como mínimo para jefatura. Ambos accesos mantienen scrypt con sal individual, cookies privadas, CSRF y los límites de intentos existentes. El nombre interno password_hash se conserva para evitar una migración de datos innecesaria.
 
-## Recursos y configuración
+El ensayo activo conserva estado interno draft y permite pendientes. No entra en porcentajes consolidados hasta finalizarse; solo puede haber uno activo por temporada. Los cambios se consultan cada diez segundos mientras la pestaña está visible. No hay WebSocket.
 
-Usar una cuenta **Workers Free** y un proyecto independiente de vista previa. No subir a Workers Paid ni aceptar una suscripción facturable automáticamente. D1 y el Durable Object SQLite-backed están disponibles en Free; R2 requiere un proceso de suscripción separado y autorización explícita.
+La práctica guiada calcula el análisis real en el navegador. D1 conserva la puntuación y el detalle junto a la grabación enviada; las tomas no enviadas no se guardan. El dashboard y el modo avanzado usan puntuaciones reales y muestran — sin análisis. La presentación histórica de 2025 se conserva.
 
-1. Guardar las fuentes actuales y crear un repositorio GitHub si el propietario lo decide. La implementación no ha creado ni modificado repositorios remotos. No publicar `.local`, `.dev.vars`, `.wrangler`, `node_modules` ni credenciales. `backups/pre-platform` puede guardarse en el repositorio privado o como respaldo local; el build no la publica.
-2. Instalar dependencias de desarrollo con `pnpm install --frozen-lockfile`. Ejecutar pruebas y `node scripts/build.mjs`.
-3. Iniciar sesión en Cloudflare con `pnpm exec wrangler login`. Crear D1 con `pnpm exec wrangler d1 create tenores` y sustituir `REEMPLAZAR_ID_D1` en `wrangler.jsonc` por el identificador devuelto. Conservar `binding: DB`.
-4. La configuración define `PASSWORDS → PasswordHasher` y una migración `new_sqlite_classes`. Este Durable Object **solo calcula hashes** mediante un binding privado; no almacena usuarios, contraseñas, sesiones ni bitácoras. No ofrece una ruta HTTP pública. SQLite-backed se elige porque es el backend compatible con Free, aunque esta clase no necesita guardar datos.
-5. Aplicar primero a una base local: `pnpm exec wrangler d1 migrations apply tenores --local` (incluye `0006` y `0007`; en remoto, aplicarlas antes de publicar el Worker). Para la base nueva de vista previa, aplicar `--remote` únicamente después de confirmar que es la base correcta. Las migraciones conservan los agregados de 2025; no generan ensayos históricos ficticios.
-6. Generar un secreto aleatorio de 32 bytes para `BOOTSTRAP_SECRET` y establecerlo con `pnpm exec wrangler secret put BOOTSTRAP_SECRET` por entrada interactiva. No pasarlo como argumento, escribirlo en Git ni enviarlo en mensajes públicos. Para el runtime local de Wrangler usar `.dev.vars`, excluido del build y de Git. No reutilizar claves ni contraseñas de las pruebas.
-7. Antes de publicar: `pnpm exec wrangler deploy --dry-run --outdir output/worker`. Este comando compila sin publicar. El build contiene únicamente HTML/CSS/JS públicos, imágenes y la encuesta. Las referencias propias siguen en sus URLs Cloudinary existentes; no se duplica toda la carpeta de audios en Static Assets.
-8. Publicar la vista previa con `pnpm exec wrangler deploy` cuando estén confirmados los recursos Free y los bindings correctos. No asociar todavía el dominio público actual. Mantener frontend y API bajo el mismo origen HTTPS; no añadir CORS para acceder desde GitHub Pages.
-9. En la vista previa, abrir **Configuración inicial de jefatura**, introducir la clave temporal y establecer la contraseña de `Jefe de cuerda`. El endpoint deja de permitir creación cuando existe una cuenta administrativa. Eliminar luego el secreto con `pnpm exec wrangler secret delete BOOTSTRAP_SECRET`.
-10. Activar las cuentas existentes e inscribir las nuevas usando el panel. Probar acceso como invitado, tenor y jefatura antes de compartir el enlace.
+## Actualizaciones del despliegue existente
 
-## R2 pendiente de autorización
+Usar la configuración actual de wrangler.jsonc: ya contiene la cuenta y D1 correctos. No crear otra base ni ejecutar de nuevo la importación privada. No se necesita BOOTSTRAP_SECRET porque ya existe jefatura.
 
-La integración funciona sin un bucket público y no necesita tokens S3 en el navegador. Hasta configurar `RECORDINGS`, las rutas de subida responden con error explícito; no simulan guardado. Cuentas, ensayos y estadísticas pueden utilizarse sin R2.
+1. Instalar dependencias con pnpm install --frozen-lockfile.
+2. Ejecutar node --test tests/*.test.mjs y node scripts/build.mjs.
+3. Para migraciones nuevas, respaldar D1 y probarlas primero con wrangler d1 migrations apply tenores --local. Aplicar --remote únicamente a la cuenta/base comprobadas.
+4. Ejecutar pnpm exec wrangler deploy --dry-run --outdir output/worker.
+5. Publicar con pnpm exec wrangler deploy usando la autorización de la cuenta Tenores. El build contiene solo archivos públicos permitidos; no incluye SQL, servidor, respaldos ni grabaciones personales.
+6. Comprobar la publicación y documentar el resultado. La subida manual a GitHub no provoca este despliegue automáticamente.
 
-**No activar R2 ni completar su checkout sin autorización.** Cloudflare exige una suscripción para usar R2, aun con cuota gratuita. Si se autoriza:
+Las migraciones usan LF, protegido por .gitattributes. Los triggers usan SELECT RAISE(...) WHERE condición para evitar los problemas de separación de sentencias de D1. Estas restricciones se comprobaron en SQLite local y en D1 remoto.
 
-1. Crear `tenores-grabaciones` en clase **Standard**; nunca Infrequent Access.
-2. Desactivar acceso público, `r2.dev`, dominio público y reglas de ciclo de vida que borren objetos automáticamente.
-3. Descomentar `r2_buckets` en `wrangler.jsonc` con `binding: RECORDINGS` y el nombre correcto.
-4. Probar primero con R2 local. No utilizar `--remote` para desarrollo de grabaciones.
-5. Publicar esa configuración y validar un audio por dispositivo real. Las claves de objeto nunca se devuelven al cliente; GET/Range pasa por la autorización del Worker. API y medios privados usan `Cache-Control: no-store`.
+En una instalación nueva e independiente, crear otra D1, aplicar sus migraciones y activar las identidades mediante transferencia privada o la API. Solo si no existe jefatura se configura un BOOTSTRAP_SECRET aleatorio por entrada interactiva, se crea la cuenta y se retira el secreto. Nunca publicar credenciales en migraciones.
+
+## R2 conectado y comprobado
+
+Armando completó el checkout de R2 y autorizó su configuración. El bucket Standard está conectado al Worker. No se solicitó un cambio a Workers Paid. La cuota incluida no garantiza gratuidad fuera de sus límites.
+
+Configuración aplicada y mantenimiento:
+
+1. Conservar tenores-grabaciones en clase **Standard**, con acceso privado.
+2. Mantener desactivados r2.dev, dominios públicos y reglas que eliminen audios completos automáticamente. La regla predeterminada solo cancela subidas multipart incompletas tras siete días; no elimina prácticas enviadas.
+3. Conservar r2_buckets con binding RECORDINGS y el nombre del bucket en wrangler.jsonc.
+4. En cada cambio de almacenamiento, comprobar subida, lectura privada y acceso exclusivo del tenor/jefatura. El navegador accede a los audios a través del Worker; no recibe credenciales R2.
+5. La comprobación remota retiró sus bytes sintéticos, metadatos, actividad y sesiones. 2026 permanece listo para datos reales. Sigue pendiente validar micrófono y reproducción en teléfonos físicos con el propietario.
+
+Fuentes: [activación de R2](https://developers.cloudflare.com/r2/get-started/), [cuotas y precios](https://developers.cloudflare.com/r2/pricing/).
 
 ## Seguridad y operación
 

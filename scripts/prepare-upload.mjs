@@ -13,7 +13,7 @@ const backupDir=inWorkspace(resolve('.local',`respaldo-publicacion-${stamp}-${ra
 const stage=inWorkspace(resolve('.local',`preparacion-github-${randomUUID()}`));
 await mkdir(backupDir,{recursive:true});await mkdir(stage,{recursive:true});
 
-const files=['index.html','styles.css','app.js','platform.css','platform.js','_headers','.gitignore','package.json','pnpm-lock.yaml','wrangler.jsonc','README.md','assets/letter-banner.svg'];
+const files=['index.html','styles.css','app.js','platform.css','platform.js','advanced.js','_headers','.gitignore','.gitattributes','package.json','pnpm-lock.yaml','wrangler.jsonc','README.md','assets/letter-banner.svg'];
 async function addDirectory(directory){
   for(const entry of await readdir(directory,{withFileTypes:true})){
     const path=`${directory}/${entry.name}`;
@@ -21,7 +21,7 @@ async function addDirectory(directory){
     if(entry.isDirectory())await addDirectory(path);else if(entry.isFile())files.push(path);
   }
 }
-for(const directory of ['server','migrations','docs','tests','encuesta'])await addDirectory(directory);
+for(const directory of ['server','migrations','docs','tests','encuesta','practice'])await addDirectory(directory);
 for(const entry of await readdir('scripts',{withFileTypes:true})){
   if(entry.isFile()&&entry.name.endsWith('.mjs')&&entry.name!=='seed.mjs')files.push(`scripts/${entry.name}`);
 }
