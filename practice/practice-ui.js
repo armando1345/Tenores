@@ -11,8 +11,6 @@ import { sendState, sendOutcome } from './send-state.js';
 import { incompleteTake } from './take-check.js';
 
 const LIVE_PITCH = true;
-const GUIDE_WARNING = 'Ponte auriculares para que el micrófono escuche solo tu voz. Así evitamos que la guía afecte el resultado. Si usas Bluetooth, ajusta la sincronización antes de empezar.';
-const LATENCY_SOURCE = { calibrated: 'calibrado', browser: 'automático', default: 'estimado' };
 const GUIDE_TIMEOUT_MS = 3000; // si la guía no empieza a sonar en este tiempo, se avisa
 const INCOMPLETE_TAKE = 'El audio llegó incompleto, así que la nota no sería fiable. Repite la toma; si usas auriculares Bluetooth y vuelve a pasar, prueba con auriculares con cable.';
 
@@ -33,6 +31,7 @@ function ensurePanel() {
         <div><p class="practice-eyebrow">Práctica</p><h2 id="practiceTitle"></h2></div>
         <button class="practice-close" type="button" data-close aria-label="Cerrar práctica">&times;</button>
       </header>
+      <div class="practice-steps" role="img" data-practice-steps></div>
       <div class="practice-body" aria-live="polite"></div>
     </section>
   </div>`;
@@ -86,12 +85,13 @@ export async function openPractice(song, hooks) {
   audio.preload = 'auto';
   s = {
     song, hooks, audio, token: ++seq, ref: null, recorder: null, timers: new Set(), raf: 0,
-    take: null, takeSource: null, refStop: null, finished: -1, takeStartedAt: 0,
+    take: null, takeSource: null, refStop: null, reviewReferencePlaying: false, finished: -1, takeStartedAt: 0,
     result: null, pending: null, send: null,
     settings: { range: 'full', phraseFrom: 1, phraseTo: 1 },
   };
   titleEl.textContent = song.title;
   panel.hidden = false;
+  setStep(1);
   document.body.classList.add('practice-panel-open');
   document.addEventListener('keydown', onKeydown);
   sheet.focus();
@@ -191,7 +191,7 @@ async function loadReference() {
     if (stale(token)) return;
     s.ref = ref;
     s.settings.phraseTo = ref.phrases.length;
-    renderSetup();
+    renderIntro();
   } catch {
     if (!stale(token)) renderError('No se pudo cargar la referencia.', loadReference);
   }
@@ -243,27 +243,49 @@ function guardPending(action) {
   focusBody();
 }
 
+function setStep(step) {
+  const names = ['Auriculares', 'Qué cantar', 'Grabación', 'Resultados'];
+  const progress = sheet.querySelector('[data-practice-steps]');
+  progress.setAttribute('aria-label', `Paso ${step} de 4: ${names[step-1]}`);
+  progress.innerHTML = names.map((name,index)=>`<span class="${index+1===step?'is-current':index+1<step?'is-complete':''}" aria-hidden="true"></span>`).join('');
+  sheet.scrollTop = 0;
+}
+
+function renderIntro() {
+  cancelFlow();
+  s.take = null; s.result = null; s.send = null;
+  setStep(1);
+  body.innerHTML = `<div class="practice-intro">
+    <p class="practice-intro-message">Para realizar tu práctica, utiliza auriculares para que el micrófono escuche solamente tu voz. Así tu resultado será mucho más preciso.</p>
+    <p class="practice-intro-note"><strong>Nota:</strong> es recomendable que uses auriculares con cable. Si usas auriculares Bluetooth, presiona el botón ajustar sincronización.</p>
+    <div class="practice-step-actions"><button type="button" class="btn quiet" data-calibrate>Ajustar sincronización</button><button type="button" class="btn" data-next>Siguiente <span aria-hidden="true">→</span></button></div>
+  </div>`;
+  body.querySelector('[data-calibrate]').addEventListener('click', calibrate);
+  body.querySelector('[data-next]').addEventListener('click', renderSetup);
+  focusBody();
+}
+
 function renderSetup() {
   cancelFlow();
+  s.take = null; s.result = null; s.send = null;
+  setStep(2);
   const { range, phraseFrom, phraseTo } = s.settings;
   const hop = s.ref.hopMs / 1000;
   const options = selected => s.ref.phrases
     .map(p => `<option value="${p.index}"${p.index === selected ? ' selected' : ''}>Frase ${p.index} · ${formatTime(p.start * hop)}</option>`)
     .join('');
-  body.innerHTML = `<form class="practice-setup"><h3 class="practice-setup-title">Prepara tu prueba</h3><p class="practice-setup-intro">Escucha la guía, canta y descubre cómo mejorar tu entonación</p>
-    <p class="practice-warning">${GUIDE_WARNING}</p>
-    <details class="practice-calibration"><summary>Ajustar auriculares Bluetooth <span aria-hidden="true">+</span></summary><p>Si tu voz aparece adelantada o retrasada, este ajuste ayuda a sincronizarla con la guía.</p><div class="practice-latency"><span data-latency></span><button type="button" class="btn small quiet" data-calibrate>Ajustar sincronización</button></div></details>
-    <fieldset><legend>Qué cantar</legend>
+  body.innerHTML = `<form class="practice-setup">
+    <fieldset><legend class="practice-setup-title">¿Qué cantar?</legend>
       <label class="practice-choice"><input type="radio" name="range" value="full"${range === 'full' ? ' checked' : ''}>
-        <span><strong>Canción completa</strong><small>Analiza tu prueba y envía los resultados a jefatura</small></span></label>
+        <span><strong>Canción completa</strong></span></label>
       <label class="practice-choice"><input type="radio" name="range" value="phrases"${range === 'phrases' ? ' checked' : ''}>
-        <span><strong>Un fragmento</strong><small>Perfecciona una parte antes de la prueba completa</small></span></label>
+        <span><strong>Un fragmento</strong></span></label>
       <div class="practice-range" data-range${range === 'phrases' ? '' : ' hidden'}>
         <label>Desde <select name="from">${options(phraseFrom)}</select></label>
         <label>Hasta <select name="to">${options(phraseTo)}</select></label>
       </div>
     </fieldset>
-    <button type="submit" class="btn practice-start">Comenzar prueba</button>
+    <div class="practice-step-actions"><button type="button" class="practice-text-action" data-previous><span aria-hidden="true">←</span> Atrás</button><button type="submit" class="btn practice-start">Comenzar prueba</button></div>
   </form>`;
   const form = body.querySelector('form');
   form.addEventListener('change', () => {
@@ -276,9 +298,7 @@ function renderSetup() {
     s.settings.phraseTo = to;
     form.querySelector('[data-range]').hidden = s.settings.range !== 'phrases';
   });
-  const lat = effectiveLatency(s.recorder?.context ?? null);
-  form.querySelector('[data-latency]').textContent = `Ajuste ${LATENCY_SOURCE[lat.source]} · ${lat.ms} ms`;
-  form.querySelector('[data-calibrate]').addEventListener('click', () => calibrate());
+  form.querySelector('[data-previous]').addEventListener('click', renderIntro);
   form.addEventListener('submit', e => { e.preventDefault(); startTake(); });
   focusBody();
 }
@@ -296,6 +316,7 @@ async function ensureRecorder(token, retry) {
 // Calibrar auriculares: suenan clics, el tenor canta «ta» con cada uno y se mide cuánto llega tarde su voz.
 async function calibrate() {
   cancelFlow();
+  setStep(1);
   const token = s.token;
   if (!(await ensureRecorder(token, calibrate))) return;
   const ctx = s.recorder.context;
@@ -324,14 +345,14 @@ async function calibrate() {
       <div class="practice-actions"><button type="button" class="btn small" data-retry>Reintentar</button>
       <button type="button" class="btn small quiet" data-back>Volver</button></div></div>`;
     body.querySelector('[data-retry]').addEventListener('click', calibrate);
-    body.querySelector('[data-back]').addEventListener('click', renderSetup);
+    body.querySelector('[data-back]').addEventListener('click', renderIntro);
     focusBody();
     return;
   }
   saveLatency(r.ms);
-  body.innerHTML = `<div class="practice-message"><p>Retraso calibrado: ${r.ms} ms.</p>
+  body.innerHTML = `<div class="practice-message"><p>Sincronización ajustada.</p>
     <button type="button" class="btn small" data-back>Volver</button></div>`;
-  body.querySelector('[data-back]').addEventListener('click', renderSetup);
+  body.querySelector('[data-back]').addEventListener('click', renderIntro);
   focusBody();
 }
 
@@ -342,6 +363,7 @@ function renderCountdown(big, hint) {
 
 async function startTake() {
   cancelFlow();
+  setStep(3);
   const token = s.token;
   const { from, to } = currentRange();
   const hop = s.ref.hopMs / 1000;
@@ -479,10 +501,11 @@ async function finishTake(token, take) {
 
 // La grabación duró menos que el tiempo real (AudioContext ralentizado): no se analiza ni se envía.
 function renderIncomplete() {
+  setStep(4);
   body.innerHTML = `<div class="practice-error" role="alert"><p>${esc(INCOMPLETE_TAKE)}</p>
     <div class="practice-actions"><button type="button" class="btn small" data-act="repeat">Volver a grabar</button>
     <button type="button" class="btn small quiet" data-act="setup">Cambiar ajustes</button></div></div>`;
-  body.querySelector('[data-act="repeat"]').addEventListener('click', () => startTake());
+  body.querySelector('[data-act="repeat"]').addEventListener('click', renderIntro);
   body.querySelector('[data-act="setup"]').addEventListener('click', renderSetup);
   focusBody();
 }
@@ -568,6 +591,7 @@ async function sendTake() {
 }
 
 function renderResults(r) {
+  setStep(4);
   if (!r.valid) {
     body.innerHTML = `<div class="practice-error" role="alert">
       <p>No se detectó suficiente voz. Acércate al micrófono o canta más fuerte.</p>
@@ -578,9 +602,9 @@ function renderResults(r) {
   } else {
     body.innerHTML = analysisMarkup(r, {
       interactive: true,
+      reviewTracks: `<div class="practice-review-tracks"><h3 class="practice-subtitle">Escucha y compara</h3><button type="button" class="practice-take-control" data-act="reference" aria-pressed="false">${takeControlMarkup(false,true)}</button><button type="button" class="practice-take-control" data-act="take" aria-pressed="false">${takeControlMarkup(false)}</button><p class="practice-review-message" role="status" aria-live="polite"></p></div>`,
       phraseActions: `<div class="practice-phrase-actions" hidden><p class="practice-selected-phrase" data-selected-phrase></p><div class="practice-fragment-tools"><button type="button" class="practice-text-action" data-act="listen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 6 9 6-9 6Z"/></svg>Escuchar referencia</button><button type="button" class="btn small quiet practice-drill" data-act="drill">Practicar esta frase <span aria-hidden="true">→</span></button></div></div>`,
       extra: `<section class="practice-finish" aria-label="Revisar y enviar resultados">
-        <button type="button" class="practice-take-control" data-act="take" aria-pressed="false">${takeControlMarkup(false)}</button>
         <div class="practice-finish-actions" data-result-actions>
           <button type="button" class="practice-text-action practice-retry-action" data-act="repeat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/></svg>Volver a grabar</button>
           <button type="button" class="btn practice-submit" data-act="send" hidden>Enviar resultados <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button>
@@ -602,9 +626,10 @@ function renderResults(r) {
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const act = btn.dataset.act;
-    if (act === 'repeat') guardPending(renderSetup);
+    if (act === 'repeat') guardPending(renderIntro);
     else if (act === 'setup') guardPending(renderSetup);
     else if (act === 'take') toggleTake(btn);
+    else if (act === 'reference') toggleReviewReference();
     else if (act === 'listen' && selected) playRefPhrase(selected);
     else if (act === 'drill' && selected) {
       const index = selected;
@@ -621,8 +646,32 @@ function renderResults(r) {
   focusBody();
 }
 
-function takeControlMarkup(playing) {
-  return `<span class="practice-take-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${playing?'<path d="M7 5h4v14H7zm6 0h4v14h-4z"/>':'<path d="m9 5 11 7-11 7Z"/>'}</svg></span><span><strong>${playing?'Detener mi toma':'Escuchar mi toma'}</strong><small>Tu audio permanece solo en este dispositivo</small></span>`;
+function takeControlMarkup(playing, reference = false) {
+  const range = currentRange(), duration = reference ? (s.ref.phrases[range.to-1].end-s.ref.phrases[range.from-1].start)*s.ref.hopMs/1000 : s.take?.durationSeconds||0;
+  const title = reference ? (playing?'Detener referencia':'Escuchar referencia') : (playing?'Detener mi toma':'Escuchar mi toma');
+  return `<span class="practice-take-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${playing?'<path d="M7 5h4v14H7zm6 0h4v14h-4z"/>':'<path d="m9 5 11 7-11 7Z"/>'}</svg></span><span class="practice-review-track-label"><strong>${title}</strong><small>${reference?'Voz de tenores':'Tu audio permanece solo en este dispositivo'}</small></span><span class="practice-review-duration">${formatTime(duration)}</span>`;
+}
+
+function updateReferenceControl(playing) {
+  const btn = body.querySelector('[data-act="reference"]');
+  if (btn) { btn.innerHTML = takeControlMarkup(playing,true); btn.setAttribute('aria-pressed', String(playing)); }
+}
+
+async function toggleReviewReference() {
+  if (s.reviewReferencePlaying) { stopRefSegment(); return; }
+  stopTake(); stopRefSegment();
+  const session = s, token = s.token, {from,to} = currentRange(), hop = s.ref.hopMs/1000, end = s.ref.phrases[to-1].end*hop;
+  const audio = s.audio;
+  const onTime = () => { if(audio.currentTime>=end)stopRefSegment(); };
+  const onEnded = () => stopRefSegment();
+  s.refStop = () => { audio.pause();audio.removeEventListener('timeupdate',onTime);audio.removeEventListener('ended',onEnded);session.refStop=null;session.reviewReferencePlaying=false;updateReferenceControl(false); };
+  audio.addEventListener('timeupdate',onTime);audio.addEventListener('ended',onEnded);
+  s.reviewReferencePlaying = true;
+  updateReferenceControl(true);
+  const message=body.querySelector('.practice-review-message');if(message)message.textContent='';
+  seekAudio(token,s.ref.phrases[from-1].start*hop);
+  try { await audio.play(); }
+  catch(error) { if(!stale(token)&&session.reviewReferencePlaying){stopRefSegment();if(message&&error.name!=='AbortError')message.textContent='No se pudo reproducir la referencia. Inténtalo de nuevo.';} }
 }
 
 function updateTakeControl(playing) {

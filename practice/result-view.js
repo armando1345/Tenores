@@ -21,7 +21,7 @@ function phraseItem(p, interactive) {
 }
 
 // `interactive`: frases como botones (pantalla en vivo). `extra`: HTML añadido al final del bloque.
-export function analysisMarkup(r, { interactive = false, extra = '', reviewing = false, phraseActions = '' } = {}) {
+export function analysisMarkup(r, { interactive = false, extra = '', reviewing = false, phraseActions = '', reviewTracks = '' } = {}) {
   const scores = r.scores || {};
   const tips = Array.isArray(r.tips) ? r.tips : [];
   const phrases = Array.isArray(r.phrases) ? r.phrases : [];
@@ -33,6 +33,7 @@ export function analysisMarkup(r, { interactive = false, extra = '', reviewing =
       </div>
       <ul class="practice-metrics" aria-label="Desglose de la puntuación">${METRICS.map(([k, label, description]) =>
         `<li class="practice-metric--${k} score--${band(scores[k])}"><span>${label}</span><strong${k==='pitch'?' class="practice-intonation__value"':''}>${num(scores[k])}</strong><small class="practice-metric__description">${scores[k]==null?'Sin datos suficientes para esta medida':description}</small>${k==='rhythm'?'<small class="practice-metric__note">Informativo · No cuenta en la nota total</small>':''}</li>`).join('')}</ul>
+      ${reviewTracks}
       ${tips.length ? `<h3 class="practice-subtitle">Para la próxima práctica</h3><ul class="practice-tips">${tips.map(t => `<li>${esc(t && typeof t === 'object' ? t.text : t)}</li>`).join('')}</ul>` : ''}
       ${chart ? (interactive?`<details class="practice-voice-detail"><summary><span><strong>Comparar la voz con la referencia</strong><small>Ve en qué partes coinciden y en cuáles hay diferencias</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${chart}<p class="practice-chart-help">La línea verde es tu voz y la blanca es la referencia. Cuanto más se acercan, más parecidas son las notas.</p></details>`:`<h3 class="practice-subtitle">Comparación con la referencia</h3>${chart}`) : ''}
       ${phrases.length ? (interactive ? `<details class="practice-fragment-review"><summary><span><strong>Repasar un fragmento</strong><small>Escucha la referencia y practica una parte concreta</small></span><span class="practice-fragment-count">${phrases.length} ${phrases.length===1?'frase':'frases'}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="practice-fragment-content"><p class="practice-fragment-hint">Elige la frase que quieres repasar</p><div class="practice-phrases">${phrases.map(p => phraseItem(p, true)).join('')}</div>${phraseActions}</div></details>` : `<h3 class="practice-subtitle">Frases</h3><div class="practice-phrases">${phrases.map(p => phraseItem(p, false)).join('')}</div>`) : ''}

@@ -334,6 +334,35 @@ body.tsheet-open { overflow: hidden; }
 .practice-chart-times{display:flex;justify-content:space-between;margin:10px 4px;font-size:11px;color:#a9bbb0;font-variant-numeric:tabular-nums}
 .practice-chart-help{margin:12px 0 18px;color:#a9bbb0;font-size:12px;line-height:1.65}
 
+/* Preparación por pasos: una decisión en cada pantalla. */
+.practice-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:0 0 30px}
+.practice-steps>span{height:3px;border-radius:2px;background:#2b3a31}
+.practice-steps .is-complete{background:#c3d2c9}
+.practice-steps .is-current{background:var(--accent,#0ffc7e)}
+.practice-intro{padding:4px 0 0}
+.practice-intro-message{margin:0 0 24px;font-size:clamp(19px,3vw,24px);font-weight:500;line-height:1.65;letter-spacing:-.018em;color:#f1f7f3;max-width:44ch}
+.practice-intro-note{font-size:13px;line-height:1.8;color:#b7c9be;margin:0 0 34px;max-width:62ch}
+.practice-intro-note strong{color:var(--accent,#0ffc7e);font-weight:600}
+.practice-step-actions{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:30px}
+.practice-step-actions .btn{gap:18px;min-width:160px}
+.practice-step-actions .practice-start{width:auto;margin-top:0}
+.practice-setup legend.practice-setup-title{font-size:27px;letter-spacing:-.03em;text-transform:none;color:#f1f7f3;font-weight:650;margin-bottom:22px}
+.practice-setup .practice-choice{min-height:64px}
+.practice-review-tracks{padding:0 0 18px;border-bottom:1px solid #2b3a31}
+.practice-review-tracks .practice-subtitle{margin:0 0 12px}
+.practice-review-tracks .practice-take-control{padding:14px 0}
+.practice-review-tracks .practice-take-control+.practice-take-control{border-top:1px solid #26372c}
+.practice-review-track-label{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+.practice-review-duration{font-size:12px;color:#a9bbb0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.practice-review-message:empty{display:none}
+.practice-review-message{color:var(--practice-bad);font-size:12px;line-height:1.6;margin:10px 0 0}
+@media(max-width:540px){
+  .practice-step-actions{gap:12px;flex-wrap:wrap}
+  .practice-intro .practice-step-actions{flex-direction:column-reverse;align-items:stretch}
+  .practice-step-actions .btn{min-width:0;min-height:48px;font-size:13px;padding-inline:18px}
+  .practice-setup .practice-step-actions .practice-start{margin-left:auto}
+}
+
 /* Jerarquía de acciones: repasar una frase, escuchar la toma y enviar. */
 .practice-fragment-review{border-block:1px solid #2b3a31}
 .practice-fragment-review>summary{display:flex;align-items:center;gap:14px;min-height:86px;padding:18px 0;cursor:pointer;list-style:none}
