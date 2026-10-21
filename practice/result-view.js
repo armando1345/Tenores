@@ -12,12 +12,12 @@ function phraseItem(p, interactive) {
   const inner = `Frase ${num(p.index)}<small>${formatTime(p.start)}–${formatTime(p.end)}</small><small class="practice-phrase-score">Entonación ${num(p.pitch)} · Estabilidad ${num(p.stability)} · Ritmo ${num(p.rhythm)}</small>`;
   const cls = `practice-phrase score--${band(p.pitch)}`;
   return interactive
-    ? `<button type="button" class="${cls}" data-phrase="${num(p.index)}" aria-expanded="false">${inner}</button>`
+    ? `<button type="button" class="${cls}" data-phrase="${num(p.index)}" aria-pressed="false">${inner}</button>`
     : `<span class="${cls} practice-phrase--static">${inner}</span>`;
 }
 
 // `interactive`: frases como botones (pantalla en vivo). `extra`: HTML añadido al final del bloque.
-export function analysisMarkup(r, { interactive = false, extra = '', reviewing = false } = {}) {
+export function analysisMarkup(r, { interactive = false, extra = '', reviewing = false, phraseActions = '' } = {}) {
   const scores = r.scores || {};
   const tips = Array.isArray(r.tips) ? r.tips : [];
   const phrases = Array.isArray(r.phrases) ? r.phrases : [];
@@ -32,7 +32,6 @@ export function analysisMarkup(r, { interactive = false, extra = '', reviewing =
       ${tips.length ? `<h3 class="practice-subtitle">Qué mejorar</h3><ul class="practice-tips">${tips.map(t => `<li>${esc(t && typeof t === 'object' ? t.text : t)}</li>`).join('')}</ul>` : ''}
       ${r.curves ? `<div class="practice-chart-wrap">${renderChart(r.curves, phrases)}
         <p class="practice-legend"><span class="legend-ref">Referencia</span><span class="legend-user">${reviewing?'Voz del tenor':'Tu voz'}</span></p></div>` : ''}
-      ${phrases.length ? `<h3 class="practice-subtitle">Frases</h3>
-      <div class="practice-phrases">${phrases.map(p => phraseItem(p, interactive)).join('')}</div>` : ''}
+      ${phrases.length ? (interactive ? `<details class="practice-fragment-review"><summary><span><strong>Repasar un fragmento</strong><small>Escucha la referencia y practica una parte concreta</small></span><span class="practice-fragment-count">${phrases.length} ${phrases.length===1?'frase':'frases'}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="practice-fragment-content"><p class="practice-fragment-hint">Elige la frase que quieres repasar</p><div class="practice-phrases">${phrases.map(p => phraseItem(p, true)).join('')}</div>${phraseActions}</div></details>` : `<h3 class="practice-subtitle">Frases</h3><div class="practice-phrases">${phrases.map(p => phraseItem(p, false)).join('')}</div>`) : ''}
       ${extra}</div>`;
 }

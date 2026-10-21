@@ -49,7 +49,7 @@ function ensurePanel() {
   });
 }
 
-const focusablesIn = root => [...root.querySelectorAll('button:not([disabled]), select:not([disabled]), input:not([disabled])')]
+const focusablesIn = root => [...root.querySelectorAll('button:not([disabled]), select:not([disabled]), input:not([disabled]), summary')]
   .filter(el => el.offsetParent !== null);
 
 // Escucha en `document` mientras el panel está abierto: cada render reemplaza el
@@ -546,6 +546,8 @@ function updateSend(focus) {
   area.hidden = !area.innerHTML;
   const btn = body.querySelector('[data-act="send"]');
   if (btn) btn.hidden = s.send?.state !== 'ready';
+  const resultActions = body.querySelector('[data-result-actions]');
+  if (resultActions) resultActions.hidden = ['confirm','sending','error'].includes(s.send?.state);
   const sending = s.send?.state === 'sending';
   body.querySelectorAll('[data-act="repeat"], [data-act="setup"], [data-act="drill"]').forEach(b => { b.disabled = sending; });
   if (focus === false) return;
@@ -577,17 +579,15 @@ function renderResults(r) {
   } else {
     body.innerHTML = analysisMarkup(r, {
       interactive: true,
-      extra: `<div class="practice-phrase-actions" hidden>
-        <button type="button" class="btn small quiet" data-act="listen">Escuchar referencia</button>
-        <button type="button" class="btn small" data-act="drill">Practicar esta frase</button>
-      </div>
-      <div class="practice-send" data-send aria-live="polite" hidden></div>
-      <div class="practice-actions">
-        <button type="button" class="btn small" data-act="send" hidden>Enviar resultados</button>
-        <button type="button" class="btn small quiet" data-act="take">Escuchar mi toma</button>
-        <button type="button" class="btn small" data-act="repeat">Repetir</button>
-        <button type="button" class="btn small quiet" data-act="setup">Cambiar ajustes</button>
-      </div>`,
+      phraseActions: `<div class="practice-phrase-actions" hidden><p class="practice-selected-phrase" data-selected-phrase></p><div class="practice-fragment-tools"><button type="button" class="practice-text-action" data-act="listen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 6 9 6-9 6Z"/></svg>Escuchar referencia</button><button type="button" class="btn small quiet practice-drill" data-act="drill">Practicar esta frase <span aria-hidden="true">→</span></button></div></div>`,
+      extra: `<section class="practice-finish" aria-label="Revisar y enviar resultados">
+        <button type="button" class="practice-take-control" data-act="take" aria-pressed="false">${takeControlMarkup(false)}</button>
+        <div class="practice-finish-actions" data-result-actions>
+          <button type="button" class="practice-text-action practice-retry-action" data-act="repeat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/></svg>Volver a grabar</button>
+          <button type="button" class="btn practice-submit" data-act="send" hidden>Enviar resultados <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button>
+        </div>
+        <div class="practice-send" data-send aria-live="polite" hidden></div>
+      </section>`,
     });
   }
   let selected = null;
@@ -595,8 +595,9 @@ function renderResults(r) {
     const phrase = e.target.closest('[data-phrase]');
     if (phrase) {
       selected = Number(phrase.dataset.phrase);
-      body.querySelectorAll('[data-phrase]').forEach(b => b.setAttribute('aria-expanded', String(b === phrase)));
+      body.querySelectorAll('[data-phrase]').forEach(b => b.setAttribute('aria-pressed', String(b === phrase)));
       body.querySelector('.practice-phrase-actions').hidden = false;
+      body.querySelector('[data-selected-phrase]').textContent = `Frase ${selected} seleccionada`;
       return;
     }
     const btn = e.target.closest('[data-act]');
@@ -621,8 +622,17 @@ function renderResults(r) {
   focusBody();
 }
 
+function takeControlMarkup(playing) {
+  return `<span class="practice-take-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${playing?'<path d="M7 5h4v14H7zm6 0h4v14h-4z"/>':'<path d="m9 5 11 7-11 7Z"/>'}</svg></span><span><strong>${playing?'Detener mi toma':'Escuchar mi toma'}</strong><small>Tu audio permanece solo en este dispositivo</small></span>`;
+}
+
+function updateTakeControl(playing) {
+  const btn = body.querySelector('[data-act="take"]');
+  if (btn) { btn.innerHTML = takeControlMarkup(playing); btn.setAttribute('aria-pressed', String(playing)); }
+}
+
 function toggleTake(btn) {
-  if (s.takeSource) { stopTake(); btn.textContent = 'Escuchar mi toma'; return; }
+  if (s.takeSource) { stopTake(); return; }
   stopRefSegment();
   const ctx = s.recorder.context;
   const { samples, sampleRate } = s.take;
@@ -631,16 +641,17 @@ function toggleTake(btn) {
   const src = ctx.createBufferSource();
   src.buffer = buffer;
   src.connect(ctx.destination);
-  src.onended = () => { if (s && s.takeSource === src) { s.takeSource = null; btn.textContent = 'Escuchar mi toma'; } };
+  src.onended = () => { if (s && s.takeSource === src) { s.takeSource = null; updateTakeControl(false); } };
   src.start();
   s.takeSource = src;
-  btn.textContent = 'Detener mi toma';
+  updateTakeControl(true);
 }
 
 function stopTake() {
   if (!s || !s.takeSource) return;
   const src = s.takeSource;
   s.takeSource = null;
+  updateTakeControl(false);
   try { src.stop(); } catch { /* ya detenida */ }
 }
 
