@@ -71,12 +71,14 @@ const result = {
   phrases: [{ index: 1, start: 0, end: 2.5, pitch: 81 }, { index: 2, start: 2.5, end: 5, pitch: 40 }],
   curves: { hopMs: 10, startSec: 0, ref: [60, 60.5, null, 62, 62], user: [59.8, null, 61, 62.2, 62] },
 };
-test('analysisMarkup muestra nota, desglose, consejos escapados, gráfica y frases', () => {
+test('analysisMarkup muestra nota, desglose y comparación visible sin consejos', () => {
   const html = analysisMarkup(result);
   assert.match(html, /practice-score__value">73</);
   assert(html.includes('No cuenta en la nota total'));assert(html.includes('Entonación'));assert(!html.includes('Afinación'));assert(html.includes('practice-intonation__value">81<'));assert(html.includes('Similitud total'));
-  assert(html.includes('Frase 1: &lt;b&gt;&quot;alto&quot;&lt;/b&gt; &amp; más'));
-  assert(html.includes('¡Muy bien!'));
+  assert(!html.includes('Para la próxima práctica'));
+  assert(!html.includes('¡Muy bien!'));
+  assert(html.includes('<section class="practice-voice-detail">'));
+  assert(!html.includes('<details class="practice-voice-detail">'));
   assert(html.includes('<svg'));
   assert(html.includes('Frase 2'));
   assert(!html.includes('<button'));

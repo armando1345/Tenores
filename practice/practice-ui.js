@@ -256,7 +256,7 @@ function renderIntro() {
   s.take = null; s.result = null; s.send = null;
   setStep(1);
   body.innerHTML = `<div class="practice-intro">
-    <p class="practice-intro-message">Para realizar tu práctica, utiliza auriculares para que el micrófono escuche solamente tu voz. Así tu resultado será mucho más preciso.</p>
+    <p class="practice-intro-message">Para realizar tu práctica, utiliza auriculares así el micrófono escuchará solamente tu voz y tu resultado será mucho más preciso</p>
     <p class="practice-intro-note"><strong>Nota:</strong> es recomendable que uses auriculares con cable. Si usas auriculares Bluetooth, presiona el botón ajustar sincronización.</p>
     <div class="practice-step-actions"><button type="button" class="btn quiet" data-calibrate>Ajustar sincronización</button><button type="button" class="btn" data-next>Siguiente <span aria-hidden="true">→</span></button></div>
   </div>`;
