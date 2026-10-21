@@ -11,7 +11,7 @@ import { sendState, sendOutcome } from './send-state.js';
 import { incompleteTake } from './take-check.js';
 
 const LIVE_PITCH = true;
-const GUIDE_WARNING = 'Usa auriculares, mejor con cable: si el micrófono capta la guía, la puntuación no será fiable. Con Bluetooth, pulsa «Calibrar auriculares» antes.';
+const GUIDE_WARNING = 'Ponte auriculares para que el micrófono escuche solo tu voz. Así evitamos que la guía afecte el resultado. Si usas Bluetooth, ajusta la sincronización antes de empezar.';
 const LATENCY_SOURCE = { calibrated: 'calibrado', browser: 'automático', default: 'estimado' };
 const GUIDE_TIMEOUT_MS = 3000; // si la guía no empieza a sonar en este tiempo, se avisa
 const INCOMPLETE_TAKE = 'El audio llegó incompleto, así que la nota no sería fiable. Repite la toma; si usas auriculares Bluetooth y vuelve a pasar, prueba con auriculares con cable.';
@@ -252,8 +252,7 @@ function renderSetup() {
     .join('');
   body.innerHTML = `<form class="practice-setup"><h3 class="practice-setup-title">Prepara tu prueba</h3><p class="practice-setup-intro">Escucha la guía, canta y descubre cómo mejorar tu entonación</p>
     <p class="practice-warning">${GUIDE_WARNING}</p>
-    <p class="practice-latency"><span data-latency></span>
-      <button type="button" class="btn small quiet" data-calibrate>Calibrar auriculares</button></p>
+    <details class="practice-calibration"><summary>Ajustar auriculares Bluetooth <span aria-hidden="true">+</span></summary><p>Si tu voz aparece adelantada o retrasada, este ajuste ayuda a sincronizarla con la guía.</p><div class="practice-latency"><span data-latency></span><button type="button" class="btn small quiet" data-calibrate>Ajustar sincronización</button></div></details>
     <fieldset><legend>Qué cantar</legend>
       <label class="practice-choice"><input type="radio" name="range" value="full"${range === 'full' ? ' checked' : ''}>
         <span><strong>Canción completa</strong><small>Analiza tu prueba y envía los resultados a jefatura</small></span></label>
@@ -278,7 +277,7 @@ function renderSetup() {
     form.querySelector('[data-range]').hidden = s.settings.range !== 'phrases';
   });
   const lat = effectiveLatency(s.recorder?.context ?? null);
-  form.querySelector('[data-latency]').textContent = `Retraso: ${lat.ms} ms (${LATENCY_SOURCE[lat.source]})`;
+  form.querySelector('[data-latency]').textContent = `Ajuste ${LATENCY_SOURCE[lat.source]} · ${lat.ms} ms`;
   form.querySelector('[data-calibrate]').addEventListener('click', () => calibrate());
   form.addEventListener('submit', e => { e.preventDefault(); startTake(); });
   focusBody();

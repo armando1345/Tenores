@@ -2,7 +2,7 @@ import { noteName, deviationCents } from './live-pitch.js';
 
 // Pista estilo karaoke del indicador en vivo: cálculos puros y dibujo en canvas.
 export const TRACK = { pastSec: 1.5, futureSec: 3, minSpan: 7, margin: 1, ease: 0.2, gapSec: 0.25 };
-const COLORS = { ok: '#0ffc7e', warn: '#ffc400', bad: '#ff5c5c', none: '#9ba3b1', bar: '#2a3a30', label: '#7f8b86',
+const COLORS = { ok: '#0ffc7e', warn: '#ffffff', bad: '#ff5c5c', none: '#9ba3b1', bar: '#2a3a30', label: '#7f8b86',
   current: '#1f6b45', now: 'rgba(255,255,255,.7)' };
 
 // Notas de la referencia (en segundos) que caen en la ventana alrededor de `te`, recortadas al fragmento.
