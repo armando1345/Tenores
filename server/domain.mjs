@@ -46,3 +46,28 @@ export function sniffAudio(bytes, mime) {
   if (mime.startsWith('audio/mpeg')) return ascii(0,3)==='ID3' || (b[0]===0xff && (b[1]&0xe0)===0xe0);
   return b[0]===0xff && (b[1]&0xf6)===0xf0;
 }
+export function practiceAnalysis(raw, songId) {
+  const ok = raw && typeof raw === 'object' && !Array.isArray(raw);
+  ensure(ok, 'Análisis inválido.');
+  ensure(typeof raw.engineVersion === 'string' && raw.engineVersion.length > 0 && raw.engineVersion.length <= 20, 'Versión del motor inválida.');
+  ensure(raw.mode === 'guide', 'Solo se guardan análisis con guía.');
+  ensure(raw.isFull === true, 'El análisis debe ser de la canción completa.');
+  ensure(raw.valid === true, 'El análisis no es válido.');
+  ensure(raw.songId === songId, 'El análisis no corresponde a esta canción.');
+  const total = raw.scores?.total;
+  ensure(Number.isInteger(total) && total >= 0 && total <= 100, 'Puntuación inválida.');
+  ensure(Array.isArray(raw.tips) && Array.isArray(raw.phrases) && Array.isArray(raw.curves?.ref), 'Análisis incompleto.');
+  const json = JSON.stringify(raw);
+  ensure(json.length <= 262144, 'El análisis es demasiado grande.', 413);
+  return { json, score: total };
+}
+export function referencePayload(raw, song) {
+  ensure(raw && typeof raw === 'object' && !Array.isArray(raw), 'Curva inválida.');
+  ensure(raw.source === song.reference_audio_key, 'La referencia de la canción cambió; vuelve a generar la curva.', 409);
+  ensure(raw.hopMs === 10, 'Paso de la curva inválido.');
+  ensure(Array.isArray(raw.midi) && raw.midi.length > 0, 'La curva está vacía.');
+  ensure(Array.isArray(raw.phrases) && raw.phrases.length > 0 && raw.phrases.every(p => p && p.start < p.end), 'Frases inválidas.');
+  const json = JSON.stringify({ ...raw, songId: song.id });
+  ensure(json.length <= 163840, 'La curva es demasiado grande.', 413);
+  return json;
+}

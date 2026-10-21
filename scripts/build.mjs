@@ -4,4 +4,5 @@ for(const name of ['index.html','styles.css','app.js','platform.css','platform.j
 await cp('assets','dist/assets',{recursive:true,filter: async src=> !(await stat(src)).isFile() || /\.(svg|png|jpg|webp)$/i.test(src)});
 await mkdir('dist/encuesta',{recursive:true});
 for(const name of ['index.html','styles.css','encuesta.js','config.js']) await copyFile(`encuesta/${name}`,`dist/encuesta/${name}`);
+await cp('practice','dist/practice',{recursive:true,filter: async src=> !(await stat(src)).isFile() || /\.(js|css)$/i.test(src)});
 console.log('Static Assets preparados; no se publican SQL, servidor, copias ni secretos.');

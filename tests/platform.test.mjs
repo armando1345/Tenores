@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { runInNewContext } from 'node:vm';
 import worker from '../server/worker.mjs';
 import { LocalD1, LocalR2 } from '../scripts/local-adapters.mjs';
-import { attendance, recordingMetadata, sniffAudio } from '../server/domain.mjs';
+import { attendance, recordingMetadata, sniffAudio, practiceAnalysis, referencePayload } from '../server/domain.mjs';
 import { hashPassword, verifyPassword, digest } from '../server/security.mjs';
 const uid=randomUUID();
 test('Minutos de ensayo, tardanzas y salida anticipada',()=>{
@@ -108,6 +108,7 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
     return {status:r.status,headers:r.headers,data:r.headers.get('Content-Type')?.includes('json')?await r.json():new Uint8Array(await r.arrayBuffer())};
   };
   const sql=(s,...a)=>DB.sqlite.prepare(s).run(...a),query=(s,...a)=>DB.sqlite.prepare(s).get(...a);
+  const analysisFor=(songId,total=80)=>({engineVersion:'1.0',songId,mode:'guide',isFull:true,valid:true,scores:{total,pitch:total,rhythm:total,stability:total},tips:[],phrases:[],curves:{ref:[60,null],user:[60,null],hopMs:10,startSec:0}});
   const season=query('SELECT id FROM seasons WHERE year=2026').id,oldSeason=query('SELECT id FROM seasons WHERE year=2025').id,song=query('SELECT id FROM songs LIMIT 1').id;
   const create=(await call('/api/setup',{method:'POST',body:{setup_key:env.BOOTSTRAP_SECRET,password:'test-only-admin-password'}}));assert.equal(create.status,201);
   const auth=await call('/api/login',{method:'POST',body:{username:'Jefe de cuerda',password:'test-only-admin-password'}});assert.equal(auth.status,200);
@@ -154,7 +155,7 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
   await t.test('Grabaciones privadas, reintentos, límites y audios anteriores',async()=>{
     const bytes=new Uint8Array([0x1a,0x45,0xdf,0xa3,1,2,3,4]);
     for(let i=0;i<2;i++){
-      const meta={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,file_size:bytes.length,mime_type:'audio/webm;codecs=opus'};
+      const meta={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,file_size:bytes.length,mime_type:'audio/webm;codecs=opus',analysis:analysisFor(song)};
       const reserved=await call('/api/recordings/reserve',{method:'POST',...tenor,body:meta});assert.equal(reserved.status,201);uploaded.push(meta.id);
       const summary=await call(`/api/admin/summary?season=${season}`,admin);assert.equal(summary.data.season_storage.submitted_count,uploaded.length-1);assert.equal(summary.data.season_storage.count,uploaded.length);
       assert.equal((await call(`/api/recordings/${meta.id}`,{method:'PUT',...tenor,body:bytes,headers:{'Content-Type':meta.mime_type}})).status,200);
@@ -168,7 +169,7 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
     const anotherSong=query('SELECT id FROM songs WHERE id!=? LIMIT 1',song).id;
     assert.equal((await call(`/api/recordings?season=${season}&song=${anotherSong}`,tenor)).data.items.length,0);
     assert.equal((await call(`/api/recordings?season=${season}&user=${tenorIds[0]}`,other)).data.items.length,0);
-    const base={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,file_size:20000001,mime_type:'audio/webm'};
+    const base={id:randomUUID(),song_id:song,season_id:season,duration_seconds:3,file_size:20000001,mime_type:'audio/webm',analysis:analysisFor(song)};
     assert.equal((await call('/api/recordings/reserve',{method:'POST',...tenor,body:base})).status,413);
     const corrupt={...base,id:randomUUID(),file_size:8};await call('/api/recordings/reserve',{method:'POST',...tenor,body:corrupt});assert.equal((await call(`/api/recordings/${corrupt.id}`,{method:'PUT',...tenor,body:new TextEncoder().encode('<html />'),headers:{'Content-Type':'audio/webm'}})).status,415);
     assert.equal((await R2.head(query('SELECT r2_object_key FROM recordings WHERE id=?',corrupt.id).r2_object_key)),null);
@@ -189,6 +190,46 @@ test('Integración del Worker: autorización, asistencia, correcciones, audios y
     const done=await call(`/api/admin/seasons/${season}/cleanup`,{method:'POST',...admin,body:{}});assert.equal(done.data.status,'closed');assert.equal(R2.memory.size,0);assert.equal(query('SELECT COUNT(*) n FROM rehearsal_attendance').n,2);assert.equal(query('SELECT COUNT(*) n FROM legacy_attendance WHERE season_id=?',oldSeason).n,9);
     assert.equal((await call(`/api/recordings/${uploaded[0]}/audio`,tenor)).status,410);
   });
+  await t.test('Prácticas con análisis y curvas',async()=>{
+    sql("UPDATE seasons SET status='active' WHERE id=?",season);
+    const fumSong=query("SELECT * FROM songs WHERE legacy_key='fum'"),bytes=new Uint8Array([0x1a,0x45,0xdf,0xa3,5,6,7,8]);
+    const meta={id:randomUUID(),song_id:fumSong.id,season_id:season,duration_seconds:3,file_size:bytes.length,mime_type:'audio/webm;codecs=opus'};
+    const reserve=body=>call('/api/recordings/reserve',{method:'POST',...tenor,body});
+    assert.equal((await reserve(meta)).status,400);
+    assert.equal((await reserve({...meta,analysis:{...analysisFor(fumSong.id),isFull:false}})).status,400);
+    const created=await reserve({...meta,analysis:analysisFor(fumSong.id)});assert.equal(created.status,201);
+    const again=await reserve({...meta,analysis:analysisFor(fumSong.id)});assert.equal(again.status,200);assert.equal(again.data.id,meta.id);
+    assert.equal((await reserve({...meta,analysis:analysisFor(fumSong.id,75)})).status,409);
+    assert.equal((await call(`/api/recordings/${meta.id}/analysis`,tenor)).status,409);
+    assert.equal((await call(`/api/recordings/${meta.id}`,{method:'PUT',...tenor,body:bytes,headers:{'Content-Type':meta.mime_type}})).status,200);
+    const analysis=await call(`/api/recordings/${meta.id}/analysis`,tenor);assert.equal(analysis.status,200);assert.equal(analysis.data.scores.total,80);
+    assert.equal((await call(`/api/recordings/${meta.id}/analysis`,other)).status,404);assert.equal((await call(`/api/recordings/${meta.id}/analysis`,admin)).status,200);
+    const legacyId=randomUUID();sql("INSERT INTO recordings(id,user_id,song_id,season_id,r2_object_key,duration_seconds,file_size,mime_type,status,recorded_at,uploaded_at,created_at) VALUES(?,?,?,?,?,?,?,?,'ready',?,?,?)",legacyId,tenorIds[0],fumSong.id,season,`${season}/${tenorIds[0]}/${legacyId}`,3,8,'audio/webm','2026-01-01T00:00:00.000Z','2026-01-01T00:00:00.000Z','2026-01-01T00:00:00.000Z');
+    const list=(await call(`/api/recordings?season=${season}`,tenor)).data.items;
+    const fresh=list.find(r=>r.id===meta.id),legacy=list.find(r=>r.id===legacyId);
+    assert.equal(fresh.score,80);assert.equal(fresh.has_analysis,1);assert(list.every(r=>!('analysis' in r)));
+    assert.equal(legacy.score,null);assert.equal(legacy.has_analysis,0);
+    const missing=await call(`/api/recordings/${legacyId}/analysis`,tenor);assert.equal(missing.status,404);assert.equal(missing.data.error,'Esta práctica no tiene análisis.');
+    const ref=await call(`/api/songs/${fumSong.id}/reference`,tenor);assert.equal(ref.status,200);assert.equal(ref.data.songId,fumSong.id);assert(ref.data.midi.length>0);
+    assert.equal((await call('/api/public/songs?season='+season)).data.find(s=>s.id===fumSong.id).has_reference,1);
+    const newSource='https://res.cloudinary.com/dcwx23x5o/video/upload/v2/fum_nueva.wav';
+    assert.equal((await call('/api/admin/songs',{method:'POST',...admin,body:{id:fumSong.id,season_id:season,title:fumSong.title,reference_audio_key:newSource,lyrics:fumSong.lyrics,active:true}})).status,200);
+    const gone=await call(`/api/songs/${fumSong.id}/reference`,tenor);assert.equal(gone.status,404);assert.equal(gone.data.error,'Esta canción aún no tiene curva de referencia.');
+    assert.equal((await call('/api/public/songs?season='+season)).data.find(s=>s.id===fumSong.id).has_reference,0);
+    assert.equal((await call(`/api/admin/songs?season=${season}`,admin)).data.find(s=>s.id===fumSong.id).has_reference,0);
+    assert.equal((await call(`/api/recordings/${meta.id}/analysis`,tenor)).data.scores.total,80);
+    const fixture=JSON.parse(await readFile(new URL('./fixtures/fum-reference.json',import.meta.url),'utf8'));
+    const path=`/api/admin/songs/${fumSong.id}/reference`;
+    assert.equal((await call(path,{method:'POST',...tenor,body:{reference:{...fixture,source:newSource}}})).status,403);
+    assert.equal((await call(path,{method:'POST',...admin,body:{reference:fixture}})).status,409);
+    const saved=await call(path,{method:'POST',...admin,body:{reference:{...fixture,source:newSource}}});assert.equal(saved.status,200);assert.deepEqual(saved.data,{ok:true});
+    assert.equal((await call('/api/public/songs?season='+season)).data.find(s=>s.id===fumSong.id).has_reference,1);
+    assert.equal((await call(`/api/admin/songs?season=${season}`,admin)).data.find(s=>s.id===fumSong.id).has_reference,1);
+    assert.equal((await call(`/api/songs/${fumSong.id}/reference`,tenor)).data.songId,fumSong.id);
+    assert.equal(query("SELECT COUNT(*) n FROM admin_audit WHERE action='reference_generated' AND entity_id=?",fumSong.id).n,1);
+    assert.equal((await call(`/api/admin/practice-scores?season=${season}`,tenor)).status,403);
+    assert.deepEqual((await call(`/api/admin/practice-scores?season=${season}`,admin)).data,[{user_id:tenorIds[0],average:80,count:1}]);
+  });
   await t.test('Rate limiting distribuido con D1',async()=>{for(let i=0;i<240;i++)await call('/api/session',{ip:'test-rate'});assert.equal((await call('/api/session',{ip:'test-rate'})).status,429);});
   DB.sqlite.close();
 });
@@ -201,3 +242,39 @@ test('Regresión de fuentes y paquete público',async()=>{
   for(const marker of ['audio-track','mini-toggle','fontUp','q','memories-view','presentationsPanel','dataPanel'])assert(html.includes(`id="${marker}"`));
 });
 
+test('El paquete público incluye el motor de práctica',async()=>{
+  const { execFileSync } = await import('node:child_process');const { access } = await import('node:fs/promises');
+  execFileSync(process.execPath,['scripts/build.mjs']);
+  for(const f of ['dist/practice/analyze.js','dist/practice/recorder-worklet.js','dist/practice/practice.css'])await access(f);
+  for(const f of ['dist/tests','dist/server','dist/migrations'])await assert.rejects(access(f));
+});
+test('Las 12 curvas existentes se cargan íntegras',async()=>{
+  const DB=new LocalD1();await DB.migrate();
+  assert.equal(DB.sqlite.prepare('SELECT COUNT(*) n FROM song_references').get().n,12);
+  const rows=DB.sqlite.prepare('SELECT r.song_id,r.source,r.reference,s.reference_audio_key,s.legacy_key FROM song_references r JOIN songs s ON s.id=r.song_id').all();
+  assert.equal(rows.length,12);
+  for(const row of rows){const ref=JSON.parse(row.reference);assert(ref.phrases.length>0);assert.equal(ref.hopMs,10);assert.equal(ref.source,row.reference_audio_key);assert.equal(row.source,row.reference_audio_key);}
+  const fum=rows.find(r=>r.legacy_key==='fum');
+  assert.deepEqual(JSON.parse(fum.reference),JSON.parse(await readFile(new URL('./fixtures/fum-reference.json',import.meta.url),'utf8')));
+});
+test('Ninguna sentencia de la migración de curvas supera 100 000 bytes',async()=>{
+  const { sqlStatements }=await import('../scripts/sql-statements.mjs');
+  const sql=await readFile(new URL('../migrations/0007_song_references_data.sql',import.meta.url),'utf8');
+  for(const s of sqlStatements(sql))assert(Buffer.byteLength(s)<=100000);
+});
+test('Validación del análisis y de la curva',async()=>{
+  const ok={engineVersion:'1.0',songId:'fum',mode:'guide',isFull:true,valid:true,scores:{total:83,pitch:80,rhythm:85,stability:84},tips:[],phrases:[],curves:{ref:[1,null],user:[1,null],hopMs:10,startSec:0}};
+  const r=practiceAnalysis(ok,'fum');assert.equal(r.score,83);assert.equal(JSON.parse(r.json).songId,'fum');
+  const bad=(patch,status=400)=>assert.throws(()=>practiceAnalysis({...ok,...patch},'fum'),e=>e.status===status);
+  bad({mode:'test'});bad({isFull:false});bad({valid:false});bad({songId:'otra'});
+  bad({scores:{...ok.scores,total:101}});bad({scores:{...ok.scores,total:82.5}});
+  bad({curves:{...ok.curves,ref:new Array(70000).fill(1.23)}},413);
+  assert.throws(()=>practiceAnalysis(null,'fum'),e=>e.status===400);
+  const fx=JSON.parse(await readFile(new URL('./fixtures/fum-reference.json',import.meta.url),'utf8'));
+  const song={id:'song-1',reference_audio_key:fx.source};
+  assert.equal(JSON.parse(referencePayload(fx,song)).songId,'song-1');
+  assert.throws(()=>referencePayload({...fx,source:'https://x/y.wav'},song),e=>e.status===409);
+  assert.throws(()=>referencePayload({...fx,phrases:[]},song),e=>e.status===400);
+  assert.throws(()=>referencePayload({...fx,phrases:[{start:5,end:5}]},song),e=>e.status===400);
+  assert.throws(()=>referencePayload({...fx,hopMs:20},song),e=>e.status===400);
+});

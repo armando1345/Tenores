@@ -20,7 +20,7 @@ try{
   const season=await page.locator('#platformSeason').inputValue(),members=(await (await page.request.get(`${base}/api/admin/memberships?season=${season}`)).json()).filter(m=>m.active&&m.account_active);
   const rehearsal={id:crypto.randomUUID(),request_id:crypto.randomUUID(),season_id:season,rehearsal_date:'2026-07-17',starts_at:'08:00',ends_at:'12:00',status:'final',version:0,attendance:members.map((m,i)=>i===0?{user_id:m.id,attendance_status:'on_time'}:{user_id:m.id,attendance_status:'late',late_reason:'unjustified',arrival_at:'08:35'})};
   const saved=await page.request.post(base+'/api/admin/rehearsals',{headers,data:rehearsal});assert(saved.ok());await page.reload();await page.getByRole('heading',{name:'Progreso del equipo',exact:true}).waitFor();await menu('summary');await page.getByRole('heading',{name:'Grupos de desempeño',exact:true}).waitFor();
-  for(const name of ['Asistencia de tenores','Similitud del equipo','Grupos de desempeño','Observaciones'])assert(await page.getByRole('heading',{name,exact:true}).isVisible());
+  for(const name of ['Asistencia de tenores','Nota de práctica del equipo','Grupos de desempeño','Observaciones'])assert(await page.getByRole('heading',{name,exact:true}).isVisible());
   assert.equal(await page.locator('.dashboard-team-table .tenor-name').filter({hasText:'↗'}).count(),0);
   const stats=await (await page.request.get(base+'/api/public/stats?year=2026')).json();assert.equal(await page.locator('.dashboard-summary-metrics strong').first().innerText(),`${stats.overview.averageAttendance.toFixed(1)}%`);
   await page.locator('#adminDashboard').screenshot({path:'output/playwright/dashboard-ampliado-2026.png',animations:'disabled'});

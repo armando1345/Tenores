@@ -1,4 +1,4 @@
-import { HttpError, ensure, text, uuid, date, clock, attendance, canReadRecording, recordingMetadata, sniffAudio } from './domain.mjs';
+import { HttpError, ensure, text, uuid, date, clock, attendance, canReadRecording, recordingMetadata, sniffAudio, practiceAnalysis, referencePayload } from './domain.mjs';
 import { digest, token } from './security.mjs';
 import { passwordHash, passwordVerify } from './password-service.mjs';
 export { PasswordHasher } from './password-object.mjs';
@@ -12,6 +12,7 @@ const one = (env,sql,...args) => stmt(env,sql,...args).first();
 const rows = async (env,sql,...args) => (await stmt(env,sql,...args).all()).results;
 const run = (env,sql,...args) => stmt(env,sql,...args).run();
 const audit = (env,user,action,entity,before,after) => stmt(env,'INSERT INTO admin_audit(id,changed_by,action,entity_id,previous_value,new_value) VALUES(?,?,?,?,?,?)',id(),user.id,action,entity,before?JSON.stringify(before):null,after?JSON.stringify(after):null);
+const HAS_REFERENCE = 'EXISTS(SELECT 1 FROM song_references sr WHERE sr.song_id=songs.id AND sr.source=songs.reference_audio_key) AS has_reference';
 const safeUser = user => user ? {id:user.id,username:user.username,display_name:user.display_name,role:user.role,active:user.active,last_login_at:user.last_login_at} : null;
 function origin(request) {
   ensure(request.headers.get('Origin') === new URL(request.url).origin,'Origen de solicitud no permitido.',403);
@@ -148,7 +149,7 @@ async function api(request,env) {
   }
   if(p==='/api/public/seasons' && method==='GET') return json(await rows(env,'SELECT id,year,status FROM seasons ORDER BY year DESC'));
   if(p==='/api/public/stats' && method==='GET') return json(await publicStats(env,Number(url.searchParams.get('year')||2026)));
-  if(p==='/api/public/songs' && method==='GET') return json(await rows(env,'SELECT id,season_id,legacy_key,title,reference_audio_key,lyrics FROM songs WHERE season_id=? AND active=1 ORDER BY title',uuid(url.searchParams.get('season'))));
+  if(p==='/api/public/songs' && method==='GET') return json(await rows(env,`SELECT id,season_id,legacy_key,title,reference_audio_key,lyrics,${HAS_REFERENCE} FROM songs WHERE season_id=? AND active=1 ORDER BY title`,uuid(url.searchParams.get('season'))));
   if(p==='/api/public/presentations' && method==='GET') return json(await rows(env,'SELECT id,season_id,title,presentation_date,starts_at,call_at,venue,city,notes FROM presentations WHERE season_id=? ORDER BY presentation_date,starts_at',uuid(url.searchParams.get('season'))));
   const user=await requireUser(request,env,p.startsWith('/api/admin/'));
   if(p==='/api/my-progress' && method==='GET'){
@@ -189,19 +190,25 @@ async function api(request,env) {
     const offset=Math.max(0,Math.min(100000,Number(url.searchParams.get('offset'))||0)),season=uuid(url.searchParams.get('season'));
     const owner=user.role==='admin'?(url.searchParams.get('user')||null):user.id;
     const songFilter=url.searchParams.has('song')?uuid(url.searchParams.get('song')):null;
-    const result=await rows(env,'SELECT r.id,r.user_id,r.song_id,r.season_id,r.recorded_at,r.uploaded_at,r.duration_seconds,r.file_size,r.mime_type,r.codec,s.title,u.display_name FROM recordings r JOIN songs s ON s.id=r.song_id JOIN users u ON u.id=r.user_id WHERE r.season_id=? AND r.status=\'ready\' AND (? IS NULL OR r.user_id=?) AND (? IS NULL OR r.song_id=?) ORDER BY s.title,r.uploaded_at DESC,r.id LIMIT 30 OFFSET ?',season,owner,owner,songFilter,songFilter,offset);
+    const result=await rows(env,'SELECT r.id,r.user_id,r.song_id,r.season_id,r.recorded_at,r.uploaded_at,r.duration_seconds,r.file_size,r.mime_type,r.codec,r.score,r.analysis IS NOT NULL AS has_analysis,s.title,u.display_name FROM recordings r JOIN songs s ON s.id=r.song_id JOIN users u ON u.id=r.user_id WHERE r.season_id=? AND r.status=\'ready\' AND (? IS NULL OR r.user_id=?) AND (? IS NULL OR r.song_id=?) ORDER BY s.title,r.uploaded_at DESC,r.id LIMIT 30 OFFSET ?',season,owner,owner,songFilter,songFilter,offset);
     return json({items:result,next_offset:result.length===30?offset+30:null});
   }
   if(p==='/api/recordings/reserve' && method==='POST'){
     ensure(env.RECORDINGS,'Almacenamiento privado pendiente de configurar.',503);
-    const l=await limits(env), b=recordingMetadata(await body(request),{bytes:l.audio_bytes,seconds:l.audio_seconds});
+    const l=await limits(env), b=recordingMetadata(await body(request,300000),{bytes:l.audio_bytes,seconds:l.audio_seconds}), a=practiceAnalysis(b.analysis,b.song_id);
     await checkMember(env,user,b.season_id);
     const old=await one(env,'SELECT * FROM recordings WHERE id=?',b.id);
-    if(old){ensure(old.user_id===user.id && old.song_id===b.song_id && old.file_size===b.file_size && old.mime_type===b.mime_type && old.duration_seconds===b.duration_seconds,'Identificador de grabación en uso.',409);ensure(old.status!=='deleted','La grabación fue eliminada.',410);return json({id:old.id,status:old.status});}
-    await run(env,'INSERT INTO recordings(id,user_id,song_id,season_id,r2_object_key,duration_seconds,file_size,mime_type,codec,recorded_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)',b.id,user.id,b.song_id,b.season_id,`${b.season_id}/${user.id}/${b.id}`,b.duration_seconds,b.file_size,b.mime_type,b.codec,now(),now());
+    if(old){ensure(old.user_id===user.id && old.song_id===b.song_id && old.file_size===b.file_size && old.mime_type===b.mime_type && old.duration_seconds===b.duration_seconds && old.score===a.score,'Identificador de grabación en uso.',409);ensure(old.status!=='deleted','La grabación fue eliminada.',410);return json({id:old.id,status:old.status});}
+    await run(env,'INSERT INTO recordings(id,user_id,song_id,season_id,r2_object_key,duration_seconds,file_size,mime_type,codec,analysis,score,recorded_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',b.id,user.id,b.song_id,b.season_id,`${b.season_id}/${user.id}/${b.id}`,b.duration_seconds,b.file_size,b.mime_type,b.codec,a.json,a.score,now(),now());
     return json({id:b.id,status:'pending'},201);
   }
-  const recordingMatch=/^\/api\/recordings\/([a-f0-9-]{36})(\/audio)?$/.exec(p);
+  const songReference=/^\/api\/songs\/([a-f0-9-]{36})\/reference$/.exec(p);
+  if(songReference && method==='GET'){
+    const s=await one(env,'SELECT * FROM songs WHERE id=?',songReference[1]);ensure(s,'Canción no encontrada.',404);await checkMember(env,user,s.season_id);
+    const r=await one(env,'SELECT reference FROM song_references WHERE song_id=? AND source=?',s.id,s.reference_audio_key);ensure(r,'Esta canción aún no tiene curva de referencia.',404);
+    return json({...JSON.parse(r.reference),songId:s.id});
+  }
+  const recordingMatch=/^\/api\/recordings\/([a-f0-9-]{36})(\/audio|\/analysis)?$/.exec(p);
   if(recordingMatch){
     const r=await one(env,'SELECT * FROM recordings WHERE id=?',recordingMatch[1]);ensure(r && canReadRecording(user,r),'Grabación no encontrada.',404);
     ensure(r.status!=='deleted','Grabación eliminada.',410);ensure(env.RECORDINGS,'Almacenamiento no configurado.',503);
@@ -231,7 +238,11 @@ async function api(request,env) {
       }
       await event(env,user,'recording_sent',r.song_id);return json({id:r.id,status:'ready'});
     }
-    if(method==='GET' && recordingMatch[2]){
+    if(method==='GET' && recordingMatch[2]==='/analysis'){
+      ensure(r.status==='ready','La grabación aún no está disponible.',409);ensure(r.analysis,'Esta práctica no tiene análisis.',404);
+      return json(JSON.parse(r.analysis));
+    }
+    if(method==='GET' && recordingMatch[2]==='/audio'){
       ensure(r.status==='ready','La grabación aún no está disponible.',409);
       const range=request.headers.get('Range');
       if(range){const match=/^bytes=(\d*)-(\d*)$/.exec(range);ensure(match&&(match[1]||match[2]),'Rango inválido.',416);if(match[1])ensure(Number(match[1])<r.file_size&&(!match[2]||Number(match[2])>=Number(match[1])),'Rango fuera del audio.',416);else ensure(Number(match[2])>0,'Rango inválido.',416);}
@@ -279,13 +290,24 @@ async function api(request,env) {
     const r=await one(env,'SELECT * FROM rehearsals WHERE id=?',rehearsalMatch[1]);ensure(r,'Ensayo no encontrado.',404);
     return json({...r,attendance:await rows(env,'SELECT a.*,u.display_name FROM rehearsal_attendance a JOIN users u ON u.id=a.user_id WHERE a.rehearsal_id=? ORDER BY u.display_name',r.id),audit:await rows(env,'SELECT a.action,a.changed_at,u.display_name FROM admin_audit a JOIN users u ON u.id=a.changed_by WHERE a.entity_id=? ORDER BY a.changed_at DESC LIMIT 20',r.id)});
   }
-  if(p==='/api/admin/songs' && method==='GET') return json(await rows(env,'SELECT * FROM songs WHERE season_id=? ORDER BY title',uuid(url.searchParams.get('season'))));
+  if(p==='/api/admin/songs' && method==='GET') return json(await rows(env,`SELECT *,${HAS_REFERENCE} FROM songs WHERE season_id=? ORDER BY title`,uuid(url.searchParams.get('season'))));
   if(p==='/api/admin/songs' && method==='POST'){
     const b=await body(request),songId=b.id?uuid(b.id):id();await checkSeason(env,b.season_id);
     const ref=text(b.reference_audio_key,1000);ensure(/^https:\/\//.test(ref),'La referencia debe ser una URL HTTPS.');
     const before=await one(env,'SELECT * FROM songs WHERE id=?',songId);ensure(!before || before.season_id===b.season_id,'No se puede mover una canción.');
     ensure(typeof b.lyrics==='string'&&b.lyrics.length<=16000,'Letra inválida.');
     await env.DB.batch([stmt(env,'INSERT INTO songs(id,season_id,title,reference_audio_key,lyrics,active) VALUES(?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,reference_audio_key=excluded.reference_audio_key,lyrics=excluded.lyrics,active=excluded.active',songId,b.season_id,text(b.title,150),ref,b.lyrics,b.active?1:0),audit(env,user,'song_updated',songId,before,b)]);return json({id:songId});
+  }
+  const referenceMatch=/^\/api\/admin\/songs\/([a-f0-9-]{36})\/reference$/.exec(p);
+  if(referenceMatch && method==='POST'){
+    const b=await body(request,170000),s=await one(env,'SELECT * FROM songs WHERE id=?',referenceMatch[1]);ensure(s,'Canción no encontrada.',404);
+    const reference=referencePayload(b.reference,s),before=await one(env,'SELECT source,created_at FROM song_references WHERE song_id=?',s.id);
+    await env.DB.batch([stmt(env,"INSERT INTO song_references(song_id,source,reference,created_by,created_at) VALUES(?,?,?,?,datetime('now')) ON CONFLICT(song_id) DO UPDATE SET source=excluded.source,reference=excluded.reference,created_by=excluded.created_by,created_at=excluded.created_at",s.id,s.reference_audio_key,reference,user.id),audit(env,user,'reference_generated',s.id,before,{source:s.reference_audio_key})]);
+    return json({ok:true});
+  }
+  if(p==='/api/admin/practice-scores' && method==='GET'){
+    const season=await checkSeason(env,url.searchParams.get('season'));
+    return json(await rows(env,"SELECT user_id,ROUND(AVG(score)) AS average,COUNT(*) AS count FROM recordings WHERE season_id=? AND status='ready' AND score IS NOT NULL GROUP BY user_id ORDER BY user_id",season.id));
   }
   if(p==='/api/admin/activity' && method==='GET'){
     const since=new Date(Date.now()-90*86400000).toISOString().slice(0,10);

@@ -1,6 +1,6 @@
 body:has(dialog[open]){overflow:hidden}
 .platform-dialog{color:var(--fg);background:#0d1010;border:1px solid #303a34;border-radius:20px;padding:28px;width:min(940px,calc(100% - 24px));max-height:calc(100dvh - 24px);font-family:var(--font-ui);box-shadow:0 20px 90px #000b}
-.platform-dialog::backdrop{background:#000e}.access-dialog{max-width:400px;text-align:left}.access-brand{text-align:center;margin-bottom:24px}.access-brand img{display:block;margin:auto}.access-brand h2{font-size:38px;margin:6px}.platform-kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:10px 0}.platform-form{display:grid;gap:16px}.platform-form label,.platform-field{display:grid;gap:6px;font-size:14px}.platform-dialog input,.platform-dialog select,.platform-dialog textarea,.audio-card input{font:inherit;background:#171c19;color:var(--fg);padding:12px;border:1px solid #48534b;border-radius:8px;width:100%;min-height:44px}.platform-dialog textarea{min-height:110px;resize:vertical}.platform-dialog input[type=checkbox],.platform-dialog input[type=radio]{width:20px;min-height:20px;accent-color:var(--accent)}.platform-dialog input:focus-visible,.platform-dialog select:focus-visible,.platform-dialog textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.platform-dialog button,.audio-card button{min-height:44px}.access-dialog>#guestEntry{width:100%;margin-top:12px}.platform-status{font-size:14px;min-height:22px;color:#d7e4dd}.platform-status.is-error{color:#ffb6b6}.platform-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.platform-heading h2{font-size:28px;margin:0}.platform-season{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:20px 0}.platform-season select{width:auto;min-width:100px}.platform-nav{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid #303a34}.platform-nav .is-active{color:var(--accent);border-color:var(--accent)}.platform-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0}.platform-card{padding:18px;background:#161b18;border:1px solid #303a34;border-radius:12px}.platform-card strong{display:block;font-size:26px;margin:4px 0}.platform-card small,.platform-note{color:#bac9c0;font-size:13px}.platform-columns{display:grid;grid-template-columns:1fr 1fr;gap:24px}.platform-row{border-top:1px solid #303a34;padding:16px 0;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.platform-row p{margin:4px 0;color:#bac9c0}.platform-actions{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.platform-check{display:flex!important;gap:8px;align-items:center}.platform-heading-small{font-size:18px;margin-top:24px}.attendance-list{display:grid;gap:12px;margin-top:18px}.attendance-item{background:#161b18;border:1px solid #303a34;padding:16px;border-radius:12px}.attendance-item fieldset{padding:0;border:0;margin:10px 0;display:flex;gap:12px;flex-wrap:wrap}.attendance-item label{display:flex;gap:6px;align-items:center;min-height:44px;font-size:14px}.attendance-late{padding:12px;border-left:2px solid var(--accent)}.attendance-late .platform-field{display:grid;max-width:220px}.attendance-late h4{font-size:15px;margin:0}.rehearsal-summary{background:#17251c;border:1px solid #355f44;padding:18px;border-radius:12px;margin-top:24px}.rehearsal-summary ul{padding-left:20px}.platform-table-wrap{overflow-x:auto}.platform-table{width:100%;border-collapse:collapse;font-size:13px}.platform-table th,.platform-table td{text-align:left;padding:12px;border-bottom:1px solid #303a34}.platform-dialog audio,.audio-card audio[data-private]{width:100%;height:44px}.record-clock{font-size:32px;font-variant-numeric:tabular-nums;margin:10px 0}.record-state{display:block;color:var(--accent);font-size:13px}.record-controls{display:flex;flex-wrap:wrap;gap:8px}.platform-dialog button:disabled,.audio-card button:disabled{opacity:.45;cursor:wait}.recording-group h3{margin-top:28px}.audio-history{margin-top:20px}.access-dialog summary{cursor:pointer;font-size:13px}.danger-text{color:#ffb6b6}.platform-dialog .btn-ghost{border-color:#64766a}.platform-dialog a{text-decoration:underline;text-underline-offset:3px}.platform-feedback{color:#d3ded6;font-size:14px}.platform-warning{border-left:3px solid #edc36c;padding:12px;background:#261f13}.platform-panel form:has(#rehearsalDate){margin-top:22px}
+.platform-dialog::backdrop{background:#000e}.access-dialog{max-width:400px;text-align:left}.access-brand{text-align:center;margin-bottom:24px}.access-brand img{display:block;margin:auto}.access-brand h2{font-size:38px;margin:6px}.platform-kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:10px 0}.platform-form{display:grid;gap:16px}.platform-form label,.platform-field{display:grid;gap:6px;font-size:14px}.platform-dialog input,.platform-dialog select,.platform-dialog textarea,.audio-card input{font:inherit;background:#171c19;color:var(--fg);padding:12px;border:1px solid #48534b;border-radius:8px;width:100%;min-height:44px}.platform-dialog textarea{min-height:110px;resize:vertical}.platform-dialog input[type=checkbox],.platform-dialog input[type=radio]{width:20px;min-height:20px;accent-color:var(--accent)}.platform-dialog input:focus-visible,.platform-dialog select:focus-visible,.platform-dialog textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.platform-dialog button,.audio-card button{min-height:44px}.access-dialog>#guestEntry{width:100%;margin-top:12px}.platform-status{font-size:14px;min-height:22px;color:#d7e4dd}.platform-status.is-error{color:#ffb6b6}.platform-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.platform-heading h2{font-size:28px;margin:0}.platform-season{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:20px 0}.platform-season select{width:auto;min-width:100px}.platform-nav{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid #303a34}.platform-nav .is-active{color:var(--accent);border-color:var(--accent)}.platform-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0}.platform-card{padding:18px;background:#161b18;border:1px solid #303a34;border-radius:12px}.platform-card strong{display:block;font-size:26px;margin:4px 0}.platform-card small,.platform-note{color:#bac9c0;font-size:13px}.platform-columns{display:grid;grid-template-columns:1fr 1fr;gap:24px}.platform-row{border-top:1px solid #303a34;padding:16px 0;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.platform-row p{margin:4px 0;color:#bac9c0}.platform-actions{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.platform-check{display:flex!important;gap:8px;align-items:center}.platform-heading-small{font-size:18px;margin-top:24px}.attendance-list{display:grid;gap:12px;margin-top:18px}.attendance-item{background:#161b18;border:1px solid #303a34;padding:16px;border-radius:12px}.attendance-item fieldset{padding:0;border:0;margin:10px 0;display:flex;gap:12px;flex-wrap:wrap}.attendance-item label{display:flex;gap:6px;align-items:center;min-height:44px;font-size:14px}.attendance-late{padding:12px;border-left:2px solid var(--accent)}.attendance-late .platform-field{display:grid;max-width:220px}.attendance-late h4{font-size:15px;margin:0}.rehearsal-summary{background:#17251c;border:1px solid #355f44;padding:18px;border-radius:12px;margin-top:24px}.rehearsal-summary ul{padding-left:20px}.platform-table-wrap{overflow-x:auto}.platform-table{width:100%;border-collapse:collapse;font-size:13px}.platform-table th,.platform-table td{text-align:left;padding:12px;border-bottom:1px solid #303a34}.platform-dialog audio,.audio-card audio[data-private]{width:100%;height:44px}.platform-dialog button:disabled,.audio-card button:disabled{opacity:.45;cursor:wait}.recording-group h3{margin-top:28px}.audio-history{margin-top:20px}.access-dialog summary{cursor:pointer;font-size:13px}.danger-text{color:#ffb6b6}.platform-dialog .btn-ghost{border-color:#64766a}.platform-dialog a{text-decoration:underline;text-underline-offset:3px}.platform-feedback{color:#d3ded6;font-size:14px}.platform-warning{border-left:3px solid #edc36c;padding:12px;background:#261f13}.platform-panel form:has(#rehearsalDate){margin-top:22px}
 @media(max-width:640px){.platform-dialog{padding:20px 16px}.platform-columns{grid-template-columns:1fr}.platform-heading{align-items:flex-start}.platform-nav .chip{font-size:12px}.platform-actions .btn{flex:1}.attendance-item fieldset{gap:6px 12px}.platform-panel{max-height:calc(100dvh - 12px);width:calc(100% - 12px);border-radius:14px}.platform-table td,.platform-table th{padding:8px}}
 
 /* Acceso: marca contenida y una acción principal clara. */
@@ -36,20 +36,6 @@ body:has(dialog[open]){overflow:hidden}
 .song-recordings-link svg{width:22px;height:22px;flex-shrink:0}
 .song-recordings-link:focus-visible{outline:2px solid var(--accent);outline-offset:5px;border-radius:4px}
 .practice-recorder{margin-top:24px}
-.custum-file-upload{height:200px;width:min(300px,100%);margin:0 auto;display:flex;flex-direction:column;gap:20px;cursor:pointer;align-items:center;justify-content:center;border:2px dashed #e8e8e8;background-color:#212121;padding:1.5rem;border-radius:10px;box-shadow:0 48px 35px -48px var(--accent);font:inherit}
-.custum-file-upload .icon,.custum-file-upload .text{display:flex;align-items:center;justify-content:center}
-.custum-file-upload .icon svg{height:80px;width:80px;fill:#e8e8e8}
-.custum-file-upload .text span{font-weight:400;color:#e8e8e8}
-.custum-file-upload:hover{background-color:#272727}
-.custum-file-upload:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
-.custum-file-upload:disabled{opacity:.55;cursor:wait}
-.record-live,.record-confirm{max-width:540px;margin:0 auto;padding:24px;border:1px solid rgba(15,252,126,.22);border-radius:20px;background:linear-gradient(160deg,#141516,#0f1011);text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-.record-confirm h3{font-size:18px;font-weight:600;margin:0 0 8px;line-height:1.4}
-.record-confirm p{font-size:14px;color:var(--fg-muted);margin:0 0 22px;line-height:1.6}
-.record-confirm .record-controls{justify-content:center;gap:12px;margin-top:22px}
-.record-confirm .record-send{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);min-width:120px;cursor:pointer}
-.record-confirm .record-again{border-color:#343638;background:#111213;cursor:pointer}
-.record-confirm .record-send:focus-visible,.record-confirm .record-again:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .record-preview-player{flex-direction:row;align-items:center;text-align:left;gap:16px}
 .record-preview-player .audio-toggle{flex-shrink:0;cursor:pointer}
 .record-preview-player .audio-progress-group{width:auto;flex:1}
@@ -61,12 +47,11 @@ body:has(dialog[open]){overflow:hidden}
 .preview-seek::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:14px;height:14px;margin-top:-3px;border:0;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(15,252,126,.2)}
 .preview-seek::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--accent)}
 .preview-seek:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
-.record-live .record-stop{min-width:140px}
 .practice-recorder .platform-feedback{text-align:center;margin:12px 0 0}
 .practice-recorder .platform-feedback:empty{display:none}
 .audio-card audio[data-private]{display:block}
 @media(max-width:720px){.reference-card .audio-progress-group{width:100%;flex:none}}
-@media(max-width:720px){.record-confirm{padding:20px 16px}.record-preview-player .audio-progress-group{width:auto;flex:1}.record-preview-player{padding:12px;gap:12px}}
+@media(max-width:720px){.record-preview-player .audio-progress-group{width:auto;flex:1}.record-preview-player{padding:12px;gap:12px}}
 
 /* Biblioteca de prácticas: una canción, fechas claras y el mismo reproductor propio. */
 .recordings-dialog{max-width:760px;background:#0e0f10;border-color:#292c2e;padding:30px;color-scheme:dark}
@@ -273,7 +258,7 @@ body:has(dialog[open]){overflow:hidden}
 .recording-tenor:hover .recording-tenor-action{color:var(--accent)}
 @media(max-width:480px){.recording-tenor{gap:12px}.recording-tenor-action{font-size:12px}.recording-tenor>span:first-child{font-size:19px}}
 .tenor-name{padding:0;border:0;background:none;color:var(--fg);font:inherit;cursor:pointer;text-align:left;min-height:34px}
-.tenor-name:hover,.tenor-name span,.similarity-value{color:var(--accent)}
+.tenor-name:hover,.tenor-name span,.practice-score-value{color:var(--accent)}
 .dashboard-team-table tr[data-tenor]{cursor:pointer}
 .dashboard-team-table tr[data-tenor]:hover td{background:rgba(15,252,126,.055)}
 .dashboard-team-table tr[data-tenor]:hover .tenor-name{color:var(--accent)}
@@ -293,7 +278,6 @@ body:has(dialog[open]){overflow:hidden}
 .dashboard-chart-tenor .stats-chart__track{display:flex;min-height:0}
 .dashboard-chart-tenor:hover .stats-chart__name{color:var(--accent)}
 .dashboard-chart-tenor:focus-visible{outline:1px solid var(--accent);outline-offset:5px}
-.similarity-chart .stats-card__range strong{color:var(--accent)}
 .dashboard-insight-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:40px;margin-bottom:44px}
 .dashboard-insight-section{border-top:1px solid #27342c;padding-top:22px}
 .dashboard-insight-section h3{font-size:20px;font-weight:550;margin:0 0 18px;letter-spacing:-.025em}
@@ -361,12 +345,18 @@ body:has(dialog[open]){overflow:hidden}
 .brand-calendar{padding:20px;border:1px solid #23372b;border-radius:18px;align-self:start;background:#0a100c}
 .presentation-times{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 #presentationEditor{max-width:650px;margin:40px auto 0;scroll-margin-top:30px;border-top:1px solid #273e2e;padding-top:25px}
-.similarity-preview{margin:24px 0 0;text-align:left;border-top:1px solid #2b3a30;padding-top:20px}
-.similarity-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:12px;color:#abc0b3}
-.similarity-heading strong{font-size:30px;letter-spacing:-.04em;color:var(--accent)}
-.similarity-timeline{display:flex;height:10px;overflow:hidden;border-radius:99px;margin:14px 0 12px}
-.similarity-high{background:var(--accent)}.similarity-low{background:#ef6674}
-.similarity-legend{display:flex;gap:18px;font-size:10px;color:#819689}
-.similarity-duration{display:flex;justify-content:space-between;margin:-4px 0 12px;font-size:10px;color:#819689;font-variant-numeric:tabular-nums}
-.similarity-legend span{display:flex;align-items:center;gap:6px}.similarity-legend i{width:5px;height:5px;border-radius:50%}.high-dot{background:var(--accent)}.low-dot{background:#ef6674}
 @media(max-width:640px){.wizard-footer{flex-wrap:wrap;gap:14px}.wizard-live{flex-basis:100%;order:3}.presentations-heading{align-items:flex-start;flex-direction:column}.presentations-workspace{grid-template-columns:1fr;gap:24px}.presentation-times{grid-template-columns:1fr}.branded-picker{left:auto;right:0}.wizard-times .branded-picker{right:auto;left:0}.wizard-times label:last-child .branded-picker{left:auto;right:0}.dashboard-team-table{min-width:620px}}
+/* Práctica con guía: lanzador en la tarjeta, nota y detalle en las grabaciones, curvas en Repertorio. */
+.practice-launcher{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.practice-launch{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-width:220px;min-height:52px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600;cursor:pointer}
+.practice-launch svg{width:20px;height:20px;flex-shrink:0}
+.practice-launch:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.practice-launcher-note{max-width:420px;margin:0;color:var(--fg-muted);font-size:14px;line-height:1.6}
+.recording-score{margin-left:auto;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.recording-score.is-empty{font-weight:400;color:#828b93}
+.recording-detail-toggle{margin-top:10px;cursor:pointer}
+.recording-detail{margin-top:14px;padding-top:14px;border-top:1px solid #282b2d}
+.recording-detail[hidden],.song-reference[hidden]{display:none}
+.song-curve{color:#9ea9a2}.song-curve.has-curve{color:var(--accent)}
+.song-reference{flex-basis:100%;width:100%}
+@media(max-width:480px){.practice-launch{width:100%;min-width:0}}
